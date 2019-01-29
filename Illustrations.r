@@ -64,10 +64,10 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 	# say('This experiment tunes the settings to be used for BRTs using the simplest landscape.')
 
 	# thisOutDir <- 'tune brt for logistic responses'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -90,7 +90,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 		# response=response,
 		# species=species,
 		# geography=geography,
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# numTrainPres=200,
 		# numTestPres=200,
 		# numBg=10000,
@@ -104,7 +104,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 	
 	# # train full models
 	# mainTrainModels(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# vars=c('T1', 'F1'),
 		# algos='brt',
 		# type=c('multivariate'),
@@ -118,7 +118,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 
 	# # evaluate: MULTIVARIATE
 	# mainEval(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# algos='brt',
 		# type=c('multivariate'),
 		# iters=iters,
@@ -134,10 +134,10 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 # say('################')
 
 	# thisOutDir <- 'simple'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -160,7 +160,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 		# # response=response,
 		# # species=species,
 		# # geography=geography,
-		# # outDir=outDir,
+		# # scenarioDir=scenarioDir,
 		# # numTrainPres=200,
 		# # numTestPres=200,
 		# # numBg=10000,
@@ -174,7 +174,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 
 	# # train full models
 	# mainTrainModels(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# vars=c('T1', 'F1'),
 		# algos=algos,
 		# type=c('multivariate', 'univariate'),
@@ -188,7 +188,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 
 	# # evaluate: MULTIVARIATE
 	# mainEval(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# algos=algos,
 		# type=c('multivariate', 'univariate'),
 		# iters=iters,
@@ -204,10 +204,10 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 # say('#####################')
 
 	# thisOutDir <- 'sample size'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# ### define species
 	# ##################
@@ -237,7 +237,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=n,
 			# numTestPres=200,
 			# numBg=10000,
@@ -251,7 +251,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -265,7 +265,7 @@ debug <- FALSE; modelType <- 'does not matter' # for running code
 
 		# # evaluate
 		# mainEval(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -283,10 +283,10 @@ say('### [prevalence] ###')
 say('####################')
 
 	thisOutDir <- 'prevalence'
-	outDir <- paste0('./Results/', thisOutDir)
-	dirCreate(outDir)
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
 	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# define landscape
 	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
@@ -319,7 +319,7 @@ say('####################')
 			response=response,
 			species=species,
 			geography=geography,
-			outDir=outDir,
+			scenarioDir=scenarioDir,
 			numTrainPres=200,
 			numTestPres=200,
 			numBg=10000,
@@ -333,7 +333,7 @@ say('####################')
 		
 		# train full models
 		mainTrainModels(
-			outDir=outDir,
+			scenarioDir=scenarioDir,
 			vars=c('T1', 'F1'),
 			algos=algos,
 			type=c('multivariate', 'univariate'),
@@ -349,7 +349,7 @@ say('####################')
 		
 		# evaluate: MULTIVARIATE
 		mainEval(
-			outDir=outDir,
+			scenarioDir=scenarioDir,
 			algos=algos,
 			type=c('multivariate', 'univariate'),
 			iters=iters,
@@ -367,10 +367,10 @@ say('####################')
 # say('################')
 
 	# thisOutDir <- 'extent'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -400,7 +400,7 @@ say('####################')
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
 			# numTestPres=200,
 			# numBg=10000,
@@ -415,7 +415,7 @@ say('####################')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -429,7 +429,7 @@ say('####################')
 
 		# # evaluate
 		# mainEval(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -447,10 +447,10 @@ say('####################')
 # say('####################')
 
 	# thisOutDir <- 'resolution'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -480,7 +480,7 @@ say('####################')
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
 			# numTestPres=200,
 			# numBg=10000,
@@ -495,7 +495,7 @@ say('####################')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -509,7 +509,7 @@ say('####################')
 
 		# # evaluate
 		# mainEval(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -530,10 +530,10 @@ say('####################')
 	# say('Covariates include landscape rotation and rho')
 
 	# thisOutDir <- 'tune brt for bivariate responses'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# ### define species
 	# ##################
@@ -580,11 +580,11 @@ say('####################')
 			# }
 		# }
 
-		# dirCreate(outDir, '/!starts - ', algo)
-		# dirCreate(outDir, '/!stops - ', algo)
+		# dirCreate(scenarioDir, '/!starts - ', algo)
+		# dirCreate(scenarioDir, '/!stops - ', algo)
 
 		# # sets in progress or completed
-		# started <- list.files(paste0(outDir, '/!starts - ', algo))
+		# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# # for each SCENARIO
 		# while (length(started) < nrow(progress)) {
@@ -596,7 +596,7 @@ say('####################')
 				# doing <- progress$string[-match(started, progress$string)][1]
 				# doing <- which(progress$string==doing)
 			# }
-			# write.csv(progress$string[doing], paste0(outDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
 			# rot <- progress$rot[doing]
 			# thisRho <- progress$rho[doing]
@@ -621,7 +621,7 @@ say('####################')
 				# response=response,
 				# species=species,
 				# geography=geography,
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# numTrainPres=200,
 				# numTestPres=200,
 				# numBg=10000,
@@ -635,7 +635,7 @@ say('####################')
 			
 			# # train full models
 			# mainTrainModels(
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# vars=c('T1', 'T2'),
 				# algos='brt',
 				# type='multivariate',
@@ -648,7 +648,7 @@ say('####################')
 
 			# # evaluate
 			# mainEval(
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# algos='brt',
 				# type='multivariate',
 				# iters=iters,
@@ -660,8 +660,8 @@ say('####################')
 			# )
 				
 			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(outDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(outDir, '/!starts - ', algo))
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# } # next scenario
 		
@@ -675,10 +675,10 @@ say('####################')
 	# say('Covariates include landscape rotation and rho')
 
 	# thisOutDir <- 'bivariate'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# ### define species
 	# ##################
@@ -725,11 +725,11 @@ say('####################')
 			# }
 		# }
 
-		# dirCreate(outDir, '/!starts - ', algo)
-		# dirCreate(outDir, '/!stops - ', algo)
+		# dirCreate(scenarioDir, '/!starts - ', algo)
+		# dirCreate(scenarioDir, '/!stops - ', algo)
 
 		# # sets in progress or completed
-		# started <- list.files(paste0(outDir, '/!starts - ', algo))
+		# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# # for each SCENARIO
 		# while (length(started) < nrow(progress)) {
@@ -741,7 +741,7 @@ say('####################')
 				# doing <- progress$string[-match(started, progress$string)][1]
 				# doing <- which(progress$string==doing)
 			# }
-			# write.csv(progress$string[doing], paste0(outDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
 			# rot <- progress$rot[doing]
 			# thisRho <- progress$rho[doing]
@@ -766,7 +766,7 @@ say('####################')
 				# # response=response,
 				# # species=species,
 				# # geography=geography,
-				# # outDir=outDir,
+				# # scenarioDir=scenarioDir,
 				# # numTrainPres=200,
 				# # numTestPres=200,
 				# # numBg=10000,
@@ -780,7 +780,7 @@ say('####################')
 			
 			# # train full models
 			# mainTrainModels(
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# vars=c('T1', 'T2'),
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
@@ -794,7 +794,7 @@ say('####################')
 
 			# # evaluate
 			# mainEval(
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
 				# iters=iters,
@@ -806,8 +806,8 @@ say('####################')
 			# )
 				
 			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(outDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(outDir, '/!starts - ', algo))
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# } # next scenario
 		

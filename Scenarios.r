@@ -1,29 +1,41 @@
 ## SDM PREDICTOR INFERENCE - SCENARIOS
 ## Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 
-memory.limit(memory.limit() * 2^30)
-rm(list=ls())
-options(keep.source=FALSE) # manage memory
-gc()
+	memory.limit(memory.limit() * 2^30)
+	rm(list=ls())
+	options(keep.source=FALSE) # manage memory
+	gc()
+	print('')
+	print(date())
 
-# # source('C:/ecology/Drive/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
-# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-# tempDrive <- 'C:'
+# source('C:/ecology/Drive/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
+setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
+tempDrive <- 'C:'
 
 # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
-setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
-tempDrive <- 'C:'
+# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
 # tempDrive <- 'D:'
 # tempDrive <- 'E:'
 
-library(compiler); library(sp); library(rgdal); library(raster); library(rJava); options(java.parameters='-Xmx1g' ); library(dismo); library(gbm); library(mgcv); library(MuMIn); library(scales); library(beanplot); library(hier.part); library(omnibus); library(enmSdm)
+	library(compiler)
+	library(sp);
+	library(rgdal);
+	library(raster);
+	library(rJava);
+	options(java.parameters='-Xmx1g' );
+	library(dismo)
+	library(scales)
+	library(beanplot)
+	library(omnibus)
+	library(enmSdm)
+	# library(enmSdmPredImport)
+	library(legendary)
 
-files <- listFiles('./Scripts NEW/Functions')
-for (thisFile in files) source(thisFile)
+	files <- listFiles('C:/ecology/Drive/R/enmSdmPredImport/R')
+	for (thisFile in files) source(thisFile)
 
-print('')
-print(date())
-
+	tempDir <- paste0(tempDrive, '/ecology/!Scratch/_TEMP\\') # maxent temp directory
+	
 #######################
 ### master settings ###
 #######################
@@ -81,10 +93,10 @@ algos <- c('maxent')
 	# say('This experiment tunes the settings to be used for BRTs using the simplest landscape.')
 
 	# thisOutDir <- 'tune brt for logistic responses'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -107,7 +119,7 @@ algos <- c('maxent')
 		# response=response,
 		# species=species,
 		# geography=geography,
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# numTrainPres=200,
 		# numTestPres=200,
 		# numBg=10000,
@@ -121,7 +133,7 @@ algos <- c('maxent')
 	
 	# # train full models
 	# mainTrainModels(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# vars=c('T1', 'F1'),
 		# algos='brt',
 		# type=c('multivariate'),
@@ -134,8 +146,8 @@ algos <- c('maxent')
 	# )
 
 	# # evaluate: MULTIVARIATE
-	# mainEval(
-		# outDir=outDir,
+	# mainEvalModels(
+		# scenarioDir=scenarioDir,
 		# algos='brt',
 		# type=c('multivariate'),
 		# iters=iters,
@@ -146,85 +158,85 @@ algos <- c('maxent')
 		# verbose=verbose
 	# )
 
-# say('################')
-# say('### [simple] ###')
-# say('################')
+say('################')
+say('### [simple] ###')
+say('################')
 
-	# thisOutDir <- 'simple'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
-	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	thisOutDir <- 'simple'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
 	
-	# # define landscape
-	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# define landscape
+	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	# ### define species
-	# ##################
-	# response <- logistic
-	# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
-
-	# # # create data
-	# # mainMakeData(
-		# # response=response,
-		# # species=species,
-		# # geography=geography,
-		# # outDir=outDir,
-		# # numTrainPres=200,
-		# # numTestPres=200,
-		# # numBg=10000,
-		# # iters=iters,
-		# # overwrite=FALSE,
-		# # fileAppend=NULL,
-		# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-		# # verbose=verbose,
-		# # circle=FALSE
-	# # )
-
-	# # train full models
-	# mainTrainModels(
-		# outDir=outDir,
-		# vars=c('T1', 'F1'),
-		# algos=algos,
-		# type=c('multivariate', 'univariate'),
+	### define species
+	##################
+	response <- logistic
+	species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
+print(ABC)
+	# # create data
+	# mainMakeData(
+		# response=response,
+		# species=species,
+		# geography=geography,
+		# scenarioDir=scenarioDir,
+		# numTrainPres=200,
+		# numTestPres=200,
+		# numBg=10000,
 		# iters=iters,
-		# fileAppend=NULL,
 		# overwrite=FALSE,
+		# fileAppend=NULL,
+		# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
 		# verbose=verbose,
-		# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-		# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+		# circle=FALSE
 	# )
 
-	# # evaluate: MULTIVARIATE
-	# mainEval(
-		# outDir=outDir,
-		# algos=algos,
-		# type=c('multivariate', 'univariate'),
-		# iters=iters,
-		# perms=30,
-		# ia=TRUE,
-		# overwrite=FALSE,
-		# fileAppend=NULL,
-		# verbose=verbose
-	# )
+	# train full models
+	mainTrainModels(
+		scenarioDir=scenarioDir,
+		vars=c('T1', 'F1'),
+		algos=algos,
+		type=c('multivariate', 'univariate'),
+		iters=iters,
+		fileAppend=NULL,
+		overwrite=FALSE,
+		verbose=verbose,
+		maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
+		regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+	)
+
+	# evaluate: MULTIVARIATE
+	mainEvalModels(
+		scenarioDir=scenarioDir,
+		algos=algos,
+		type=c('multivariate', 'univariate'),
+		iters=iters,
+		perms=30,
+		ia=TRUE,
+		overwrite=FALSE,
+		fileAppend=NULL,
+		verbose=verbose
+	)
 
 # say('#####################')
 # say('### [sample size] ###')
 # say('#####################')
 
 	# thisOutDir <- 'sample size'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# ### define species
 	# ##################
@@ -255,7 +267,7 @@ algos <- c('maxent')
 			# # response=response,
 			# # species=species,
 			# # geography=geography,
-			# # outDir=outDir,
+			# # scenarioDir=scenarioDir,
 			# # numTrainPres=n,
 			# # numTestPres=200,
 			# # numBg=10000,
@@ -269,7 +281,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -282,8 +294,8 @@ algos <- c('maxent')
 		# )
 
 		# # evaluate
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -301,10 +313,10 @@ algos <- c('maxent')
 # say('####################')
 
 	# thisOutDir <- 'prevalence'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# # define landscape
 	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
@@ -335,7 +347,7 @@ algos <- c('maxent')
 			# # response=response,
 			# # species=species,
 			# # geography=geography,
-			# # outDir=outDir,
+			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
 			# # numTestPres=200,
 			# # numBg=10000,
@@ -349,7 +361,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -361,11 +373,11 @@ algos <- c('maxent')
 			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
 		# )
 
-		# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Functions/mainEval.r')
+		# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Functions/mainEvalModels.r')
 		
 		# # evaluate: MULTIVARIATE
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -383,10 +395,10 @@ algos <- c('maxent')
 # say('################')
 
 	# thisOutDir <- 'extent'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -416,7 +428,7 @@ algos <- c('maxent')
 			# # response=response,
 			# # species=species,
 			# # geography=geography,
-			# # outDir=outDir,
+			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
 			# # numTestPres=200,
 			# # numBg=10000,
@@ -431,7 +443,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -444,8 +456,8 @@ algos <- c('maxent')
 		# )
 
 		# # evaluate
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -463,10 +475,10 @@ algos <- c('maxent')
 # say('####################')
 
 	# thisOutDir <- 'resolution'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -502,7 +514,7 @@ algos <- c('maxent')
 			# # response=response,
 			# # species=species,
 			# # geography=geography,
-			# # outDir=outDir,
+			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
 			# # numTestPres=200,
 			# # numBg=10000,
@@ -520,7 +532,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -533,8 +545,8 @@ algos <- c('maxent')
 		# )
 
 		# # evaluate
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -555,10 +567,10 @@ algos <- c('maxent')
 	# say('Covariates include landscape rotation and rho')
 
 	# thisOutDir <- 'tune brt for bivariate responses'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# ### define species
 	# ##################
@@ -602,11 +614,11 @@ algos <- c('maxent')
 		# }
 	# }
 
-	# dirCreate(outDir, '/!starts - brt')
-	# dirCreate(outDir, '/!stops - brt')
+	# dirCreate(scenarioDir, '/!starts - brt')
+	# dirCreate(scenarioDir, '/!stops - brt')
 
 	# # sets in progress or completed
-	# started <- list.files(paste0(outDir, '/!starts - brt'))
+	# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
 
 	# # for each SCENARIO
 	# while (length(started) < nrow(progress)) {
@@ -618,7 +630,7 @@ algos <- c('maxent')
 			# doing <- progress$string[-match(started, progress$string)][1]
 			# doing <- which(progress$string==doing)
 		# }
-		# write.csv(progress$string[doing], paste0(outDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
+		# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
 
 		# rot <- progress$rot[doing]
 		# thisRho <- progress$rho[doing]
@@ -643,7 +655,7 @@ algos <- c('maxent')
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
 			# numTestPres=200,
 			# numBg=10000,
@@ -657,7 +669,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'T2'),
 			# algos='brt',
 			# type='multivariate',
@@ -669,8 +681,8 @@ algos <- c('maxent')
 		# )
 
 		# # evaluate
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos='brt',
 			# type='multivariate',
 			# iters=iters,
@@ -682,8 +694,8 @@ algos <- c('maxent')
 		# )
 			
 		# # indicate this set complete and save
-		# write.csv(progress$string[doing], paste0(outDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
-		# started <- list.files(paste0(outDir, '/!starts - brt'))
+		# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
+		# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
 
 	# } # next scenario
 
@@ -694,10 +706,10 @@ algos <- c('maxent')
 	# say('Vary strength correlation between a TRUE and FALSE variable.')
 
 	# thisOutDir <- 'correlated TRUE & FALSE'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# # define species
 	# b0 <- 0 # intercept
@@ -740,7 +752,7 @@ algos <- c('maxent')
 			# # response=response,
 			# # species=species,
 			# # geography=geography,
-			# # outDir=outDir,
+			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
 			# # numTestPres=200,
 			# # numBg=10000,
@@ -754,7 +766,7 @@ algos <- c('maxent')
 		
 		# # train full models
 		# mainTrainModels(
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# vars=c('T1', 'F1'),
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
@@ -767,8 +779,8 @@ algos <- c('maxent')
 		# )
 
 		# # evaluate
-		# mainEval(
-			# outDir=outDir,
+		# mainEvalModels(
+			# scenarioDir=scenarioDir,
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
@@ -790,10 +802,10 @@ algos <- c('maxent')
 	# say('Covariates include landscape rotation and rho')
 
 	# thisOutDir <- 'bivariate'
-	# outDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(outDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	# ### define species
 	# ##################
@@ -842,11 +854,11 @@ algos <- c('maxent')
 	# # by ALGORITHM
 	# for (algo in algos) {
 		
-		# dirCreate(outDir, '/!starts - ', algo)
-		# dirCreate(outDir, '/!stops - ', algo)
+		# dirCreate(scenarioDir, '/!starts - ', algo)
+		# dirCreate(scenarioDir, '/!stops - ', algo)
 
 		# # sets in progress or completed
-		# started <- list.files(paste0(outDir, '/!starts - ', algo))
+		# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# # by SCENARIO
 		# while (length(started) < nrow(progress)) {
@@ -858,7 +870,7 @@ algos <- c('maxent')
 				# doing <- progress$string[-match(started, progress$string)][1]
 				# doing <- which(progress$string==doing)
 			# }
-			# write.csv(progress$string[doing], paste0(outDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
 			# rot <- progress$rot[doing]
 			# thisRho <- progress$rho[doing]
@@ -883,7 +895,7 @@ algos <- c('maxent')
 				# # response=response,
 				# # species=species,
 				# # geography=geography,
-				# # outDir=outDir,
+				# # scenarioDir=scenarioDir,
 				# # numTrainPres=200,
 				# # numTestPres=200,
 				# # numBg=10000,
@@ -897,7 +909,7 @@ algos <- c('maxent')
 			
 			# # train full models
 			# mainTrainModels(
-				# outDir=outDir,
+				# scenarioDir=scenarioDir,
 				# vars=c('T1', 'T2'),
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
@@ -910,8 +922,8 @@ algos <- c('maxent')
 			# )
 
 			# # evaluate
-			# mainEval(
-				# outDir=outDir,
+			# mainEvalModels(
+				# scenarioDir=scenarioDir,
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
 				# iters=iters,
@@ -923,8 +935,8 @@ algos <- c('maxent')
 			# )
 				
 			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(outDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(outDir, '/!starts - ', algo))
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# } # next scenario
 		
@@ -938,10 +950,10 @@ say('##############################')
 	say('Covariates include landscape rotation and rho')
 
 	thisOutDir <- 'extra false variable'
-	outDir <- paste0('./Results/', thisOutDir)
-	dirCreate(outDir)
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
 	scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
-	write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	### define species
 	##################
@@ -1020,7 +1032,7 @@ say('##############################')
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
 			# numTestPres=200,
 			# numBg=10000,
@@ -1040,11 +1052,11 @@ say('##############################')
 	
 	for (algo in algos) {
 		
-		dirCreate(outDir, '/!starts - ', algo)
-		dirCreate(outDir, '/!stops - ', algo)
+		dirCreate(scenarioDir, '/!starts - ', algo)
+		dirCreate(scenarioDir, '/!stops - ', algo)
 
 		# sets in progress or completed
-		started <- list.files(paste0(outDir, '/!starts - ', algo))
+		started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# by SCENARIO
 		while (length(started) < nrow(progress)) {
@@ -1056,7 +1068,7 @@ say('##############################')
 				doing <- progress$string[-match(started, progress$string)][1]
 				doing <- which(progress$string==doing)
 			}
-			write.csv(progress$string[doing], paste0(outDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
 			rot <- progress$rot[doing]
 			thisRho <- progress$rho[doing]
@@ -1069,7 +1081,7 @@ say('##############################')
 		
 			# train full models
 			mainTrainModels(
-				outDir=outDir,
+				scenarioDir=scenarioDir,
 				vars=c('T1', 'T2', 'F1'),
 				algos=algo,
 				type=c('multivariate', 'reduced', 'univariate'),
@@ -1082,8 +1094,8 @@ say('##############################')
 			)
 
 			# evaluate
-			mainEval(
-				outDir=outDir,
+			mainEvalModels(
+				scenarioDir=scenarioDir,
 				algos=algo,
 				type=c('multivariate', 'reduced', 'univariate'),
 				iters=iters,
@@ -1096,8 +1108,8 @@ say('##############################')
 			)
 				
 			# indicate this set complete and save
-			write.csv(progress$string[doing], paste0(outDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			started <- list.files(paste0(outDir, '/!starts - ', algo))
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		} # next scenario
 		
@@ -1111,10 +1123,10 @@ say('###############################')
 	say('Covariates include landscape rotation and rho')
 
 	thisOutDir <- 'missing true variable'
-	outDir <- paste0('./Results/', thisOutDir)
-	dirCreate(outDir)
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
 	scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
-	write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
 	### define species
 	##################
@@ -1193,7 +1205,7 @@ say('###############################')
 			# response=response,
 			# species=species,
 			# geography=geography,
-			# outDir=outDir,
+			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
 			# numTestPres=200,
 			# numBg=10000,
@@ -1213,11 +1225,11 @@ say('###############################')
 	
 	for (algo in algos) {
 		
-		dirCreate(outDir, '/!starts - ', algo)
-		dirCreate(outDir, '/!stops - ', algo)
+		dirCreate(scenarioDir, '/!starts - ', algo)
+		dirCreate(scenarioDir, '/!stops - ', algo)
 
 		# sets in progress or completed
-		started <- list.files(paste0(outDir, '/!starts - ', algo))
+		started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		# by SCENARIO
 		while (length(started) < nrow(progress)) {
@@ -1229,7 +1241,7 @@ say('###############################')
 				doing <- progress$string[-match(started, progress$string)][1]
 				doing <- which(progress$string==doing)
 			}
-			write.csv(progress$string[doing], paste0(outDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
 			rot <- progress$rot[doing]
 			thisRho <- progress$rho[doing]
@@ -1242,7 +1254,7 @@ say('###############################')
 		
 			# train full models
 			mainTrainModels(
-				outDir=outDir,
+				scenarioDir=scenarioDir,
 				vars=c('T1', 'F1'),
 				algos=algo,
 				type=c('multivariate', 'univariate'),
@@ -1255,8 +1267,8 @@ say('###############################')
 			)
 
 			# evaluate
-			mainEval(
-				outDir=outDir,
+			mainEvalModels(
+				scenarioDir=scenarioDir,
 				algos=algo,
 				type=c('multivariate', 'univariate'),
 				iters=iters,
@@ -1269,8 +1281,8 @@ say('###############################')
 			)
 				
 			# indicate this set complete and save
-			write.csv(progress$string[doing], paste0(outDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			started <- list.files(paste0(outDir, '/!starts - ', algo))
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
 		} # next scenario
 		
