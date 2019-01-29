@@ -8,69 +8,10 @@
 	print('')
 	print(date())
 
-# source('C:/ecology/Drive/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
-setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-tempDrive <- 'C:'
-
-# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
-# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
-# tempDrive <- 'D:'
-# tempDrive <- 'E:'
-
-	library(compiler)
-	library(sp);
-	library(rgdal);
-	library(raster);
-	library(rJava);
-	options(java.parameters='-Xmx1g' );
-	library(dismo)
-	library(scales)
-	library(beanplot)
-	library(omnibus)
-	library(enmSdm)
-	# library(enmSdmPredImport)
-	library(legendary)
-
-	files <- listFiles('C:/ecology/Drive/R/enmSdmPredImport/R')
-	for (thisFile in files) source(thisFile)
-
-	tempDir <- paste0(tempDrive, '/ecology/!Scratch/_TEMP\\') # maxent temp directory
-	
-#######################
+### CONTENTS ###
 ### master settings ###
-#######################
+### functions ###
 
-# verbose <- 0 # minimal display
-verbose <- 1 # some display -- best for most scenarios
-# verbose <- 2 # much display
-# verbose <- Inf # all display
-debug <- FALSE; modelType <- 'does not matter' # for running code
-# debug <- TRUE; modelType <- 'logistic' # for debugging using logistic response
-# debug <- TRUE; modelType <- 'gaussian' # for debugging using Gaussian response
-
-# ## iterations
-iters <- 1:100 # iterations to do -- want 100 total
-# iters <- 100:1 # iterations to do -- want 100 total
-
-# iters <- 1:50 # iterations to do
-# iters <- 51:100 # iterations to do
-
-# iters <- 1:25 # iterations to do
-# iters <- 26:50 # iterations to do
-# iters <- 51:75 # iterations to do
-# iters <- 76:100 # iterations to do
-
-# algos <- c('omniscient', 'maxent', 'brt', 'gam')
-# algos <- c('gam', 'omniscient', 'maxent', 'brt')
-# algos <- c('omniscient', 'maxent', 'gam')
-# algos <- c('omniscient', 'maxent')
-# algos <- c('omniscient')
-algos <- c('maxent')
-# algos <- c('brt')
-# algos <- c('gam')
-# algos <- c('rf')
-
-### EXPERIMENTS
 ### [tune brt and rf for logistic responses] ### RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
 ### [simple] RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
 ### [sample size] RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
@@ -85,6 +26,72 @@ algos <- c('maxent')
 ### [bivariate] ###
 ### [extra false variable]
 ### [missing true variable] ###
+	
+#######################
+### master settings ###
+#######################
+
+	# source('C:/ecology/Drive/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
+	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
+	tempDrive <- 'C:'
+
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
+	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'D:'
+	# tempDrive <- 'E:'
+
+	# verbose <- 0 # minimal display
+	verbose <- 1 # some display -- best for most scenarios
+	# verbose <- 2 # much display
+	# verbose <- Inf # all display
+	debug <- FALSE; modelType <- 'does not matter' # for running code
+	# debug <- TRUE; modelType <- 'logistic' # for debugging using logistic response
+	# debug <- TRUE; modelType <- 'gaussian' # for debugging using Gaussian response
+
+	# ## iterations
+	iters <- 1:100 # iterations to do -- want 100 total
+	# iters <- 100:1 # iterations to do -- want 100 total
+
+	# iters <- 1:50 # iterations to do
+	# iters <- 51:100 # iterations to do
+
+	# iters <- 1:25 # iterations to do
+	# iters <- 26:50 # iterations to do
+	# iters <- 51:75 # iterations to do
+	# iters <- 76:100 # iterations to do
+
+	# algos <- c('omniscient', 'maxent', 'brt', 'gam')
+	# algos <- c('gam', 'omniscient', 'maxent', 'brt')
+	# algos <- c('omniscient', 'maxent', 'gam')
+	# algos <- c('omniscient', 'maxent')
+	# algos <- c('omniscient')
+	algos <- c('maxent')
+	# algos <- c('brt')
+	# algos <- c('gam')
+	# algos <- c('rf')
+
+#################
+### functions ###
+#################
+
+	library(compiler)
+	library(sp);
+	library(rgdal);
+	library(raster);
+	library(rJava);
+	options(java.parameters='-Xmx1g' );
+	library(dismo)
+	library(scales)
+	library(beanplot)
+	library(omnibus)
+	library(enmSdm)
+	library(enmSdmPredImport)
+	library(legendary)
+
+	# files <- listFiles('C:/ecology/Drive/R/enmSdmPredImport/R')
+	# for (thisFile in files) source(thisFile)
+
+	tempDir <- paste0(tempDrive, '/ecology/!Scratch/_TEMP\\') # maxent temp directory
 
 # say('#########################################')
 # say('### [tune brt for logistic responses] ###')
@@ -112,12 +119,10 @@ algos <- c('maxent')
 	# ### define species
 	# ##################
 	# response <- logistic
-	# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
 
 	# # create data
 	# mainMakeData(
 		# response=response,
-		# species=species,
 		# geography=geography,
 		# scenarioDir=scenarioDir,
 		# numTrainPres=200,
@@ -182,12 +187,10 @@ say('################')
 	### define species
 	##################
 	response <- logistic
-	species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
-print(ABC)
+
 	# # create data
 	# mainMakeData(
 		# response=response,
-		# species=species,
 		# geography=geography,
 		# scenarioDir=scenarioDir,
 		# numTrainPres=200,
@@ -210,6 +213,7 @@ print(ABC)
 		iters=iters,
 		fileAppend=NULL,
 		overwrite=FALSE,
+		tempDir=tempDir,
 		verbose=verbose,
 		maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
 		regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
@@ -252,7 +256,6 @@ print(ABC)
 
 	# # define species
 	# response <- logistic
-	# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
 
 	# trainPresSet <- sort(c(2^(3:9), 2^(3:8) + 2^(2:7)))
 	# # trainPresSet <- rev(trainPresSet)
@@ -265,7 +268,6 @@ print(ABC)
 		# # # create data
 		# # mainMakeData(
 			# # response=response,
-			# # species=species,
 			# # geography=geography,
 			# # scenarioDir=scenarioDir,
 			# # numTrainPres=n,
@@ -287,6 +289,7 @@ print(ABC)
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
 			# fileAppend=paste0('n = ', prefix(n, 4)),
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
@@ -340,12 +343,10 @@ print(ABC)
 		
 		# # define species
 		# response <- logisticShift
-		# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', thisB11, ', b12=', b12, ')')
 
 		# # # create data
 		# # mainMakeData(
 			# # response=response,
-			# # species=species,
 			# # geography=geography,
 			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
@@ -367,14 +368,13 @@ print(ABC)
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
 			# fileAppend=paste0('b11 = ', sprintf('%.2f', thisB11)),
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
 			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
 		# )
 
-		# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Functions/mainEvalModels.r')
-		
 		# # evaluate: MULTIVARIATE
 		# mainEvalModels(
 			# scenarioDir=scenarioDir,
@@ -421,12 +421,10 @@ print(ABC)
 		# ### define species
 		# ##################
 		# response <- logisticShift
-		# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
 
 		# # # create data
 		# # mainMakeData(
 			# # response=response,
-			# # species=species,
 			# # geography=geography,
 			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
@@ -449,6 +447,7 @@ print(ABC)
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
 			# fileAppend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
@@ -504,7 +503,6 @@ print(ABC)
 		# ### define species
 		# ##################
 		# response <- logisticShift
-		# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
 
 		# # create data
 		# rescale <- if (thisRes == 1024) { NULL } else if (thisRes < 1024) { 'agg' } else if (thisRes > 2014) { 'disagg' }
@@ -512,7 +510,6 @@ print(ABC)
 		
 		# # mainMakeData(
 			# # response=response,
-			# # species=species,
 			# # geography=geography,
 			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
@@ -538,6 +535,7 @@ print(ABC)
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
 			# fileAppend=paste0('resolution = ', prefix(thisRes, 5)),
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
@@ -646,14 +644,9 @@ print(ABC)
 			# T2=list(type='linear', min=-1, max=1, rot=rot)
 		# )
 
-		# ### define species
-		# ##################
-		# species <- paste0('response(mu1=', mu1, ', mu2=', mu2, ', x1=landscape[[\'T1\']], x2=landscape[[\'T2\']], sigma1=', thisSigma1, ', sigma2=', thisSigma2, ', rho=', thisRho, ')')
-
 		# # create data
 		# mainMakeData(
 			# response=response,
-			# species=species,
 			# geography=geography,
 			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
@@ -675,6 +668,7 @@ print(ABC)
 			# type='multivariate',
 			# iters=iters,
 			# fileAppend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=6000, learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=0.6
@@ -722,7 +716,6 @@ print(ABC)
 	# ### define species
 	# ##################
 	# response <- logistic
-	# species <- paste0('response(x1=landscape[[1]], x2=0, b0=', b0, ', b1=', b1, ', b2=', b2, ', b11=', b11, ', b12=', b12, ')')
 
 	# rots <- seq(22.5, 157.5, by=22.5)
 	# # rots <- rev(seq(22.5, 157.5, by=22.5))
@@ -750,7 +743,6 @@ print(ABC)
 		# # # create data
 		# # mainMakeData(
 			# # response=response,
-			# # species=species,
 			# # geography=geography,
 			# # scenarioDir=scenarioDir,
 			# # numTrainPres=200,
@@ -759,6 +751,7 @@ print(ABC)
 			# # circle=TRUE,
 			# # iters=iters,
 			# # overwrite=FALSE,
+			# # tempDir=tempDir,
 			# # fileAppend=fileAppend,
 			# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
 			# # verbose=verbose
@@ -886,14 +879,9 @@ print(ABC)
 				# T2=list(type='linear', min=-1, max=1, rot=rot)
 			# )
 
-			# ### define species
-			# ##################
-			# species <- paste0('response(mu1=', mu1, ', mu2=', mu2, ', x1=landscape[[\'T1\']], x2=landscape[[\'T2\']], sigma1=', thisSigma1, ', sigma2=', thisSigma2, ', rho=', thisRho, ')')
-
 			# # # create data
 			# # mainMakeData(
 				# # response=response,
-				# # species=species,
 				# # geography=geography,
 				# # scenarioDir=scenarioDir,
 				# # numTrainPres=200,
@@ -915,6 +903,7 @@ print(ABC)
 				# type=c('multivariate', 'univariate'),
 				# iters=iters,
 				# fileAppend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
+				# tempDir=tempDir,
 				# overwrite=FALSE,
 				# verbose=verbose,
 				# maxTrees=6000, learningRate=0.005, treeComplexity=3, bagFraction=0.6,
@@ -1021,16 +1010,11 @@ say('##############################')
 			# F1=list(type='linear', min=-1, max=1, rot=rot)
 		# )
 
-		# ### define species
-		# ##################
-		# species <- paste0('response(mu1=', mu1, ', mu2=', mu2, ', x1=landscape[[\'T1\']], x2=landscape[[\'T2\']], sigma1=', thisSigma1, ', sigma2=', thisSigma2, ', rho=', thisRho, ')')
-
 		# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
 	
 		# # create data
 		# mainMakeData(
 			# response=response,
-			# species=species,
 			# geography=geography,
 			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
@@ -1038,6 +1022,7 @@ say('##############################')
 			# numBg=10000,
 			# circle=TRUE,
 			# iters=iters,
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# fileAppend=fileAppend,
 			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
@@ -1194,16 +1179,11 @@ say('###############################')
 			# F1=list(type='linear', min=-1, max=1, rot=rot)
 		# )
 
-		# ### define species
-		# ##################
-		# species <- paste0('response(mu1=', mu1, ', mu2=', mu2, ', x1=landscape[[\'T1\']], x2=landscape[[\'T2\']], sigma1=', thisSigma1, ', sigma2=', thisSigma2, ', rho=', thisRho, ')')
-
 		# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
 	
 		# # create data
 		# mainMakeData(
 			# response=response,
-			# species=species,
 			# geography=geography,
 			# scenarioDir=scenarioDir,
 			# numTrainPres=200,
@@ -1260,6 +1240,7 @@ say('###############################')
 				type=c('multivariate', 'univariate'),
 				iters=iters,
 				fileAppend=fileAppend,
+				tempDir=tempDir,
 				overwrite=FALSE,
 				verbose=verbose,
 				maxTrees=6000, learningRate=0.005, treeComplexity=3, bagFraction=0.6,
