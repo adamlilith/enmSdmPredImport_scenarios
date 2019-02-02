@@ -112,13 +112,10 @@
 	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logistic
 	
 	# # define landscape
 	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-
-	# ### define species
-	# ##################
-	# response <- logistic
 
 	# # create data
 	# mainMakeData(
@@ -163,74 +160,71 @@
 		# verbose=verbose
 	# )
 
-say('################')
-say('### [simple] ###')
-say('################')
+# say('################')
+# say('### [simple] ###')
+# say('################')
 
-	thisOutDir <- 'simple'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
-	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# thisOutDir <- 'simple'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# define species
-	b0 <- 0 # intercept
-	b1 <- 2 # slope of P1
-	b2 <- 1 # slope of P2
-	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- 0 # slope of T1 * T2
-	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logistic
 	
-	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	### define species
-	##################
-	response <- logistic
+	# # # create data
+	# # mainMakeData(
+		# # response=response,
+		# # geography=geography,
+		# # scenarioDir=scenarioDir,
+		# # numTrainPres=200,
+		# # numTestPres=200,
+		# # numBg=10000,
+		# # iters=iters,
+		# # overwrite=FALSE,
+		# # fileAppend=NULL,
+		# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+		# # verbose=verbose,
+		# # circle=FALSE
+	# # )
 
-	# # create data
-	# mainMakeData(
-		# response=response,
-		# geography=geography,
+	# # train full models
+	# mainTrainModels(
 		# scenarioDir=scenarioDir,
-		# numTrainPres=200,
-		# numTestPres=200,
-		# numBg=10000,
+		# vars=c('T1', 'F1'),
+		# algos=algos,
+		# type=c('multivariate', 'univariate'),
 		# iters=iters,
-		# overwrite=FALSE,
 		# fileAppend=NULL,
-		# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+		# overwrite=FALSE,
+		# tempDir=tempDir,
 		# verbose=verbose,
-		# circle=FALSE
+		# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
+		# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
 	# )
 
-	# train full models
-	mainTrainModels(
-		scenarioDir=scenarioDir,
-		vars=c('T1', 'F1'),
-		algos=algos,
-		type=c('multivariate', 'univariate'),
-		iters=iters,
-		fileAppend=NULL,
-		overwrite=FALSE,
-		tempDir=tempDir,
-		verbose=verbose,
-		maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-		regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
-	)
-
-	# evaluate: MULTIVARIATE
-	mainEvalModels(
-		scenarioDir=scenarioDir,
-		algos=algos,
-		type=c('multivariate', 'univariate'),
-		iters=iters,
-		perms=30,
-		ia=TRUE,
-		overwrite=FALSE,
-		fileAppend=NULL,
-		verbose=verbose
-	)
+	# # evaluate: MULTIVARIATE
+	# mainEvalModels(
+		# scenarioDir=scenarioDir,
+		# algos=algos,
+		# type=c('multivariate', 'univariate'),
+		# iters=iters,
+		# perms=30,
+		# ia=TRUE,
+		# overwrite=FALSE,
+		# fileAppend=NULL,
+		# verbose=verbose
+	# )
 
 # say('#####################')
 # say('### [sample size] ###')
@@ -242,20 +236,17 @@ say('################')
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
 	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# ### define species
-	# ##################
+	# # define species
 	# b0 <- 0 # intercept
 	# b1 <- 2 # slope of P1
 	# b2 <- 1 # slope of P2
 	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logistic
 	
 	# # define landscape
 	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-
-	# # define species
-	# response <- logistic
 
 	# trainPresSet <- sort(c(2^(3:9), 2^(3:8) + 2^(2:7)))
 	# # trainPresSet <- rev(trainPresSet)
@@ -418,8 +409,7 @@ say('################')
 		# # define landscape
 		# geography <- list(T1=list(type='linear', min=landSize$min[countLandSize], max=landSize$max[countLandSize]), F1=list(type='random', min=-1, max=1))
 
-		# ### define species
-		# ##################
+		# # define species
 		# response <- logisticShift
 
 		# # # create data
