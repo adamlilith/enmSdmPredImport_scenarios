@@ -398,6 +398,7 @@
 	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logisticShift
 	
 	# # test each landscape size (increase number of cells and range of environment)
 	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
@@ -410,7 +411,6 @@
 		# geography <- list(T1=list(type='linear', min=landSize$min[countLandSize], max=landSize$max[countLandSize]), F1=list(type='random', min=-1, max=1))
 
 		# # define species
-		# response <- logisticShift
 
 		# # # create data
 		# # mainMakeData(
