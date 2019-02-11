@@ -702,20 +702,9 @@
 	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	
-	# ### define species
-	# ##################
 	# response <- logistic
 
 	# rots <- seq(22.5, 157.5, by=22.5)
-	# # rots <- rev(seq(22.5, 157.5, by=22.5))
-	# # rots <- rots[1] # MX #4
-	# # rots <- rots[2] # MX #4
-	# # rots <- rots[3] # MX #4
-	# # rots <- rots[4] # MX #4
-	# # rots <- rots[5] # MX #3
-	# # rots <- rots[6] # MX #3
-	# # rots <- rots[7] # MX #3
 	
 	# for (rot in rots) {
 	

@@ -16,6 +16,12 @@
 ### [simple] simulation results ###
 ### [extent] landscape and species ###
 ### [extent] simulation results ###
+### [prevalence] landscape and species ###
+### [prevalence] simulation results ###
+### [correlated TRUE & FALSE] landscape and species ###
+### calculate correlation between variables as a function of their rotation ###
+### [correlated TRUE & FALSE] simulation results ###
+### [bivariate] landscape and species: no niche covariance ###
 
 #################
 ### functions ###
@@ -31,7 +37,6 @@
 	options(java.parameters='-Xmx1g' )
 	library(dismo)
 	library(scales)
-	# library(beanplot)
 	library(tidyverse)
 	library(omnibus)
 	library(enmSdm)
@@ -74,7 +79,156 @@
 		right <- at + 0.5 * width
 		
 		polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=col, border=border, xpd=NA, ...)
-		lines(x=c(left, right), y=c(med, med), col=border, xpd=NA, ...)
+		lines(x=c(left, right), y=c(med, med), col=border, xpd=NA, lwd=0.9, lend=1)
+		
+	}
+	
+	##############################
+	### "scalar" plot function ###
+	##############################
+	
+	# variables used by "scalar" plot function
+	width <- 0.22 # bar width
+	nudge <- 0.22 # nudge pair of bars for same algorithm left/right
+	subnudge <- nudge / 3 # nudge bars within same algorithm left/right
+	figLabPos <- c(-0.150, 0.05) # position of figure label
+	
+	legCex <- 0.34 # legend
+	
+	ylabX1 <- -0.15 # position of inner y-axis label
+	ylabX2 <- -0.25 # position of outer y-axis label
+	labCex <- 0.55 # size of algorithm, y-axis, and figure labels
+	
+	xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
+	xlabY2 <- -0.23 # position of outer x-axis label
+	
+	### generic plot function for plots with a scalar along the x-axis and variable importance along the y
+	### The x-axis can represent: prevalence, landscape extent, correlation between landscape variables, correlation between variables in shaping the niche, and so on. This function is intended to supply a thematic unity to plots of these types.
+	plotScalarResp <- function(
+		xCol,
+		decs,
+		xlab,
+		algo,
+		variable,
+		nudge,
+		subnudge,
+		ylim,
+		yTicks,
+		ylab,
+		lab,
+		rand,
+		resp,
+		respControl
+	) {
+		
+		# general idea:
+		# graph shows results for one algorithm plus OMNI
+		# x-axis: independent variable (prevalence, extent, etc)
+		# y-axis: variable importance
+		# each level of TRUE variable range: two sets of bars per algorithm, one is control, one is TRUE or FALSE, sets of bars are staggered
+		
+		# xCol			name of column in evals that has values for x axis
+		# decs			NULL (use values of xCol as-is for x-axis tick labels) or an integer indicating number of digits to display for x tick labels
+		# xlab			x-axis label
+		# algo			algorithm (not OMNI)
+		# variable		either 'T1' or 'F1'
+		# nudge 		amount to move sets of bars belonging to different algorithm relative to x-axis tick
+		# subnudge		amount to move bars belonging to same algorithm relative to x-axis tick
+		# ylim			y-axis limits
+		# ylab			y-axis label
+		# yTicks		position of tick marks on y-axis
+		# lab			figure label
+		# rand			value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
+		# resp			field name of response (minus the variable name, ie "T1" or "F1")
+		# respControl	field name of response for control case (or NULL if none)
+
+		# x-axis values
+		x <- sort(unique(evals[ , xCol]))
+		
+		# base plot
+		plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(x)), ylim=ylim)
+		labelFig(lab, adj=figLabPos, cex=labCex)
+		usr <- par('usr')
+		
+		# gray background
+		left <- 1 - (2.5 + ifelse(is.null(respControl), 0.75, 0)) * nudge
+		right <- length(x) + (2.5 + ifelse(is.null(respControl), 0.25, 0)) * nudge
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
+		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
+		for (i in 1:(length(x) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
+
+		# x: axis labels
+		axis(1, at=seq_along(x), labels=rep('', length(x)), tck=-0.03, lwd=0.8)
+		xLabs <- if (!is.null(decs)) { sprintf(paste0('%.', decs, 'f'), x) } else { x }
+		text(seq_along(x), y=rep(usr[3] + xlabY1 * (usr[4] - usr[3]), length(x)), labels=xLabs, cex=0.8 * labCex, xpd=NA, srt=0, pos=1, col='black')
+		text(mean(seq_along(x)), y=usr[3] + xlabY2 * (usr[4] - usr[3]), labels=xlab, cex=labCex, xpd=NA, srt=0, col='black')
+	
+		# y: y-axis labels
+		axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
+		text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
+		text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
+
+		thisNudge <- length(algos) / 2
+		
+		for (countX in seq_along(x)) {
+		
+			thisX <- x[countX]
+		
+			if (!is.null(respControl)) omniControl <- evals[evals$algo == 'omniscient' & evals[ , xCol] == thisX, respControl]
+			omniResponse <- evals[evals$algo == 'omniscient' & evals[ , xCol] == thisX, paste0(resp, variable)]
+			
+			if (!is.null(respControl)) algoControl <- evals[evals$algo == algo & evals[ , xCol] == thisX, respControl]
+			algoResponse <- evals[evals$algo == algo & evals[ , xCol] == thisX, paste0(resp, variable)]
+			
+			if (variable == 'T1') {
+				colResp <- colTrue
+				borderResp <- borderTrue
+				variableName <- 'TRUE'
+			} else {
+				colResp <- colFalse
+				borderResp <- borderFalse
+				variableName <- 'FALSE'
+			}
+			
+			# unperturbed OMNI
+			if (!is.null(respControl)) rect(omniControl, at=countX - nudge - subnudge, width=width, col=colOmniControl, border=borderOmniControl, xpd=NA, lwd=0.5)
+			
+			# perturbed OMNI
+			rect(omniResponse, at=countX - nudge + subnudge, width=width, col=colOmniResp, border=borderOmniResp, xpd=NA, lwd=0.5)
+		
+			# unperturbed SDM
+			if (!is.null(respControl)) rect(algoControl, at=countX + nudge - subnudge, width=width, col=colControl, border=borderControl, xpd=NA, lwd=0.5)
+			
+			# perturbed SDM
+			rect(algoResponse, at=countX + nudge + subnudge, width=width, col=colResp, border=borderResp, xpd=NA, lwd=0.5)
+		
+			if (!is.null(respControl)) {
+			
+				leg <- c(
+					'OMNI control',
+					paste0('OMNI ', variableName,' permuted'),
+					paste0(algosShort(algo), ' control'),
+					paste0(algosShort(algo), ' ', variableName, ' permuted')
+				)
+			
+				par(lwd=0.5)
+			
+				legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=leg, cex=legCex, fill=c(colOmniControl, colOmniResp, colControl, colResp), border=c(borderOmniControl, borderOmniResp, borderControl, borderResp))
+				
+			} else {
+
+				leg <- c(
+					paste0('OMNI ', variableName,' permuted'),
+					paste0(algosShort(algo), ' ', variableName, ' permuted')
+				)
+			
+				par(lwd=0.5)
+
+				legend('bottomright', inset=c(0, 0.025), ncol=1, bty='n', legend=leg, cex=legCex, fill=c(colOmniResp, colResp), border=c(borderOmniResp, borderResp))
+			}
+		
+		}
 		
 	}
 	
@@ -87,16 +241,38 @@
 	algos <- c('omniscient', 'gam', 'maxent', 'brt')
 	sdmAlgos <- c('gam', 'maxent', 'brt')
 	
-	### colors
-	colTrue <- 'chartreuse3'
-	borderTrue <- 'chartreuse4'
+	# ### colors of bars
+	# colTrue <- 'chartreuse3' # perturbed SDM vs TRUE
+	# borderTrue <- 'chartreuse4' # perturbed SDM vs TRUE
 	
-	colControl <- 'gray'
-	borderControl <- 'black'
-	
-	colFalse <- 'red'
-	borderFalse <- 'darkred'
+	# colFalse <- 'red' # perturbed SDM vs FALSE
+	# borderFalse <- 'darkred' # perturbed SDM vs FALSE
 
+	# colControl <- 'khaki1' # unperturbed SDM
+	# borderControl <- 'black' # unperturbed SDM
+	
+	# colOmniControl <- 'white' # unperturbed OMNI
+	# borderOmniControl <- 'black' # unperturbed OMNI
+	
+	# colOmniResp <- 'gray' # perturbed OMNI
+	# borderOmniResp <- 'black' # perturbed OMNI
+	
+	### colors of bars
+	colTrue <- '#4daf4a' # perturbed SDM vs TRUE
+	borderTrue <- 'lightgreen' # perturbed SDM vs TRUE
+	
+	colFalse <- '#e41a1c' # perturbed SDM vs FALSE
+	borderFalse <- '#fc8d62' # perturbed SDM vs FALSE
+
+	colControl <- '#984ea3' # unperturbed SDM
+	borderControl <- '#8da0cb' # unperturbed SDM
+	
+	colOmniControl <- 'white' # unperturbed OMNI
+	borderOmniControl <- 'black' # unperturbed OMNI
+	
+	colOmniResp <- 'gray' # perturbed OMNI
+	borderOmniResp <- 'black' # perturbed OMNI
+	
 	grays <- gray(seq(0, 1, by=0.01))
 
 	greens <- colorRampPalette(c('white', 'forestgreen'))
@@ -187,7 +363,7 @@
 	# sublabCex <- 0.4 # size of TRUE/FALSE sublabels
 
 	# # master plot function
-	# plotResp <- function(nudge, ylim, yTicks, ylab, lab, rand, respT1, respControl, respF1) {
+	# plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, respT1, respControl, respF1) {
 		
 		# # nudge 	amount to move bars in same group (algorithm) left or right
 		# # ylim		y-axis limits
@@ -236,7 +412,7 @@
 			# if (!is.null(respControl)) control <- evals[evals$algo==algo, respControl]
 			# false <- evals[evals$algo==algo, respF1]
 		
-			# if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col=colControl, border=borderControl)
+			# if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col=colOmniControl, border=borderOmniControl)
 			# rect(true, at=countAlgo - nudge, width=width, col=colTrue, border=borderTrue, xpd=NA)
 			# rect(false, at=countAlgo + nudge, width=width, col=colFalse, border=borderFalse, xpd=NA)
 			
@@ -262,7 +438,7 @@
 		# respControl <- NULL
 		# respF1 <- 'corPresAbsMulti_permF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # COR presence/bg multivariate
 		# lab <- bquote('b) Multivariate COR'['bg'])
@@ -273,7 +449,7 @@
 		# respControl <- NULL
 		# respF1 <- 'corPresBgMulti_permF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # AUCpa multivariate
 		# lab <- bquote('c) Multivariate AUC'['pa'])
@@ -284,7 +460,7 @@
 		# respControl <- 'aucPresAbsMulti'
 		# respF1 <- 'aucPresAbsMulti_permF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
 
 		# # AUCbg multivariate
 		# lab <- bquote('d) Multivariate AUC'['bg'])
@@ -295,7 +471,7 @@
 		# respControl <- 'aucPresBgMulti'
 		# respF1 <- 'aucPresBgMulti_permF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # CBI multivariate
 		# lab <- bquote('e) Multivariate CBI')
@@ -306,7 +482,7 @@
 		# respControl <- 'cbiMulti'
 		# respF1 <- 'cbiMulti_permF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.2)
 		
@@ -330,7 +506,7 @@
 		# # respControl <- NULL
 		# # respF1 <- 'corPresAbsMulti_permF1'
 
-		# # plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# # plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # # COR presence/bg univariate
 		# # lab <- bquote('b) Univariate COR'['bg'])
@@ -341,7 +517,7 @@
 		# # respControl <- NULL
 		# # respF1 <- 'corPresBgMulti_permF1'
 
-		# # plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# # plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # AUCpa univariate
 		# lab <- bquote('a) Univariate AUC'['pa'])
@@ -352,7 +528,7 @@
 		# respControl <- 'aucPresAbsMulti'
 		# respF1 <- 'aucPresAbsUni_onlyF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
 
 		# # AUCbg univariate
 		# lab <- bquote('b) Univariate AUC'['bg'])
@@ -363,7 +539,7 @@
 		# respControl <- 'aucPresBgMulti'
 		# respF1 <- 'aucPresBgUni_onlyF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# # CBI univariate
 		# lab <- bquote('c) Univariate CBI')
@@ -374,7 +550,7 @@
 		# respControl <- 'cbiMulti'
 		# respF1 <- 'cbiUni_onlyF1'
 
-		# plotResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1)
 		
 		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.2)
 		
@@ -521,116 +697,22 @@
 # say('### [extent] simulation results ###')
 # say('###################################')
 
-	# scenarioDir <- './Results/extent'
-
-	# source('C:/Ecology/Drive/R/enmSdmPredImport/R/loadEvals.r')
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
-	
 	# # generalization
-	# width <- 0.22 # bar width
-	# nudge <- 0.22 # nudge pair of bars for same algorithm left/right
-	# subnudge <- nudge / 3 # nudge bars within same algorithm left/right
-	# figLabPos <- c(-0.150, 0.05) # position of figure label
-	
-	# legCex <- 0.45 # legend
-	
-	# ylabX1 <- -0.15 # position of inner y-axis label
-	# ylabX2 <- -0.25 # position of outer y-axis label
-	# labCex <- 0.55 # size of algorithm, y-axis, and figure labels
-	
-	# xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
-	# xlabY2 <- -0.23 # position of outer x-axis label
+	# scenarioDir <- './Results/extent' # scenario directory
+	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
+	# decs <- NULL # number of decimals to show in x-axis variable tick mark labels
+	# xlab <- 'Range of TRUE variable' # x-axis label
 
-	# # master plot function
-	# plotResp <- function(algo, variable, nudge, subnudge, ylim, yTicks, ylab, lab, rand, resp, respControl) {
-		
-		# # general idea:
-		# # graph shows results for one algorithm plus OMNI
-		# # x-axis: log-scaled range of TRUE variable
-		# # y-axis: variable importance
-		# # each level of TRUE variable range: two sets of bars per algorithm, one is control, one is TRUE or FALSE, sets of bars are staggered
-		
-		# # algo			algorithm (not OMNI)
-		# # variable		either 'T1' or 'F1'
-		# # nudge 		amount to move sets of bars belonging to different algorithm relative to x-axis tick
-		# # subnudge		amount to move bars belonging to same algorithm relative to x-axis tick
-		# # ylim		y-axis limits
-		# # ylab		y-axis label
-		# # yTicks	position of tick marks on y-axis
-		# # lab		figure label
-		# # rand		value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
-		# # resp			field name of response (minus the variable name, ie "T1" or "F1")
-		# # respControl	field name of response for control case (or NULL if none)
-
-		# # environmental range of TRUE variable
-		# evals$rangeT1 <- evals$maxT1 - evals$minT1
-		# envRanges <- sort(unique(evals$rangeT1))
-		
-		# # base plot
-		# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(envRanges)), ylim=ylim)
-		# labelFig(lab, adj=figLabPos, cex=labCex)
-		# usr <- par('usr')
-		
-		# # gray background
-		# left <- 1 - (2.5 + ifelse(is.null(respControl), 0.75, 0)) * nudge
-		# right <- length(envRanges) + (2.5 + ifelse(is.null(respControl), 0.25, 0)) * nudge
-		# polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
-		# lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
-		# for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
-		# for (i in 1:(length(envRanges) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
-
-		# # x: axis labels
-		# axis(1, at=seq_along(envRanges), labels=rep('', length(envRanges)), tck=-0.03, lwd=0.8)
-		# text(seq_along(envRanges), y=rep(usr[3] + xlabY1 * (usr[4] - usr[3]), length(envRanges)), labels=envRanges, cex=0.9 * labCex, xpd=NA, srt=0, pos=1, col='black')
-		# text(mean(seq_along(envRanges)), y=usr[3] + xlabY2 * (usr[4] - usr[3]), labels='Range of TRUE variable', cex=labCex, xpd=NA, srt=0, col='black')
-	
-		# # y: y-axis labels
-		# axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
-		# text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
-		# text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
-
-		# thisNudge <- length(algos) / 2
-		
-		# for (countRange in seq_along(envRanges)) {
-		
-			# thisEnvRange <- envRanges[countRange]
-		
-			# if (!is.null(respControl)) omniControl <- evals[evals$algo == 'omniscient' & evals$rangeT1 == thisEnvRange, respControl]
-			# omniResponse <- evals[evals$algo == 'omniscient' & evals$rangeT1 == thisEnvRange, paste0(resp, variable)]
-			
-			# if (!is.null(respControl)) algoControl <- evals[evals$algo == algo & evals$rangeT1 == thisEnvRange, respControl]
-			# algoResponse <- evals[evals$algo == algo & evals$rangeT1 == thisEnvRange, paste0(resp, variable)]
-			
-			# if (variable == 'T1') {
-				# colResp <- colTrue
-				# borderResp <- borderTrue
-			# } else {
-				# colResp <- colFalse
-				# borderResp <- borderFalse
-			# }
-			
-			# if (!is.null(respControl)) rect(omniControl, at=countRange - nudge - subnudge, width=width, col='black', border='white', xpd=NA, lwd=0.5)
-			# rect(omniResponse, at=countRange - nudge + subnudge, width=width, col='white', border='black', xpd=NA, lwd=0.5)
-		
-			# if (!is.null(respControl)) rect(algoControl, at=countRange + nudge - subnudge, width=width, col=colControl, border=borderControl, xpd=NA, lwd=0.5)
-			# rect(algoResponse, at=countRange + nudge + subnudge, width=width, col=colResp, border=borderResp, xpd=NA, lwd=0.5)
-		
-			# if (!is.null(respControl)) {
-				# legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=c('OMNI control', 'OMNI permuted', paste0(algosShort(algo), ' control'), paste0(algosShort(algo), ' permuted')), cex=legCex, fill=c('black', 'white', colControl, colResp), border=c('white', 'black', borderControl, borderResp))
-			# } else {
-				# legend('bottomright', inset=c(0, 0.01), ncol=1, bty='n', legend=c('OMNI permuted', paste0(algosShort(algo), ' permuted')), cex=legCex, fill=c('white', colResp), border=c('black', borderResp))
-			# }
-		
-		# }
-		
-	# }
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
 	# ### multivariate
 	# ################
 	
 	# # CBI multivariate
 	# ylim <- c(-1, 1)
-	# yTicks <- seq(-1, 1, by=0.5)
+	# yTicks <- seq(-1, 1, by=0.25)
 	# ylab <- 'CBI'
 	# rand <- 0
 	# resp <- 'cbiMulti_perm'
@@ -645,10 +727,10 @@
 			# algo <- sdmAlgos[countAlgo]
 		
 			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotResp(algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
 			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotResp(algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
 		# }
@@ -674,10 +756,10 @@
 			# algo <- sdmAlgos[countAlgo]
 		
 			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotResp(algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
 			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotResp(algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
 		# }
@@ -686,160 +768,529 @@
 		
 	# dev.off()
 	
+# say('##########################################')
+# say('### [prevalence] landscape and species ###')		
+# say('##########################################')		
+
+	# say('Wanting a simple illustration of the landscape and species in the "prevalence" scenario.')
+	
+	# thisOutDir <- 'prevalence'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# landscape <- genesis(geography, circle=FALSE)
+	
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logisticShift
+	
+	# # test each inflection point
+	# # inflection points chosen to match prevalence of 0.95, 0.85, 0.75, 0.625, 0.5, 0.375, 0.25, 0.15, 0.05 as closely as possible
+	# # b11Set <- c(-1.74, -1.08, -0.7, -0.33, 0, 0.33, 0.7, 1.08, 1.74)
+	# b11Set <- rev(c(-1.74, -0.7, 0, 0.7, 1.74)) # subsetted
+
+	# # extent (for border)
+	# ext <- extent(landscape)
+	# ext <- as(ext, 'SpatialPolygons')
+
+	# png(paste0(scenarioDir, '/Illustration - PREVALENCE Scenario Landscape and Species.png'), width=5 * 400, height=600, res=300)
+	
+		# par(mfrow=c(1, 5), oma=c(0, 0, 0, 3.1), mar=c(0, 0, 2, 0), fg='white', col.axis='white')
+
+		# for (countB11 in seq_along(b11Set)) {
+		
+			# thisB11 <- b11Set[countB11]
+		
+			# species <- response(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=thisB11, b12=b12)
+			# prev <- cellStats(species, 'mean')
+		
+			# par(fg='white')
+			# plot(ext)
+			# plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+			# lab <- paste0(letters[countB11], ') Prevalence of ', sprintf('%.2f', prev))
+			# labelFig(lab, adj=c(-0.02, -0.1), cex=0.9, col='black')
+		
+		# }
+	
+		# par(fg='black')
+		# legendGrad('right', inset=-0.2, width=0.1, height=0.75, labels=c(0, 0.5, 1), title='Occurrence\nProbability', titleAdj=c(0.5, 0.95), col=greens, labAdj=0.7, xpd=NA, adjX=c(0, 0.5), adjY=c(0.055, 0.75), boxBorder=NA, cex=0.75)
+		
+	# dev.off()
+	
+# say('#######################################')
+# say('### [prevalence] simulation results ###')
+# say('#######################################')
+
+	# # generalization
+	# scenarioDir <- './Results/prevalence' # scenario directory
+	# xCol <- 'prev' # name of x-axis variable column in evaluation data frame
+	# decs <- 2 # number of decimals to show in x-axis variable tick mark labels
+	# xlab <- 'Prevalence' # x-axis label
+
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	
+	# # generalization
+	# width <- 0.22 # bar width
+	# nudge <- 0.22 # nudge pair of bars for same algorithm left/right
+	# subnudge <- nudge / 3 # nudge bars within same algorithm left/right
+	# figLabPos <- c(-0.150, 0.05) # position of figure label
+	
+	# legCex <- 0.34 # legend
+	
+	# ylabX1 <- -0.15 # position of inner y-axis label
+	# ylabX2 <- -0.25 # position of outer y-axis label
+	# labCex <- 0.55 # size of algorithm, y-axis, and figure labels
+	
+	# xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
+	# xlabY2 <- -0.23 # position of outer x-axis label
+
+	# ### multivariate
+	# ################
+	
+	# # CBI multivariate
+	# ylim <- c(-1, 1)
+	# yTicks <- seq(-1, 1, by=0.25)
+	# ylab <- 'CBI'
+	# rand <- 0
+	# resp <- 'cbiMulti_perm'
+	# respControl <- 'cbiMulti'
+
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
+		
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# for (countAlgo in seq_along(sdmAlgos)) {
+		# # for (countAlgo in 1) {
+
+			# algo <- sdmAlgos[countAlgo]
+		
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		# }
+		
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		
+	# dev.off()
 	
+	# # COR multivariate
+	# ylim <- c(-0.25, 1)
+	# yTicks <- seq(-0.25, 1, by=0.25)
+	# ylab <- bquote('COR'['bg'])
+	# rand <- 0
+	# resp <- 'corPresBgMulti_perm'
+	# respControl <- NULL
 	
-	# n <- nrow(evals)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
+		
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# for (countAlgo in seq_along(sdmAlgos)) {
 
-	# evals <- data.frame(
-		# algo=rep(evals$algo, 6 * 3 * n),
-		# resp=c(rep('aucPresAbsMulti', 3 * n),
-			# rep('aucPresBgMulti', 3 * n),
-			# rep('cbiMulti', 3 * n),
-			# rep('aucPresAbsUni', 3 * n),
-			# rep('aucPresBgUni', 3 * n),
-			# rep('cbiUni', 3 * n)
-		# ),
-		# model=c(rep('Multivariate', 3 * n),
-			# rep('Multivariate', 3 * n),
-			# rep('Multivariate', 3 * n),
-			# rep('Univariate', 3 * n),
-			# rep('Univariate', 3 * n),
-			# rep('Univariate', 3 * n)
-		# ),
-		# metric=c(rep('AUCpa', 3 * n),
-			# rep('AUCbg', 3 * n),
-			# rep('CBI', 3 * n),
-			# rep('AUCpa', 3 * n),
-			# rep('AUCpb', 3 * n),
-			# rep('CBI', 3 * n)
-		# ),
-		# manip=c(c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-			# c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-			# c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-			# c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-			# c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-			# c(rep('TRUE', n), rep('Full', n), rep('FALSE', n))
-		# ),
-		# value=c(c(evals$aucPresAbsMulti_permT1, evals$aucPresAbsMulti, evals$aucPresAbsMulti_permF1),
-			# c(evals$aucPresBgMulti_permT1, evals$aucPresBgMulti, evals$aucPresBgMulti_permF1),
-			# c(evals$cbiMulti_permT1, evals$cbiMulti, evals$cbiMulti_permF1),
-			# c(evals$aucPresAbsUni_onlyT1, evals$aucPresAbsMulti, evals$aucPresAbsUni_onlyF1),
-			# c(evals$aucPresBgUni_onlyT1, evals$aucPresBgMulti, evals$aucPresBgUni_onlyF1),
-			# c(evals$cbiUni_onlyT1, evals$cbiMulti, evals$cbiUni_onlyF1)
+			# algo <- sdmAlgos[countAlgo]
+		
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+		
+		
+		# }
+		
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		
+	# dev.off()
+
+# say('#######################################################')
+# say('### [correlated TRUE & FALSE] landscape and species ###')
+# say('#######################################################')
+
+	# say('Wanting a simple illustration of the landscape and species in the "correlated TRUE & FALSE" scenario.')
+	
+	# thisOutDir <- 'correlated TRUE & FALSE'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+
+	# # landscape rotations
+	# # rots <- seq(22.5, 157.5, by=22.5)
+	# rots <- c(22.5 + 22.5, 90, 157.5 - 22.5) # abbreviated
+
+	# png(paste0(scenarioDir, '/Illustration - correlated TRUE & FALSE Scenario Landscape and Species.png'), width=5 * 400, height=600, res=300)
+		
+		# par(mfrow=c(1, 5), oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white')
+		
+		# # generate landscape
+		# geography <- list(
+			# T1=list(type='linear', min=-1, max=1),
+			# F1=list(type='linear', min=-1, max=1, rot=rots[1])
 		# )
-	# )
+		
+		# landscape <- genesis(geography, circle=TRUE)
+
+		# # extent (for border)
+		# ext <- extent(landscape)
+		# ext <- as(ext, 'SpatialPolygons')
 			
-	# p <- ggplot(data=evals, mapping=aes(x=manip, y=value, fill=algo))
-	# p + geom_violin(mapping=aes(group=algo)) + facet_wrap(~ metric + model, ncol=3)
+		# # TRUE
+		# plot(ext)
+		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# labelFig('a) TRUE variable', adj=c(0, -0.15), cex=0.8, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+
+		# # first FALSE
+		# par(fg='white')
+		# plot(ext)
+		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
+		# lab <- paste0('b) FALSE: Correlation = ', sprintf('%.2f', correlation))
+		# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+
+		# # next FALSES
+		# for (countRot in 2:length(rots)) {
+		
+			# rot <- rots[countRot]
+		
+			# # generate landscape
+			# geography <- list(
+				# T1=list(type='linear', min=-1, max=1),
+				# F1=list(type='linear', min=-1, max=1, rot=rot)
+			# )
 			
-	# evals <- data.frame(
-		# algo=c(evals$algo, evals$algo, evals$algo),
-		# type=c(rep('TRUE', n), rep('Full', n), rep('FALSE', n)),
-		# aucPresAbsMulti=c(evals$aucPresAbsMulti_permT1, evals$aucPresAbsMulti, evals$aucPresAbsMulti_permF1),
-		# aucPresBgMulti=c(evals$aucPresBgMulti_permT1, evals$aucPresBgMulti, evals$aucPresBgMulti_permF1),
-		# cbiMulti=c(evals$cbiMulti_permT1, evals$cbiMulti, evals$cbiMulti_permF1),
-		# corPresAbsMulti=c(evals$corPresAbsMulti_permT1, rep(NA, n), evals$corPresAbsMulti_permF1),
-		# corPresBgMulti=c(evals$corPresBgMulti_permT1, rep(NA, n), evals$corPresBgMulti_permF1),
-		# aucPresAbsUni=c(evals$aucPresAbsUni_onlyT1, rep(NA, n), evals$aucPresAbsUni_onlyF1),
-		# aucPresBgUni=c(evals$aucPresBgUni_onlyT1, rep(NA, n), evals$aucPresBgUni_onlyF1),
-		# cbiUni=c(evals$cbiUni_onlyT1, rep(NA, n), evals$cbiUni_onlyF1)
-	# )
+			# landscape <- genesis(geography, circle=TRUE)
 
-	# x <- ggplot(evals, aes(x=type, color=algo)) +
-		# geom_violin() 
+			# # FALSE
+			# par(fg='white')
+			# plot(ext)
+			# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
+			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+			# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
+			# lab <- paste0(letters[countRot + 1], ') FALSE: Correlation = ', sprintf('%.2f', correlation))
+			# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
+			# par(fg='black')
+			# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+			
+		# }
+		
+		# # species
+		# species <- logistic(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
+		
+		# par(fg='white')
+		# plot(ext)
+		# plot(species, breaks=seq(0, 1, length.out=length(browns) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# labelFig('e) Species', adj=c(0, -0.15), cex=0.8, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='', col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+			
+	# dev.off()
 
+# say('###############################################################################')
+# say('### calculate correlation between variables as a function of their rotation ###')
+# say('###############################################################################')
 
-	
-	# p <- ggplot(data=evals, mapping=aes(x=type, y=aucPresAbsMulti))
-	# p + geom_violin() + scale_y_continuous(limits=c(0, 1)) + ylab('AUCpa')
-	
-	# ### AUC with presences/absences
-	# resp <- 'aucPresAbsMulti'
-	# respPermT1 <- 'aucPresAbsMulti_permT1'
-	# respPermF1 <- 'aucPresAbsMulti_permF1'
-	
-	# ylab <- 'AUCpa'
-	
-	# plot(1, 1, xlim=c(0, length(algos)), ylim=c(0, 1), ylab=ylab, xaxt='n', col='white', bty='n', xlab='')
-	# axis(1, at=seq_along(algos) - 0.5, col.axis='white')
-	# usr <- par('usr')
-	# y <- usr[3] - 0.1 * usr[4] - usr[3]
-	# text(x=seq_along(algos) - 0.5, y=rep(y, length(algos)), labels=algosShort(algos), xpd=NA)
-	
-	# for (algo in algos) {
-	
-		# control <- evals[evals$algo==algo, resp]
-		# resp1 <- evals[evals$algo==algo, respPermT1]
-		# resp2 <- evals[evals$algo==algo, respPermF1]
+	# say('To speed further operations, pre-calculate correlation between two variables as a function of the rotation between them on the landscape.', breaks=80)
 
-
+	# rots <- seq(22.5, 157.5, by=22.5)
 	
+	# correlations <- data.frame()
+	# for (rot in rots) {
+	
+		# say(rot, post=0)
+	
+		# # generate landscape
+		# geography <- list(
+			# V1=list(type='linear', min=-1, max=1),
+			# V2=list(type='linear', min=-1, max=1, rot=rot)
+		# )
+		
+		# landscape <- genesis(geography, circle=TRUE)
+		
+		# correlation <- cor(
+			# c(as.matrix(landscape[['V1']])),
+			# c(as.matrix(landscape[['V2']])),
+			# use='pairwise.complete.obs'
+		# )
+		
+		# say(correlation)
+		
+		# correlations <- rbind(
+			# correlations,
+			# data.frame(
+				# rot=rot,
+				# cor=correlation
+			# )
+		# )
+	
+	# }
+	
+	# write.csv(correlations, './Results/Correlations between Variables as a Function of Rotation between Them.csv', row.names=FALSE)
+
+# say('####################################################')
+# say('### [correlated TRUE & FALSE] simulation results ###')
+# say('####################################################')
+
+	# # generalization
+	# scenarioDir <- './Results/correlated TRUE & FALSE' # scenario directory
+	# xCol <- 'correlation' # name of x-axis variable column in evaluation data frame
+	# decs <- 2 # number of decimals to show in x-axis variable tick mark labels
+	# xlab <- 'Correlation between TRUE and FALSE' # x-axis label
+
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+
+	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
+	# evals$correlation <- correlations$cor[match(evals$rotVar2, correlations$rot)]
+	
+	# ### multivariate
+	# ################
+	
+	# # CBI multivariate
+	# ylim <- c(-1, 1)
+	# yTicks <- seq(-1, 1, by=0.25)
+	# ylab <- 'CBI'
+	# rand <- 0
+	# resp <- 'cbiMulti_perm'
+	# respControl <- 'cbiMulti'
+
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
+		
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# for (countAlgo in seq_along(sdmAlgos)) {
+		# # for (countAlgo in 1) {
+
+			# algo <- sdmAlgos[countAlgo]
+		
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+		
+		
+		# }
+		
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		
+	# dev.off()
+	
+	# # COR multivariate
+	# ylim <- c(-0.5, 1)
+	# yTicks <- seq(-0.5, 1, by=0.25)
+	# ylab <- bquote('COR'['bg'])
+	# rand <- 0
+	# resp <- 'corPresBgMulti_perm'
+	# respControl <- NULL
+	
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
+		
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# for (countAlgo in seq_along(sdmAlgos)) {
+
+			# algo <- sdmAlgos[countAlgo]
+		
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+		
+		
+		# }
+		
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		
+	# dev.off()
+
+say('##############################################################')
+say('### [bivariate] landscape and species: no niche covariance ###')
+say('##############################################################')
+
+	say('Wanting a simple illustration of the landscape and species in the "bivariate" scenario with no niche covariance (rho = 0 in Gaussian bivariate generative model).', breaks=80)
+	
+	thisOutDir <- 'bivariate'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+
+	# generalization
+	landscapeBorder <- 'black' # color of ring around landscape
+	
+	# define species
+	b0 <- NA # intercept
+	b1 <- NA # slope of P1
+	b2 <- NA # slope of P2
+	b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- NA # slope of T1 * T2
+	mu1 <- 0
+	mu2 <- 0
+	sigma1 <- NA
+	sigma2 <- NA
+	rho <- 0
+
+	# sigma2s <- seq(0.1, 0.5, by=0.1)
+	sigmas <- c(0.1, 0.3, 0.5) # abbreviated
+	
+	# landscape rotations
+	# rots <- seq(22.5, 157.5, by=22.5)
+	rots <- rev(c(22.5 + 22.5, 90, 157.5 - 22.5)) # abbreviated
+
+	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
+	
+	png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - No Niche Covariance.png'), width=11 * 400, height=4 * 450, res=300)
+		
+		par(mfrow=c(4, 11), oma=c(0, 3, 3, 0))
+
+		for (countRot in seq_along(rots)) {
+		# for (countRot in 1) {
+		
+			rot <- rots[countRot]
+		
+			# generate landscape
+			geography <- list(
+				T1=list(type='linear', min=-1, max=1),
+				T2=list(type='linear', min=-1, max=1, rot=rot)
+				# T2=list(type='linear', min=-1, max=1)
+			)
+		
+			landscape <- genesis(geography, circle=TRUE)
+
+			# rectangular extent
+			ext <- extent(landscape)
+			ext <- as(ext, 'SpatialPolygons')
+			
+			# circular extent (for plotting)
+			center <- SpatialPoints(cbind(0.5, 0.5), CRS(projection(landscape)))
+			ring <- gBuffer(center, width=0.5, quadsegs=20)
+			
+			column <- if (countRot == 1) {
+				1
+			} else if (countRot == 2) {
+				5
+			} else if (countRot == 3) {
+				9
+			}
+			
+			par(mar=c(6, 1, 0, 0), mfg=c(1, column))
+			
+			# legend bar
+			par(fg='black')
+			frame()
+			legendGrad('right', inset=0.035, vert=TRUE, width=0.17, height=1.7, labels=c(-1, 0, 1), title='', col=browns, labAdj=0.5, xpd=NA, adjX=c(0, 0.5), adjY=c(0, 0.75), boxBorder=NA, cex=1.4, lwd=1, border=landscapeBorder)
+			text(-0.25, 0.3, 'Landscape', xpd=NA, cex=1.8, pos=4)
+
+			# major panel label
+			r <- correlations$cor[correlations$rot == rot]
+			r <- round(r, 2)
+			iffy <- if (countRot == 2) { 'un' } else { '' }
+			lab <- paste0(letters[countRot], ') Variables ', iffy, 'correlated (r = ', r, ')')
+			labelFig(lab, adj=c(-0.3, 0.42), cex=2.2, col='black')
+
+			# labels for sigma1 across top of species
+			par(mar=c(4, 1, 0, 0), fg='black')
+			
+			# TRUE1
+			plot(ext, border=NA)
+			plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, legend=FALSE, add=TRUE, axes=FALSE)
+			plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
+			lab <- paste0('T1')
+			labelFig(lab, adj=c(-0.03, -0.1), cex=1.8, col='black')
+			
+			# sigma1 axis label
+			text(0.5, -0.4, labels='Niche width in T1', xpd=NA, col='black', cex=2)
+			
+			# TRUE2
+			par(mar=c(4, 1, 0, 0), fg=NA)
+			plot(ext, border=NA)
+			plot(landscape[['T2']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, legend=FALSE, add=TRUE, axes=FALSE)
+			plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
+			lab <- paste0('T2')
+			labelFig(lab, adj=c(-0.03, -0.1), cex=1.9, col='black')
+			
+			par(mar=c(0.5, 0.5, 0.5, 0.5))
+
+			# plot species: vary niche width
+			for (countSigma2 in seq_along(sigmas)) {
+			# for (countSigma2 in 1) {
+			
+				sigma2 <- sigmas[countSigma2]
+			
+				for (countSigma1 in seq_along(sigmas)) {
+				
+					sigma1 <- sigmas[countSigma1]
+				
+					# column and row of species maps
+					row <- countSigma2 + 1
+					
+					if (countRot == 1) {
+						column <- countSigma1 + 0
+					} else if (countRot == 2) {
+						column <- countSigma1 + 4
+					} else if (countRot == 3) {
+						column <- countSigma1 + 8
+					}
+					
+					# species map
+					species <- enmSdmPredImport::gaussian(x1=landscape[['T1']], x2=landscape[['T2']], mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho)
+
+					# plot
+					par(fg=NA, mfg=c(row, column))
+					plot(ext, border=NA)
+					plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, legend=FALSE, add=TRUE, axes=FALSE)
+					plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
+					
+					# sigma1 label
+					if (countSigma2 == 1) {
+						lab <- bquote(sigma[1] * ' = ' * .(sigma1))
+						labelFig(lab, adj=c(0.15, 0.01), cex=2, col='black')
+					}
+					
+					# sigma2 label
+					if (countSigma1 == 1) {
+						lab <- bquote(sigma[2] * ' = ' * .(sigma2))
+						text(-0.12, 0.5, labels=lab, srt=90, cex=2, xpd=NA, col='black')
+					}
+					
+					# sigma2 axis label
+					if (countSigma1 == 1 & countSigma2 == 2) {
+						text(-0.34, 0.5, labels='Niche width in T2', xpd=NA, col='black', srt=90, cex=2)
+					}
+					
+				} # next sigma1
+				
+			} # next sigma2
+			
+		} # next landscape rotation
+		
+	dev.off()
+
 	
 #################################
 say('DONE!!!', level=1, deco='&')
