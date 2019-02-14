@@ -349,7 +349,7 @@
 
 	# scenarioDir <- './Results/simple'
 
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# # generalization
 	# width <- 0.14 # bar width
@@ -705,7 +705,7 @@
 	# xlab <- 'Range of TRUE variable' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	# evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
 	# ### multivariate
@@ -837,7 +837,7 @@
 	# xlab <- 'Prevalence' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 	# # generalization
 	# width <- 0.22 # bar width
@@ -1064,7 +1064,7 @@
 	# xlab <- 'Correlation between TRUE and FALSE' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 	# evals$correlation <- correlations$cor[match(evals$rotVar2, correlations$rot)]
@@ -1292,158 +1292,158 @@
 		
 	# dev.off()
 
-say('#########################################################################################')
-say('### [bivariate] landscape and species: YES niche covariance, NO landscape correlation ###')
-say('#########################################################################################')
+# say('#########################################################################################')
+# say('### [bivariate] landscape and species: YES niche covariance, NO landscape correlation ###')
+# say('#########################################################################################')
 
-	say('Wanting a simple illustration of the landscape and species in the "bivariate" scenario with changing rho (Gaussian interaction term) and no landscape correlation (r = 0). Panels represent values of rho. Maps within panels vary sigma1 and sigma2.', breaks=80)
+	# say('Wanting a simple illustration of the landscape and species in the "bivariate" scenario with changing rho (Gaussian interaction term) and no landscape correlation (r = 0). Panels represent values of rho. Maps within panels vary sigma1 and sigma2.', breaks=80)
 	
-	thisOutDir <- 'bivariate'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
+	# thisOutDir <- 'bivariate'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 
-	# generalization
-	landscapeBorder <- 'black' # color of ring around landscape
+	# # generalization
+	# landscapeBorder <- 'black' # color of ring around landscape
 	
-	# define species
-	b0 <- NA # intercept
-	b1 <- NA # slope of P1
-	b2 <- NA # slope of P2
-	b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- NA # slope of T1 * T2
-	mu1 <- 0
-	mu2 <- 0
-	sigma1 <- NA
-	sigma2 <- NA
-	rhos <- c(-0.5, 0, 0.5)
+	# # define species
+	# b0 <- NA # intercept
+	# b1 <- NA # slope of P1
+	# b2 <- NA # slope of P2
+	# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- NA # slope of T1 * T2
+	# mu1 <- 0
+	# mu2 <- 0
+	# sigma1 <- NA
+	# sigma2 <- NA
+	# rhos <- c(-0.5, 0, 0.5)
 
-	# sigma2s <- seq(0.1, 0.5, by=0.1)
-	sigmas <- c(0.1, 0.3, 0.5) # abbreviated
+	# # sigma2s <- seq(0.1, 0.5, by=0.1)
+	# sigmas <- c(0.1, 0.3, 0.5) # abbreviated
 	
-	png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - Niche Covariance with No Landscape Correlation.png'), width=11 * 400, height=3 * 450, res=300)
+	# png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - Niche Covariance with No Landscape Correlation.png'), width=11 * 400, height=3 * 450, res=300)
 		
-		par(mfrow=c(3, 11), oma=c(0, 3, 6, 0))
+		# par(mfrow=c(3, 11), oma=c(0, 3, 6, 0))
 
-		for (countPanel in seq_along(rhos)) {
-		# for (countPanel in 1) {
+		# for (countPanel in seq_along(rhos)) {
+		# # for (countPanel in 1) {
 		
-			rho <- rhos[countPanel]
+			# rho <- rhos[countPanel]
 		
-			# generate landscape
-			geography <- list(
-				T1=list(type='linear', min=-1, max=1),
-				T2=list(type='linear', min=-1, max=1, rot=90)
-				# T2=list(type='linear', min=-1, max=1)
-			)
+			# # generate landscape
+			# geography <- list(
+				# T1=list(type='linear', min=-1, max=1),
+				# T2=list(type='linear', min=-1, max=1, rot=90)
+				# # T2=list(type='linear', min=-1, max=1)
+			# )
 		
-			landscape <- genesis(geography, circle=TRUE)
+			# landscape <- genesis(geography, circle=TRUE)
 
-			# rectangular extent
-			ext <- extent(landscape)
-			ext <- as(ext, 'SpatialPolygons')
+			# # rectangular extent
+			# ext <- extent(landscape)
+			# ext <- as(ext, 'SpatialPolygons')
 			
-			# circular extent (for plotting)
-			center <- SpatialPoints(cbind(0.5, 0.5), CRS(projection(landscape)))
-			ring <- gBuffer(center, width=0.5, quadsegs=20)
+			# # circular extent (for plotting)
+			# center <- SpatialPoints(cbind(0.5, 0.5), CRS(projection(landscape)))
+			# ring <- gBuffer(center, width=0.5, quadsegs=20)
 			
-			column <- if (countPanel == 1) {
-				1
-			} else if (countPanel == 2) {
-				5
-			} else if (countPanel == 3) {
-				9
-			}
+			# column <- if (countPanel == 1) {
+				# 1
+			# } else if (countPanel == 2) {
+				# 5
+			# } else if (countPanel == 3) {
+				# 9
+			# }
 			
-			par(mar=c(0.5, 0.5, 0.5, 0.5), mfg=c(1, column))
+			# par(mar=c(0.5, 0.5, 0.5, 0.5), mfg=c(1, column))
 
-			# plot species: vary niche width
-			for (countSigma2 in rev(seq_along(sigmas))) {
-			# for (countSigma2 in 1) {
+			# # plot species: vary niche width
+			# for (countSigma2 in rev(seq_along(sigmas))) {
+			# # for (countSigma2 in 1) {
 			
-				sigma2 <- sigmas[countSigma2]
+				# sigma2 <- sigmas[countSigma2]
 			
-				for (countSigma1 in seq_along(sigmas)) {
+				# for (countSigma1 in seq_along(sigmas)) {
 				
-					sigma1 <- sigmas[countSigma1]
+					# sigma1 <- sigmas[countSigma1]
 				
-					# column and row of species maps
-					row <- 3 - countSigma2 + 1
+					# # column and row of species maps
+					# row <- 3 - countSigma2 + 1
 					
-					if (countPanel == 1) {
-						column <- countSigma1 + 0
-					} else if (countPanel == 2) {
-						column <- countSigma1 + 4
-					} else if (countPanel == 3) {
-						column <- countSigma1 + 8
-					}
+					# if (countPanel == 1) {
+						# column <- countSigma1 + 0
+					# } else if (countPanel == 2) {
+						# column <- countSigma1 + 4
+					# } else if (countPanel == 3) {
+						# column <- countSigma1 + 8
+					# }
 					
-					# species map
-					species <- enmSdmPredImport::gaussian(x1=landscape[['T1']], x2=landscape[['T2']], mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho)
+					# # species map
+					# species <- enmSdmPredImport::gaussian(x1=landscape[['T1']], x2=landscape[['T2']], mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho)
 
-					# plot
-					par(fg=NA, mfg=c(row, column))
-					plot(ext, border=NA)
-					plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, legend=FALSE, add=TRUE, axes=FALSE)
-					plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
+					# # plot
+					# par(fg=NA, mfg=c(row, column))
+					# plot(ext, border=NA)
+					# plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, legend=FALSE, add=TRUE, axes=FALSE)
+					# plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
 					
-					# major panel label
-					if (countSigma1 == 2 & countSigma2 == 3) {
+					# # major panel label
+					# if (countSigma1 == 2 & countSigma2 == 3) {
 						
-						lab <- if (rho != 0) {
-							paste0(letters[countPanel], ') Niche covariance (rho = ', rho, ')')
-						} else {
-							paste0(letters[countPanel], ') No niche covariance (rho = ', rho, ')')
-						}
+						# lab <- if (rho != 0) {
+							# paste0(letters[countPanel], ') Niche covariance (rho = ', rho, ')')
+						# } else {
+							# paste0(letters[countPanel], ') No niche covariance (rho = ', rho, ')')
+						# }
 						
-						labelFig(lab, adj=c(0.5, 1.2), cex=2.2, col='black')
+						# labelFig(lab, adj=c(0.5, 1.2), cex=2.2, col='black')
 						
-					}
+					# }
 
-					# sigma1 label
-					if (countSigma2 == 3) {
-						lab <- bquote(sigma[1] * ' = ' * .(sigma1))
-						labelFig(lab, adj=c(0.15, 0.05), cex=2, col='black')
-					}
+					# # sigma1 label
+					# if (countSigma2 == 3) {
+						# lab <- bquote(sigma[1] * ' = ' * .(sigma1))
+						# labelFig(lab, adj=c(0.15, 0.05), cex=2, col='black')
+					# }
 					
-					# sigma2 label
-					if (countSigma1 == 1) {
-						lab <- bquote(sigma[2] * ' = ' * .(sigma2))
-						text(-0.12, 0.5, labels=lab, srt=90, cex=2, xpd=NA, col='black')
-					}
+					# # sigma2 label
+					# if (countSigma1 == 1) {
+						# lab <- bquote(sigma[2] * ' = ' * .(sigma2))
+						# text(-0.12, 0.5, labels=lab, srt=90, cex=2, xpd=NA, col='black')
+					# }
 					
-					# sigma1 axis label
-					if (countSigma1 == 1 & countSigma2 == 3) {
+					# # sigma1 axis label
+					# if (countSigma1 == 1 & countSigma2 == 3) {
 					
-						lab <- if (rho != 0) {
-							'Niche covariance'
-						} else {
-							'No niche covariance'
-						}
+						# lab <- if (rho != 0) {
+							# 'Niche covariance'
+						# } else {
+							# 'No niche covariance'
+						# }
 						
-						lab <- bquote(.(letters[countPanel]) * ') ' * .(lab) * ' (' * rho * ' = ' * .(rho) * ')')
+						# lab <- bquote(.(letters[countPanel]) * ') ' * .(lab) * ' (' * rho * ' = ' * .(rho) * ')')
 					
-						text(-0.5, 1.575, labels=lab, xpd=NA, col='black', srt=0, cex=2.2, pos=4)
+						# text(-0.5, 1.575, labels=lab, xpd=NA, col='black', srt=0, cex=2.2, pos=4)
 
-					}
+					# }
 					
-					# sigma1 axis label
-					if (countSigma1 == 2 & countSigma2 == 3) {
+					# # sigma1 axis label
+					# if (countSigma1 == 2 & countSigma2 == 3) {
 					
-						text(0.5, 1.35, labels='Niche width in T1', xpd=NA, col='black', srt=0, cex=2)
-					}
+						# text(0.5, 1.35, labels='Niche width in T1', xpd=NA, col='black', srt=0, cex=2)
+					# }
 					
-					# sigma2 axis label
-					if (countSigma1 == 1 & countSigma2 == 2) {
-						text(-0.34, 0.5, labels='Niche width in T2', xpd=NA, col='black', srt=90, cex=2)
-					}
+					# # sigma2 axis label
+					# if (countSigma1 == 1 & countSigma2 == 2) {
+						# text(-0.34, 0.5, labels='Niche width in T2', xpd=NA, col='black', srt=90, cex=2)
+					# }
 					
-				} # next sigma1
+				# } # next sigma1
 				
-			} # next sigma2
+			# } # next sigma2
 			
-		} # next landscape rotation
+		# } # next landscape rotation
 		
-	dev.off()
+	# dev.off()
 
 	
 #################################
