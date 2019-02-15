@@ -392,481 +392,492 @@ say('################')
 say('### [simple] ###')
 say('################')
 
-directory <- '[simple]'
-dir.create(paste0(resultsDir, directory), recursive=T, showWarnings=F)
-scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-write.csv(scenario, paste0(resultsDir, directory, '/!scenario - ', scenario, '.txt'), row.names=F)
+	directory <- '[simple]'
+	dir.create(paste0(resultsDir, directory), recursive=T, showWarnings=F)
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(resultsDir, directory, '/!scenario - ', scenario, '.txt'), row.names=F)
 
-response <- logistic
-geography <- list(list(type='linear', min=min, max=max), list(type='random', min=min, max=max))
+	### declare species' response and landscape characteristics
+	response <- logistic
+	geography <- list(list(type='linear', min=min, max=max), list(type='random', min=min, max=max))
 
-say('RESPONSE ', paste(deparse(response), collapse=' '), ' GEOGRAPHY ', ifelse(class(geography)=='list', paste(unlist(geography), collapse=' '), paste(geography, collapse=' ')))
+	say('RESPONSE ', paste(deparse(response), collapse=' '), ' GEOGRAPHY ', ifelse(class(geography)=='list', paste(unlist(geography), collapse=' '), paste(geography, collapse=' ')))
 
-png(paste0(resultsDir, directory, '/response.png'), height=600, width=600, res=200)
-par(pty='s', cex.axis=0.6, cex.lab=0.8, tck=-0.025, mgp=0.5 * c(3, 1, 0), mar=0.5 * c(5, 4, 4, 2) + 0.1)
-plot(x=seq(min, max, by=0.01), y=response(x1=seq(min, max, by=0.01), b0=b0, b1=b1), type='l', xlab='T1', ylab='Pr(occ)', ylim=c(0, 1), lwd=2)
-dev.off()
+	# generate landscape
+	landscape <- genesis(geography, circle=FALSE)
+	names(landscape) <- c('T1', 'F1')
 
-# generate landscape
-landscape <- genesis(geography, circle=FALSE)
-names(landscape) <- c('T1', 'F1')
+	# generate species
+	species <- response(x1=subset(landscape, 1), b0=b0, b1=b1)
+	say('Mean Pr(occ) = ', cellStats(species, 'mean'))
 
-# generate species
-species <- response(x1=subset(landscape, 1), b0=b0, b1=b1)
-say('Mean Pr(occ) = ', cellStats(species, 'mean'))
+	### make figure for illustrative purposes
+	png(paste0(resultsDir, directory, '/response.png'), height=600, width=600, res=200)
+	par(pty='s', cex.axis=0.6, cex.lab=0.8, tck=-0.025, mgp=0.5 * c(3, 1, 0), mar=0.5 * c(5, 4, 4, 2) + 0.1)
+	plot(x=seq(min, max, by=0.01), y=response(x1=seq(min, max, by=0.01), b0=b0, b1=b1), type='l', xlab='T1', ylab='Pr(occ)', ylim=c(0, 1), lwd=2)
+	dev.off()
 
-plotGeog(landscape=landscape, species=species, directory=paste0(resultsDir, directory), inModel=rep(T, nlayers(landscape)), name='simple situation', bg=bg, fg=fg)
+	# plotGeog(landscape=landscape, species=species, directory=paste0(resultsDir, directory), inModel=rep(T, nlayers(landscape)), name='simple situation', bg=bg, fg=fg)
 
-# model!
-main(
-	species=species,
-	response=response,
-	landscape=landscape,
-	geography=geography,
-	directory=paste0(resultsDir, directory),
-	numTrainPres=numTrainPres,
-	numTestPres=numTestPres,
-	numBg=numBg,
-	iterToDo=iterToDo,
-	maxPermIter=maxPermIter,
-	jFoldMax=jFoldMax,
-	algorithm=algorithm,
-	suffix=NULL,
-	verbose=verbose,
-	plotResponse=TRUE,
-	cbi=TRUE,
-	interaction=TRUE,
-	b0=b0, b1=b1, b2=0, b11=0, b12=0, mu1=mu1, sigma1=sigma1, sigma2=sigma2
-)
+	# model!
+	main(
+		species=species,
+		response=response,
+		landscape=landscape,
+		geography=geography,
+		directory=paste0(resultsDir, directory),
+		numTrainPres=numTrainPres,
+		numTestPres=numTestPres,
+		numBg=numBg,
+		iterToDo=iterToDo,
+		maxPermIter=maxPermIter,
+		jFoldMax=jFoldMax,
+		algorithm=algorithm,
+		suffix=NULL,
+		verbose=verbose,
+		plotResponse=TRUE,
+		cbi=TRUE,
+		interaction=TRUE,
+		b0=b0, b1=b1, b2=0, b11=0, b12=0, mu1=mu1, sigma1=sigma1, sigma2=sigma2
+	)
 
-# # analyze
-# #########
+	### make figure of landscape and species for illustrative purposes
+	##################################################################
+	
+	geog <- list(`TRUE`=list(type='linear', min=-1, max=1), `FALSE`=list(type='random', min=-1, max=-1))
+	
+	landscape <- genesis(geog, circle=FALSE)
 
-# # load results
+	
+	
+	# # analyze
+	# #########
 
-# results <- list()
-# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - OMNISCIENT')
-# n <- 1; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
+	# # load results
 
-# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - MAXENT')
-# n <- 2; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
+	# results <- list()
+	# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - OMNISCIENT')
+	# n <- 1; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
 
-# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - GAM')
-# n <- 3; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
+	# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - MAXENT')
+	# n <- 2; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
 
-# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - BRT')
-# n <- 4; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
+	# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - GAM')
+	# n <- 3; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
 
-# mergedResults <- merge(results[[1]], results[[2]], all=TRUE)
-# mergedResults <- merge(mergedResults, results[[3]], all=TRUE)
-# mergedResults <- merge(mergedResults, results[[4]], all=TRUE)
+	# files <- list.files(paste0(resultsDir, directory), full.names=T, pattern='Results - BRT')
+	# n <- 4; results[[n]] <- data.frame(); for (f in files) { theseResults <- readRDS(f); results[[n]] <- rbind(results[[n]], theseResults) }
 
-# ### plot mergedResults by algorithm: al interesting combinations of test statistics
-# for (case in c('permute cor random-bg', 'permute cor strat-bg', 'permute cor absences', 'permute cbi', 'permute auc random-bg', 'permute auc absences', 'univariate cor random-bg', 'univariate cor strat-bg', 'univariate cor absences', 'univariate cbi', 'univariate auc random-bg', 'univariate auc absences')) {
-# # for (case in c('permute cbi')) {
+	# mergedResults <- merge(results[[1]], results[[2]], all=TRUE)
+	# mergedResults <- merge(mergedResults, results[[3]], all=TRUE)
+	# mergedResults <- merge(mergedResults, results[[4]], all=TRUE)
 
-	# say(case)
+	# ### plot mergedResults by algorithm: al interesting combinations of test statistics
+	# for (case in c('permute cor random-bg', 'permute cor strat-bg', 'permute cor absences', 'permute cbi', 'permute auc random-bg', 'permute auc absences', 'univariate cor random-bg', 'univariate cor strat-bg', 'univariate cor absences', 'univariate cbi', 'univariate auc random-bg', 'univariate auc absences')) {
+	# # for (case in c('permute cbi')) {
 
-	# if (case=='permute cor random-bg') {
-	
-		# prefixFileName <- 'COR PERMUTE' # first part of file name
-		# suffixFileName <- ' - RANDOM BG' # last part of file name
-		
-		# resp <- 'cor' # type of response variable ('cor', 'auc', 'cbi', etc.)
+		# say(case)
 
-		# # response variable(s)
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corBgFullVsPerm_perm'
-		# testEnm <- 'corBgFullVsPerm_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
+		# if (case=='permute cor random-bg') {
 		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Permute Test Using COR with Random Background' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test (random background)', 'b) F1: Permute test (random background)')
-	
-	# } else if (case=='permute cor strat-bg') {
-	
-		# prefixFileName <- 'COR PERMUTE' # first part of file name
-		# suffixFileName <- ' - STRATIFIED BG' # last part of file name
-	
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corBgFullVsPermStrat_perm'
-		# testEnm <- 'corBgFullVsPermStrat_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
-		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Permute Test Using COR with Stratified Background' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test (stratified background)', 'b) F1: Permute test (stratified background)')
-	
-	# } else if (case=='permute cor absences') {
-	
-		# prefixFileName <- 'COR PERMUTE' # first part of file name
-		# suffixFileName <- ' - ABSENCES' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corAbsFullVsPerm_perm'
-		# testEnm <- 'corAbsFullVsPerm_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
-		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Multivariate Permute Test Using COR with Absences' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test (absences)', 'b) F1: Permute test (absences)')
-	
-	# } else if (case=='permute cbi') {
-	
-		# prefixFileName <- 'CBI MULTIVARIATE' # first part of file name
-		# suffixFileName <- '- Permute Test' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'cbiFull'
-		# baselineEnm <- 'cbiFull'
-		# testOmni <- 'cbiPerm_perm'
-		# testEnm <- 'cbiPerm_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'permuted' # text for legend
-		
-		# ylab <- 'CBI' # y-axis label
-		# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using CBI' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test', 'b) F1: Permute test')
-	
-	# } else if (case=='permute auc random-bg') {
+			# prefixFileName <- 'COR PERMUTE' # first part of file name
+			# suffixFileName <- ' - RANDOM BG' # last part of file name
+			
+			# resp <- 'cor' # type of response variable ('cor', 'auc', 'cbi', etc.)
 
-		# prefixFileName <- 'AUC MULTIVARIATE' # first part of file name
-		# suffixFileName <- ' - RANDOM BG' # last part of file name
+			# # response variable(s)
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corBgFullVsPerm_perm'
+			# testEnm <- 'corBgFullVsPerm_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Permute Test Using COR with Random Background' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test (random background)', 'b) F1: Permute test (random background)')
+		
+		# } else if (case=='permute cor strat-bg') {
+		
+			# prefixFileName <- 'COR PERMUTE' # first part of file name
+			# suffixFileName <- ' - STRATIFIED BG' # last part of file name
+		
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corBgFullVsPermStrat_perm'
+			# testEnm <- 'corBgFullVsPermStrat_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Permute Test Using COR with Stratified Background' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test (stratified background)', 'b) F1: Permute test (stratified background)')
+		
+		# } else if (case=='permute cor absences') {
+		
+			# prefixFileName <- 'COR PERMUTE' # first part of file name
+			# suffixFileName <- ' - ABSENCES' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corAbsFullVsPerm_perm'
+			# testEnm <- 'corAbsFullVsPerm_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Multivariate Permute Test Using COR with Absences' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test (absences)', 'b) F1: Permute test (absences)')
+		
+		# } else if (case=='permute cbi') {
+		
+			# prefixFileName <- 'CBI MULTIVARIATE' # first part of file name
+			# suffixFileName <- '- Permute Test' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'cbiFull'
+			# baselineEnm <- 'cbiFull'
+			# testOmni <- 'cbiPerm_perm'
+			# testEnm <- 'cbiPerm_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'permuted' # text for legend
+			
+			# ylab <- 'CBI' # y-axis label
+			# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using CBI' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test', 'b) F1: Permute test')
+		
+		# } else if (case=='permute auc random-bg') {
 
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'aucBgFullModel'
-		# baselineEnm <- 'aucBgFullModel'
-		# testOmni <- 'aucBgPerm_perm'
-		# testEnm <- 'aucBgPerm_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'permuted' # text for legend
-		
-		# ylab <- 'AUC' # y-axis label
-		# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using AUC with RANDOM BG' # graph master title
-		
-		# minVal <- 0 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test (random background)', 'b) F1: Permute test (random background)')
-	
-	# } else if (case=='permute auc absences') {
-	
-		# prefixFileName <- 'AUC MULTIVARIATE' # first part of file name
-		# suffixFileName <- ' - Absences' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'aucAbsFullModel'
-		# baselineEnm <- 'aucAbsFullModel'
-		# testOmni <- 'aucAbsPerm_perm'
-		# testEnm <- 'aucAbsPerm_perm'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'permuted' # text for legend
-		
-		# ylab <- 'AUC' # y-axis label
-		# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using AUC with Absences' # graph master title
-		
-		# minVal <- 0 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Permute test (absences)', 'b) F1: Permute test (absences)')
-	
-	# } else if (case=='univariate cor random-bg') {
-	
-		# prefixFileName <- 'COR UNIVARIATE' # first part of file name
-		# suffixFileName <- ' - Random BG' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corBgFullVsUnivar_just'
-		# testEnm <- 'corBgFullVsUnivar_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
-		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Univariate COR Test with Random Background' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('b) T1: Univariate test (random background)', 'c) F1: Univariate test (random background)')
-	
-	# } else if (case=='univariate cor strat-bg') {
-	
-		# prefixFileName <- 'COR UNIVARIATE' # first part of file name
-		# suffixFileName <- ' - Stratified BG' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corBgFullVsUnivarStrat_just'
-		# testEnm <- 'corBgFullVsUnivarStrat_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
-		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Univariate Test Using COR with Stratified Background' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('a) T1: Univariate test (stratified background)', 'b) F1: Univariate test (stratified background)')
-	
-	# } else if (case=='univariate cor absences') {
-	
-		# prefixFileName <- 'COR UNIVARIATE' # first part of file name
-		# suffixFileName <- ' - Absences' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- NULL
-		# baselineEnm <- NULL
-		# testOmni <- 'corAbsFullVsUnivar_just'
-		# testEnm <- 'corAbsFullVsUnivar_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- NULL # text for legend
-		# testName <- NULL # text for legend
-		
-		# ylab <- 'COR' # y-axis label
-		# main <- 'Univariate Test Using COR with Absences' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('c) T1: Univariate test (absences)', 'd) F1: Univariate test (absences)')
-	
-	# } else if (case=='univariate cbi') {
-	
-		# prefixFileName <- 'CBI UNIVARIATE' # first part of file name
-		# suffixFileName <- '' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'cbiFull'
-		# baselineEnm <- 'cbiFull'
-		# testOmni <- 'cbiUnivar_just'
-		# testEnm <- 'cbiUnivar_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'univariate' # text for legend
-		
-		# ylab <- 'CBI' # y-axis label
-		# main <- 'Multivariate (Baseline) vs Univariate (Test) Using CBI' # graph master title
-		
-		# minVal <- -1 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('c) T1: Univariate test', 'd) F1: Univariate test')
-	
-	# } else if (case=='univariate auc random-bg') {
-	
-		# prefixFileName <- 'AUC UNIVARIATE' # first part of file name
-		# suffixFileName <- ' - Random BG' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'aucBgFullModel'
-		# baselineEnm <- 'aucBgFullModel'
-		# testOmni <- 'aucBgUnivar_just'
-		# testEnm <- 'aucBgUnivar_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'univariate' # text for legend
-		
-		# ylab <- 'AUC' # y-axis label
-		# main <- 'Multivariate (Baseline) vs Univariate (Test) Using AUC with Random Background' # graph master title
-		
-		# minVal <- 0 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('c) T1: Univariate test (random background)', 'd) F1: Univariate test (random background)')
-	
-	# } else if (case=='univariate auc absences') {
-	
-		# prefixFileName <- 'AUC UNIVARIATE' # first part of file name
-		# suffixFileName <- ' - Absences' # last part of file name
-	
-		# # response variable(s)
-		# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
-		# baselineOmni <- 'aucAbsFullModel'
-		# baselineEnm <- 'aucAbsFullModel'
-		# testOmni <- 'aucAbsUnivar_just'
-		# testEnm <- 'aucAbsUnivar_just'
-		# invert <- FALSE # use 1 - metric if TRUE
-		# baselineName <- 'full model' # text for legend
-		# testName <- 'univariate' # text for legend
-		
-		# ylab <- 'AUC' # y-axis label
-		# main <- 'Multivariate (Baseline) vs Univariate (Test) Using AUC with Absences' # graph master title
-		
-		# minVal <- 0 # minimum y-axis value *if* no y values are < this value
-		# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
-		# panels <- c('c) T1: Univariate test (absences)', 'd) F1: Univariate test (absences)')
-	
-	# }
+			# prefixFileName <- 'AUC MULTIVARIATE' # first part of file name
+			# suffixFileName <- ' - RANDOM BG' # last part of file name
 
-	png(paste0(resultsDir, directory, '/!Importance - ', prefixFileName, suffixFileName, '.png'), width=2000, height=1100, res=300)
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'aucBgFullModel'
+			# baselineEnm <- 'aucBgFullModel'
+			# testOmni <- 'aucBgPerm_perm'
+			# testEnm <- 'aucBgPerm_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'permuted' # text for legend
+			
+			# ylab <- 'AUC' # y-axis label
+			# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using AUC with RANDOM BG' # graph master title
+			
+			# minVal <- 0 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test (random background)', 'b) F1: Permute test (random background)')
+		
+		# } else if (case=='permute auc absences') {
+		
+			# prefixFileName <- 'AUC MULTIVARIATE' # first part of file name
+			# suffixFileName <- ' - Absences' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'aucAbsFullModel'
+			# baselineEnm <- 'aucAbsFullModel'
+			# testOmni <- 'aucAbsPerm_perm'
+			# testEnm <- 'aucAbsPerm_perm'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'permuted' # text for legend
+			
+			# ylab <- 'AUC' # y-axis label
+			# main <- 'Multivariate Non-Permuted (Baseline) vs Permuted (Test) Using AUC with Absences' # graph master title
+			
+			# minVal <- 0 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Permute test (absences)', 'b) F1: Permute test (absences)')
+		
+		# } else if (case=='univariate cor random-bg') {
+		
+			# prefixFileName <- 'COR UNIVARIATE' # first part of file name
+			# suffixFileName <- ' - Random BG' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corBgFullVsUnivar_just'
+			# testEnm <- 'corBgFullVsUnivar_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Univariate COR Test with Random Background' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('b) T1: Univariate test (random background)', 'c) F1: Univariate test (random background)')
+		
+		# } else if (case=='univariate cor strat-bg') {
+		
+			# prefixFileName <- 'COR UNIVARIATE' # first part of file name
+			# suffixFileName <- ' - Stratified BG' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corBgFullVsUnivarStrat_just'
+			# testEnm <- 'corBgFullVsUnivarStrat_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Univariate Test Using COR with Stratified Background' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('a) T1: Univariate test (stratified background)', 'b) F1: Univariate test (stratified background)')
+		
+		# } else if (case=='univariate cor absences') {
+		
+			# prefixFileName <- 'COR UNIVARIATE' # first part of file name
+			# suffixFileName <- ' - Absences' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- FALSE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- NULL
+			# baselineEnm <- NULL
+			# testOmni <- 'corAbsFullVsUnivar_just'
+			# testEnm <- 'corAbsFullVsUnivar_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- NULL # text for legend
+			# testName <- NULL # text for legend
+			
+			# ylab <- 'COR' # y-axis label
+			# main <- 'Univariate Test Using COR with Absences' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1.1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('c) T1: Univariate test (absences)', 'd) F1: Univariate test (absences)')
+		
+		# } else if (case=='univariate cbi') {
+		
+			# prefixFileName <- 'CBI UNIVARIATE' # first part of file name
+			# suffixFileName <- '' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'cbiFull'
+			# baselineEnm <- 'cbiFull'
+			# testOmni <- 'cbiUnivar_just'
+			# testEnm <- 'cbiUnivar_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'univariate' # text for legend
+			
+			# ylab <- 'CBI' # y-axis label
+			# main <- 'Multivariate (Baseline) vs Univariate (Test) Using CBI' # graph master title
+			
+			# minVal <- -1 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('c) T1: Univariate test', 'd) F1: Univariate test')
+		
+		# } else if (case=='univariate auc random-bg') {
+		
+			# prefixFileName <- 'AUC UNIVARIATE' # first part of file name
+			# suffixFileName <- ' - Random BG' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'aucBgFullModel'
+			# baselineEnm <- 'aucBgFullModel'
+			# testOmni <- 'aucBgUnivar_just'
+			# testEnm <- 'aucBgUnivar_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'univariate' # text for legend
+			
+			# ylab <- 'AUC' # y-axis label
+			# main <- 'Multivariate (Baseline) vs Univariate (Test) Using AUC with Random Background' # graph master title
+			
+			# minVal <- 0 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('c) T1: Univariate test (random background)', 'd) F1: Univariate test (random background)')
+		
+		# } else if (case=='univariate auc absences') {
+		
+			# prefixFileName <- 'AUC UNIVARIATE' # first part of file name
+			# suffixFileName <- ' - Absences' # last part of file name
+		
+			# # response variable(s)
+			# needBase <- TRUE # TRUE if need to plot baseline case, FALSE if not
+			# baselineOmni <- 'aucAbsFullModel'
+			# baselineEnm <- 'aucAbsFullModel'
+			# testOmni <- 'aucAbsUnivar_just'
+			# testEnm <- 'aucAbsUnivar_just'
+			# invert <- FALSE # use 1 - metric if TRUE
+			# baselineName <- 'full model' # text for legend
+			# testName <- 'univariate' # text for legend
+			
+			# ylab <- 'AUC' # y-axis label
+			# main <- 'Multivariate (Baseline) vs Univariate (Test) Using AUC with Absences' # graph master title
+			
+			# minVal <- 0 # minimum y-axis value *if* no y values are < this value
+			# maxVal <- 1 # maximum y-axis value *if* no y values are < this value
+			# panels <- c('c) T1: Univariate test (absences)', 'd) F1: Univariate test (absences)')
+		
+		# }
 
-		par(mfrow=c(1, 2), fg=fg, bg=bg, col.main=fg, col.axis=fg, col.lab=fg, mgp=0.7 * c(3, 1, 0), cex.lab=1.0, cex.main=1.2, cex.axis=0.7, lwd=1)
+		png(paste0(resultsDir, directory, '/!Importance - ', prefixFileName, suffixFileName, '.png'), width=2000, height=1100, res=300)
 
-		# each panel
-		for (variable in c('T1', 'F1')) {
+			par(mfrow=c(1, 2), fg=fg, bg=bg, col.main=fg, col.axis=fg, col.lab=fg, mgp=0.7 * c(3, 1, 0), cex.lab=1.0, cex.main=1.2, cex.axis=0.7, lwd=1)
 
-			for (algo in c('omniscient', 'gam', 'maxent', 'brt')) {
-				
-				niceNames <- c('Omniscient', 'GAM', 'Maxent', 'BRT')
+			# each panel
+			for (variable in c('T1', 'F1')) {
 
-				# get this ENM's results for BASELINE (NOT permuted, etc.)
-				if (needBase) {
+				for (algo in c('omniscient', 'gam', 'maxent', 'brt')) {
 					
-					thisSdmResultsBaseline <- mergedResults[mergedResults$algorithm==algo, ifelse(algo=='omniscient', baselineOmni, baselineEnm)]
-					if (invert) thisSdmResultsBaseline <- 1 - thisSdmResults
-					thisSdmResultsBaseline <- data.frame(algorithm=algo, response=thisSdmResultsBaseline)
-				
-				}
-				
-				# get this ENM's results for TEST case (permuted, etc.)
-				thisSdmResultsTest <- mergedResults[mergedResults$algorithm==algo, paste0(testEnm, variable)]
-				if (invert) thisSdmResultsTest <- 1 - thisSdmResultsTest
-				thisSdmResultsTest <- data.frame(algorithm=algo, response=thisSdmResultsTest)
-				
-				# blank plot
-				if (algo=='omniscient') boxplot(matrix(c(rep(maxVal, 4), rep(minVal, 4)), ncol=4, byrow=TRUE), col=bg, border=bg, main=NA, names=niceNames, ylab=ylab, cex.axis=0.5, cex.lab=0.8)
-					
-				# BASELINE bean plot--truncated at lower 2.5% and upper 2.5%, center bar represents median
-				if (needBase) {
+					niceNames <- c('Omniscient', 'GAM', 'Maxent', 'BRT')
 
+					# get this ENM's results for BASELINE (NOT permuted, etc.)
+					if (needBase) {
+						
+						thisSdmResultsBaseline <- mergedResults[mergedResults$algorithm==algo, ifelse(algo=='omniscient', baselineOmni, baselineEnm)]
+						if (invert) thisSdmResultsBaseline <- 1 - thisSdmResults
+						thisSdmResultsBaseline <- data.frame(algorithm=algo, response=thisSdmResultsBaseline)
+					
+					}
+					
+					# get this ENM's results for TEST case (permuted, etc.)
+					thisSdmResultsTest <- mergedResults[mergedResults$algorithm==algo, paste0(testEnm, variable)]
+					if (invert) thisSdmResultsTest <- 1 - thisSdmResultsTest
+					thisSdmResultsTest <- data.frame(algorithm=algo, response=thisSdmResultsTest)
+					
+					# blank plot
+					if (algo=='omniscient') boxplot(matrix(c(rep(maxVal, 4), rep(minVal, 4)), ncol=4, byrow=TRUE), col=bg, border=bg, main=NA, names=niceNames, ylab=ylab, cex.axis=0.5, cex.lab=0.8)
+						
+					# BASELINE bean plot--truncated at lower 2.5% and upper 2.5%, center bar represents median
+					if (needBase) {
+
+						# bar position
+						at <- which(algo==c('omniscient', 'gam', 'maxent', 'brt')) - 0.1
+
+						# beanplot
+						beanplot(response ~ algorithm, data=thisSdmResultsBaseline, what=c(FALSE, TRUE, TRUE, FALSE), col=list(alpha(c(bg, col1, col1, fg), 0.8)), beanlines='median', bw='nrd0', at=at, add=TRUE, cutmin=quantile(thisSdmResultsBaseline$response, 0.025, na.rm=T), cutmax=quantile(thisSdmResultsBaseline$response, 0.975, na.rm=T), names='', beanlinewd=1, xaxt='n')
+						
+					}
+					
 					# bar position
-					at <- which(algo==c('omniscient', 'gam', 'maxent', 'brt')) - 0.1
+					at <- which(algo==c('omniscient', 'gam', 'maxent', 'brt'))
+					if (needBase) at <- at + 0.1
 
-					# beanplot
-					beanplot(response ~ algorithm, data=thisSdmResultsBaseline, what=c(FALSE, TRUE, TRUE, FALSE), col=list(alpha(c(bg, col1, col1, fg), 0.8)), beanlines='median', bw='nrd0', at=at, add=TRUE, cutmin=quantile(thisSdmResultsBaseline$response, 0.025, na.rm=T), cutmax=quantile(thisSdmResultsBaseline$response, 0.975, na.rm=T), names='', beanlinewd=1, xaxt='n')
+					# PERMUTED bean plot--truncated at lower 2.5% and upper 2.5%, center bar represents median
+					beanplot(response ~ algorithm, data=thisSdmResultsTest, what=c(FALSE, TRUE, TRUE, FALSE), col=list(alpha(c(col6, col6, col6, fg), 0.7)), beanlines='median', bw='nrd0', at=at, add=TRUE, cutmin=quantile(thisSdmResultsTest$response, 0.025, na.rm=T), cutmax=quantile(thisSdmResultsTest$response, 0.975, na.rm=T), names=niceNames[at], beanlinewd=1, xaxt='n')
+					
+					# legend
+					if (needBase) {
+						legend('bottomright', inset=0, xpd=NA, bty='n', fill=c(bg, alpha(col6, 0.7)), legend=c(baselineName, testName), ncol=1, cex=0.6)
+					}
+					
+					# panel labels
+					coords <- par('usr')
+					text(x=coords[1] - (0.31 * (coords[2] - coords[1])), y=coords[4] + 0.125 * (coords[4] - coords[3]), labels=ifelse(variable=='T1', panels[1], panels[2]), xpd=NA, pos=4, cex=0.9)
 					
 				}
-				
-				# bar position
-				at <- which(algo==c('omniscient', 'gam', 'maxent', 'brt'))
-				if (needBase) at <- at + 0.1
-
-				# PERMUTED bean plot--truncated at lower 2.5% and upper 2.5%, center bar represents median
-				beanplot(response ~ algorithm, data=thisSdmResultsTest, what=c(FALSE, TRUE, TRUE, FALSE), col=list(alpha(c(col6, col6, col6, fg), 0.7)), beanlines='median', bw='nrd0', at=at, add=TRUE, cutmin=quantile(thisSdmResultsTest$response, 0.025, na.rm=T), cutmax=quantile(thisSdmResultsTest$response, 0.975, na.rm=T), names=niceNames[at], beanlinewd=1, xaxt='n')
-				
-				# legend
-				if (needBase) {
-					legend('bottomright', inset=0, xpd=NA, bty='n', fill=c(bg, alpha(col6, 0.7)), legend=c(baselineName, testName), ncol=1, cex=0.6)
-				}
-				
-				# panel labels
-				coords <- par('usr')
-				text(x=coords[1] - (0.31 * (coords[2] - coords[1])), y=coords[4] + 0.125 * (coords[4] - coords[3]), labels=ifelse(variable=='T1', panels[1], panels[2]), xpd=NA, pos=4, cex=0.9)
 				
 			}
 			
-		}
+			title(main=main, sub=date(), outer=TRUE, line=-1, cex.main=0.7, cex.sub=0.4)
+			
+		dev.off()
+
+	}
+
+	# ### plot algorithm-specific measures of importance
+	# png(paste0(resultsDir, directory, '/!Importance - Algorithm-specific Measures.png'), width=2000, height=2200, res=300)
+
+		# par(mfrow=c(1, 1), fg=fg, bg=bg, col.main=fg, col.axis=fg, col.lab=fg, mgp=0.7 * c(3, 1, 0), cex.lab=1.0, cex.main=1.2, cex.axis=0.7, lwd=1)
+
+		# # get algorithm-specific data for plotting
+		# importT1 <- data.frame(
+			# maxentContrib=results[[2]]$maxentContribT1,
+			# maxentPermImport=results[[2]]$maxentPermImportT1,
+			# maxentTrainGainWithout=results[[2]]$maxentTrainGainWithoutT1,
+			# maxentTrainGainWithOnly=results[[2]]$maxentTrainGainWithOnlyT1,
+			# gamAiccWeight=results[[3]]$gamAiccWeightT1,
+			# brtImport=results[[4]]$brtImportT1
+		# )
 		
-		title(main=main, sub=date(), outer=TRUE, line=-1, cex.main=0.7, cex.sub=0.4)
+		# importF1 <- data.frame(
+			# maxentContrib=results[[2]]$maxentContribF1,
+			# maxentPermImport=results[[2]]$maxentPermImportF1,
+			# maxentTrainGainWithout=results[[2]]$maxentTrainGainWithoutF1,
+			# maxentTrainGainWithOnly=results[[2]]$maxentTrainGainWithOnlyF1,
+			# gamAiccWeight=results[[3]]$gamAiccWeightF1,
+			# brtImport=results[[4]]$brtImportF1
+		# )
 		
-	dev.off()
+		# importT1$maxentTrainGainWithout <- importT1$maxentTrainGainWithout * 100
+		# importT1$maxentTrainGainWithOnly <- importT1$maxentTrainGainWithOnly * 100
+		
+		# importF1$maxentTrainGainWithout <- importF1$maxentTrainGainWithout * 100
+		# importF1$maxentTrainGainWithOnly <- importF1$maxentTrainGainWithOnly * 100
+		
+		# # establish empty plot
+		# boxplot(matrix(1:ncol(importT1), ncol=ncol(importT1)), ylim=c(-0.1, 1), col=bg, border=bg, names=NA, ylab='Measure', main='Algorithm-specific Measures of Importance')
+		
+		# # plot each variable
+		# for (thisImport in c('importT1', 'importF1')) {
 
-}
-
-# ### plot algorithm-specific measures of importance
-# png(paste0(resultsDir, directory, '/!Importance - Algorithm-specific Measures.png'), width=2000, height=2200, res=300)
-
-	# par(mfrow=c(1, 1), fg=fg, bg=bg, col.main=fg, col.axis=fg, col.lab=fg, mgp=0.7 * c(3, 1, 0), cex.lab=1.0, cex.main=1.2, cex.axis=0.7, lwd=1)
-
-	# # get algorithm-specific data for plotting
-	# importT1 <- data.frame(
-		# maxentContrib=results[[2]]$maxentContribT1,
-		# maxentPermImport=results[[2]]$maxentPermImportT1,
-		# maxentTrainGainWithout=results[[2]]$maxentTrainGainWithoutT1,
-		# maxentTrainGainWithOnly=results[[2]]$maxentTrainGainWithOnlyT1,
-		# gamAiccWeight=results[[3]]$gamAiccWeightT1,
-		# brtImport=results[[4]]$brtImportT1
-	# )
-	
-	# importF1 <- data.frame(
-		# maxentContrib=results[[2]]$maxentContribF1,
-		# maxentPermImport=results[[2]]$maxentPermImportF1,
-		# maxentTrainGainWithout=results[[2]]$maxentTrainGainWithoutF1,
-		# maxentTrainGainWithOnly=results[[2]]$maxentTrainGainWithOnlyF1,
-		# gamAiccWeight=results[[3]]$gamAiccWeightF1,
-		# brtImport=results[[4]]$brtImportF1
-	# )
-	
-	# importT1$maxentTrainGainWithout <- importT1$maxentTrainGainWithout * 100
-	# importT1$maxentTrainGainWithOnly <- importT1$maxentTrainGainWithOnly * 100
-	
-	# importF1$maxentTrainGainWithout <- importF1$maxentTrainGainWithout * 100
-	# importF1$maxentTrainGainWithOnly <- importF1$maxentTrainGainWithOnly * 100
-	
-	# # establish empty plot
-	# boxplot(matrix(1:ncol(importT1), ncol=ncol(importT1)), ylim=c(-0.1, 1), col=bg, border=bg, names=NA, ylab='Measure', main='Algorithm-specific Measures of Importance')
-	
-	# # plot each variable
-	# for (thisImport in c('importT1', 'importF1')) {
-
-		# import <- get(thisImport)
-	
-		# # for each measure of importance
-		# for (i in 1:ncol(import)) {
-			
-			# at <- i + ifelse(thisImport=='importT1', -0.1, 0.1)
-			
-			# beanplot(
-				# import[ , i],
-				# what=c(FALSE, TRUE, TRUE, FALSE),
-				# col=c(ifelse(thisImport=='importT1', col3, col2), ifelse(thisImport=='importT1', col3, col2), ifelse(thisImport=='importT1', col3, col2), fg),
-				# beanlines='median',
-				# bw='nrd0',
-				# at=at,
-				# add=TRUE,
-				# cutmin=quantile(import[ , i], 0.025, na.rm=T),
-				# cutmax=quantile(import[ , i], 0.975, na.rm=T),
-				# names=NA,
-				# beanlinewd=1,
-				# tick=FALSE
-			# )
-			
+			# import <- get(thisImport)
+		
+			# # for each measure of importance
+			# for (i in 1:ncol(import)) {
+				
+				# at <- i + ifelse(thisImport=='importT1', -0.1, 0.1)
+				
+				# beanplot(
+					# import[ , i],
+					# what=c(FALSE, TRUE, TRUE, FALSE),
+					# col=c(ifelse(thisImport=='importT1', col3, col2), ifelse(thisImport=='importT1', col3, col2), ifelse(thisImport=='importT1', col3, col2), fg),
+					# beanlines='median',
+					# bw='nrd0',
+					# at=at,
+					# add=TRUE,
+					# cutmin=quantile(import[ , i], 0.025, na.rm=T),
+					# cutmax=quantile(import[ , i], 0.975, na.rm=T),
+					# names=NA,
+					# beanlinewd=1,
+					# tick=FALSE
+				# )
+				
+			# }
+		
 		# }
-	
-	# }
-	
-	# # category labels
-	# text(x=1:ncol(import), y=-0.25, adj=0.5, labels=c('MX\nContrib', 'MX\nPermute', 'MX Gain\nwithout\nx100', 'MX Gain\nwith\nx100', 'GAM\nAICc\nWeight', 'BRT\nImportance'), xpd=NA)
-	
-	# legend('bottomright', inset=0.01, legend=c('T1-M', 'F1'), fill=c(col3, col2))
-	
-# dev.off()
+		
+		# # category labels
+		# text(x=1:ncol(import), y=-0.25, adj=0.5, labels=c('MX\nContrib', 'MX\nPermute', 'MX Gain\nwithout\nx100', 'MX Gain\nwith\nx100', 'GAM\nAICc\nWeight', 'BRT\nImportance'), xpd=NA)
+		
+		# legend('bottomright', inset=0.01, legend=c('T1-M', 'F1'), fill=c(col3, col2))
+		
+	# dev.off()
 
 # say('####################')
 # say('### [prevalence] ###')

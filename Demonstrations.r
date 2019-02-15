@@ -240,11 +240,11 @@ say('###########################################################################
 	# say('This demonstration illustrates how removing the most important variable results in the second-most important variable gaining equivalent performance even if it is a weak predictor of the distribution.', breaks=90)
 	
 	# thisOutDir <- 'demo - relative variable importance'
-	# outDir <- paste0('./Results/', thisOutDir)
+	# scenarioDir <- paste0('./Results/', thisOutDir)
 	
-	# dirCreate(outDir)
+	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE gaussian(T1) + gaussian(T2) MODEL T1 T2 F1 GEOG linear(T1) linear(T2) linear(F1)'
-	# write.csv(scenario, paste0(outDir, '/!scenario - ', scenario, '.txt'), row.names=F)
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=F)
 
 	# # define species
 	# b0 <- b1 <- b2 <- b11 <- b12 <- NA
@@ -266,7 +266,7 @@ say('###########################################################################
 		# response=response,
 		# species=species,
 		# geography=geography,
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# numTrainPres=200,
 		# numTestPres=200,
 		# numBg=10000,
@@ -280,7 +280,7 @@ say('###########################################################################
 
 	# # train full models
 	# mainTrainModels(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# vars=c('T1', 'T2', 'F1'),
 		# algos=c('maxent', 'brt'),
 		# type=c('multivariate', 'reduced'),
@@ -294,7 +294,7 @@ say('###########################################################################
 
 	# # evaluate
 	# mainEval(
-		# outDir=outDir,
+		# scenarioDir=scenarioDir,
 		# algos=c('maxent', 'brt'),
 		# type=c('multivariate', 'reduced'),
 		# iters=1,
