@@ -12,7 +12,9 @@
 ### master settings ###
 ### functions ###
 
-### [tune brt for logistic responses] ### RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
+### [tune brt for logistic responses] modeling ###
+### [tune brt for logistic responses] selecting optimal parameters ###
+
 ### [simple] RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
 ### [sample size] RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1) ###
 
@@ -22,7 +24,7 @@
 
 ### [correlated TRUE & FALSE] ###
 
-### [tune brt for bivariate responses] ###
+### [tune brt for bivariate responses] modeling ###
 ### [bivariate] ###
 ### [extra false variable]
 ### [missing true variable] ###
@@ -31,19 +33,19 @@
 ### master settings ###
 #######################
 
-	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	tempDrive <- 'C:'
+	# # source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
+	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
+
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
+	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	tempDrive <- 'D:'
+	tempDrive <- 'E:'
 
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
 	modelDir <- 'models' # subdirectory of each scenario's directory in which to store models
 	evalDir <- 'evaluations' # subdirectory of each scenario's directory in which to store model evaluations
 	
-	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts NEW/Scenarios.r')
-	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
-	# tempDrive <- 'D:'
-	# tempDrive <- 'E:'
-
 	# verbose <- 0 # minimal display
 	verbose <- 1 # some display -- best for most scenarios
 	# verbose <- 2 # much display
@@ -74,19 +76,22 @@
 	# algos <- c('gam')
 	# algos <- c('rf')
 
+	# values of Maxent master regularization multiplier to try (Warren & Siefert 2008)
+	regMult <- c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+	
+	# number of training background sites to test for BRTs in "tuning" exercises
+	numBgToTestForBrt <- c(10000, 1000, 200)
+	
 #################
 ### functions ###
 #################
 
-	library(compiler)
-	library(sp);
-	library(rgdal);
-	library(raster);
-	library(rJava);
-	options(java.parameters='-Xmx1g' );
+	library(sp)
+	library(rgdal)
+	library(raster)
+	library(rJava)
+	options(java.parameters='-Xmx1g' )
 	library(dismo)
-	library(scales)
-	library(beanplot)
 	library(omnibus)
 	library(enmSdm)
 	library(enmSdmPredImport)
@@ -97,127 +102,34 @@
 
 	tempDir <- paste0(tempDrive, '/ecology/!Scratch/_TEMP\\') # maxent temp directory
 
-say('#########################################')
-say('### [tune brt for logistic responses] ###')
-say('#########################################')
-
-	say('This experiment tunes the settings to be used for BRTs using the simplest landscape.')
-
-	thisOutDir <- 'tune brt for logistic responses'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
-	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
-
-	# define species
-	b0 <- 0 # intercept
-	b1 <- 2 # slope of P1
-	b2 <- 1 # slope of P2
-	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- 0 # slope of T1 * T2
-	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	response <- logistic
+	# get vector of number of training background sites customized for each algorithm
+	getNumBg <- function(algos, brtBg=200, gamBg=10000, maxentBg=10000, rfBg=200, otherBg=10000) {
 	
-	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-
-	# # # create data
-	# # mainMakeData(
-		# # response=response,
-		# # geography=geography,
-		# # simDir=paste0(scenarioDir, '/!scenario data - 10000 bg'),
-		# # numTrainPres=200,
-		# # numTestPres=200,
-		# # numBg=10000,
-		# # iters=iters,
-		# # overwrite=FALSE,
-		# # filePrepend='10000 bg',
-		# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-		# # verbose=verbose,
-		# # circle=FALSE
-	# # )
-
-	# # # subsample calibration background sites to create sets with smaller numbers of sites
-	# # for (numBg in c(1000, 200)) {
-	
-		# # fromSim <- if (numBg == 1000) {
-			# # 10000
-		# # } else if (numBg == 200) {
-			# # 1000
-		# # }
-	
-		# # for (iter in iters) {
+		# algos		names of algorithms
+		# brtBg, gamBg, maxentBg, rfBg, otherBg
+		#			number of background sites for each algorithm
 		
-			# # load(paste0(scenarioDir, '/!scenario data/', prefix(fromSim, 5), ' bg sim ', prefix(iter, 3), '.RData'))
-			# # trainPres <- sim$trainData[1:sim$stats$numTrainPres, ]
-			# # trainBg <- sim$trainData[(sim$stats$numTrainPres + 1):nrow(sim$trainData), , drop=FALSE]
-
-			# # set.seed(sim$seed)
-			# # trainBg <- trainBg[sample(1:nrow(trainBg), numBg), , drop=FALSE]
-			
-			# # trainData <- rbind(trainPres, trainBg)
-			# # sim$trainData <- trainData
-			
-			# # sim$stats$numBg <- numBg
-			
-			# # save(sim, file=paste0(scenarioDir, '/!scenario data/', prefix(numBg, 5), ' bg sim ', prefix(iter, 3), '.RData'))
-			
-		# # }
-	
-	# # }
-	
-	# ff <- listFiles('C:/ecology/Drive/R/enmSdmPredImport/R')
-	# for (f in ff) source(f)
-	
-	# # train full models
-	# for (numBg in c(10000, 1000, 200)) {
-	
-		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
-
-		# mainTrainModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/models with ', numBg, ' bg'),
-			# vars=c('T1', 'F1'),
-			# algos='brt',
-			# type=c('multivariate'),
-			# iters=iters,
-			# numBg=numBg,
-			# filePrepend=NULL,
-			# overwrite=FALSE,
-			# verbose=verbose,
-			# maxTrees=8000,
-			# learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=0.6
-		# )
+		n <- rep(NA, length(algos))
+		names(n) <- algos
 		
-	# }
-
-	# evaluate
-	# for (numBg in c(10000, 1000, 200)) {
-	for (numBg in c(1000, 200)) {
+		n[algos %in% 'brt'] <- brtBg
+		n[algos %in% 'gam'] <- gamBg
+		n[algos %in% 'maxent'] <- maxentBg
+		n[algos %in% 'rf'] <- rfBg
+		n[is.na(n)] <- otherBg
 	
-		say('USING ', numBg, ' BACKGROUND SITES', level=2)
-source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')	
-		mainEvalModels(
-			simDir=paste0(scenarioDir, '/', simDir),
-			modelDir=paste0(scenarioDir, '/models with ', numBg, ' bg'),
-			evalDir=paste0(scenarioDir, '/', evalDir, ' models with ', numBg, ' bg'),
-			algos='brt',
-			type=c('multivariate'),
-			iters=iters,
-			perms=30,
-			ia=FALSE,
-			overwrite=FALSE,
-			filePrepend=NULL,
-			verbose=verbose
-		)
+		n
 		
 	}
 
-# say('################')
-# say('### [simple] ###')
-# say('################')
+	
+# say('##################################################')
+# say('### [tune brt for logistic responses] modeling ###')
+# say('##################################################')
 
-	# thisOutDir <- 'simple'
+	# say('This experiment tunes the settings to be used for BRTs using the simplest landscape.')
+
+	# thisOutDir <- 'tune brt for logistic responses'
 	# scenarioDir <- paste0('./Results/', thisOutDir)
 	# dirCreate(scenarioDir)
 	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
@@ -239,48 +151,252 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 	# # mainMakeData(
 		# # response=response,
 		# # geography=geography,
-		# # simDir=paste0(scenarioDir, '/', simDir),
+		# # simDir=paste0(scenarioDir, '/!scenario data - 10000 bg'),
 		# # numTrainPres=200,
 		# # numTestPres=200,
 		# # numBg=10000,
 		# # iters=iters,
 		# # overwrite=FALSE,
-		# # filePrepend=NULL,
+		# # filePrepend='10000 bg',
 		# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
 		# # verbose=verbose,
 		# # circle=FALSE
 	# # )
 
 	# # train full models
-	# mainTrainModels(
+	# for (numBg in numBgToTestForBrt) {
+	
+		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+
+		# mainTrainModels(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/models with ', numBg, ' bg'),
+			# vars=c('T1', 'F1'),
+			# algos='brt',
+			# type=c('multivariate'),
+			# iters=iters,
+			# numBg=numBg,
+			# filePrepend=NULL,
+			# overwrite=FALSE,
+			# verbose=verbose,
+			# maxTrees=8000,
+			# learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=bf
+		# )
+		
+	# }
+
+	# # evaluate
+	# for (numBg in numBgToTestForBrt) {
+	
+		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+
+		# mainEvalModels(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/models with ', numBg, ' bg'),
+			# evalDir=paste0(scenarioDir, '/', evalDir, ' models with ', numBg, ' bg'),
+			# algos='brt',
+			# type=c('multivariate'),
+			# iters=iters,
+			# perms=30,
+			# ia=FALSE,
+			# overwrite=FALSE,
+			# filePrepend=NULL,
+			# verbose=verbose
+		# )
+	
+		# from <- paste0(scenarioDir, '/evaluations models with ', numBg, ' bg/Evaluations for multivariate BRT.RData')
+		# to <- paste0(scenarioDir, '/evaluations models with ', numBg, ' bg/Evaluations for multivariate BRT ', prefix(numBg, 5), ' Background Training Sites.RData')
+		# file.rename(from, to)
+		
+		# from <- to
+		# to <- paste0(scenarioDir, '/evaluations/Evaluations for multivariate BRT ', prefix(numBg, 5), ' Background Training Sites.RData')
+		
+		# dirCreate(paste0(scenarioDir, '/evaluations'))
+		# file.copy(from, to)
+	
+	# }
+	
+# say('######################################################################')
+# say('### [tune brt for logistic responses] selecting optimal parameters ###')
+# say('######################################################################')
+
+	# thisOutDir <- 'tune brt for logistic responses'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+
+	# ### load evaluations
+	# evals <- data.frame()
+	# for (numBg in numBgToTestForBrt) {
+	
+		# load(paste0(scenarioDir, '/evaluations/Evaluations for multivariate BRT ', prefix(numBg, 5), ' Background Training Sites.RData'))
+		
+		# if (!('numTrainBg' %in% names(perform))) {
+			# addition <- data.frame(numTrainBg=perform$numBg, numTestBg=perform$numBg)
+			# perform <- insertCol(addition, perform, at='response', before=FALSE)
+		# }
+		
+		# if (!('rotT1' %in% names(perform))) {
+			# addition <- data.frame(rotT1=rep(NA, nrow(perform)))
+			# perform <- insertCol(addition, perform, at='maxT1', before=FALSE)
+		# }
+		
+		# if (!('rotF1' %in% names(perform))) {
+			# addition <- data.frame(rotF1=rep(NA, nrow(perform)))
+			# perform <- insertCol(addition, perform, at='maxF1', before=FALSE)
+		# }
+		
+		# while(any(grepl('Strat', names(perform)))) {
+		
+			# strat <- which(grepl('Strat', names(perform)))[1]
+			# perform <- perform[ , -strat, drop=FALSE]
+		
+		# }
+		
+		# evals <- rbind(evals, perform)
+		
+	# }
+
+	# ### plot
+	# png(paste0(scenarioDir, '/CBI ~ Number of Training Background Sites.png'))
+		# boxplot(cbiMulti ~ numTrainBg, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
+	# dev.off()
+
+	# ### assess by number of BG sites
+	# best <- data.frame()
+	# for (numBg in numBgToTestForBrt) {
+		
+		# x <- evals[evals$numTrainBg == numBg, ]
+		# avg <- mean(x$cbiMulti, na.rm=TRUE)
+		# std <- sd(x$cbiMulti, na.rm=TRUE)
+		
+		# say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
+		
+		# best <- rbind(
+			# best,
+			# data.frame(
+				# numTrainBg=numBg,
+				# cbiMean=avg,
+				# cbiSd=std
+			# )
+		# )
+		
+	# }
+	
+	# ### get best number of BG sites
+	# bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
+	
+	# say('Best number of BG sites is ', bestNumBg, '. Using mean parameter set from this set.')
+	
+	# ### calculate BRT parameters for best set of BRT models
+	# params <- data.frame()
+	
+	# for (iter in iters) {
+	
+		# load(paste0(scenarioDir, '/models with ', bestNumBg, ' bg/multivariate brt/brt model ', prefix(iter, 3), '.Rdata'))
+	
+		# lr <- model$gbm.call$learning.rate
+		# tc <- model$gbm.call$tree.complexity
+		# bf <- model$gbm.call$bag.fraction
+		# nTrees <- model$gbm.call$best.trees
+	
+		# params <- rbind(
+			# params,
+			# data.frame(
+				# bestNumBg=bestNumBg,
+				# learningRate=lr,
+				# treeComplexity=tc,
+				# bagFraction=bf,
+				# nTrees=nTrees
+			# )
+		# )
+	
+	# }
+
+	# bestParams <- data.frame(
+		# bestNumBg=bestNumBg,
+		# learningRate=mean(params$learningRate),
+		# treeComplexity=round(mean(params$treeComplexity)),
+		# bagFraction=mean(params$bagFraction),
+		# maxTrees=50 * ceiling(1.1 * max(params$nTrees) / 50)
+	# )
+	
+	# write.csv(bestParams, paste0(scenarioDir, '/Parameters of Best BRT Models.csv'), row.names=FALSE)
+	
+say('################')
+say('### [simple] ###')
+say('################')
+
+	thisOutDir <- 'simple'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	response <- logistic
+	
+	# define landscape
+	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+
+	# # create data
+	# mainMakeData(
+		# response=response,
+		# geography=geography,
 		# simDir=paste0(scenarioDir, '/', simDir),
-		# modelDir=paste0(scenarioDir, '/', modelDir),
-		# vars=c('T1', 'F1'),
-		# algos=algos,
-		# type=c('multivariate', 'univariate'),
+		# numTrainPres=200,
+		# numTestPres=200,
+		# numBg=10000,
 		# iters=iters,
-		# filePrepend=NULL,
 		# overwrite=FALSE,
-		# tempDir=tempDir,
+		# filePrepend=NULL,
+		# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
 		# verbose=verbose,
-		# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-		# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+		# circle=FALSE
 	# )
 
-	# # evaluate: MULTIVARIATE
-	# mainEvalModels(
-		# simDir=paste0(scenarioDir, '/', simDir),
-		# modelDir=paste0(scenarioDir, '/', modelDir),
-		# evalDir=paste0(scenarioDir, '/', evalDir),
-		# algos=algos,
-		# type=c('multivariate', 'univariate'),
-		# iters=iters,
-		# perms=30,
-		# ia=TRUE,
-		# overwrite=FALSE,
-		# filePrepend=NULL,
-		# verbose=verbose
-	# )
+	# BRT parameters
+	bestBrtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	lr <- bestBrtParams$learningRate
+	tc <- bestBrtParams$treeComplexity
+	bf <- bestBrtParams$bagFraction
+	maxTrees <- bestBrtParams$maxTrees
+	
+	# train full models
+	mainTrainModels(
+		simDir=paste0(scenarioDir, '/', simDir),
+		modelDir=paste0(scenarioDir, '/', modelDir),
+		vars=c('T1', 'F1'),
+		algos=algos,
+		type=c('multivariate', 'univariate'),
+		iters=iters,
+		numBg=getNumBg(algos),
+		filePrepend=NULL,
+		overwrite=FALSE,
+		tempDir=tempDir,
+		verbose=verbose,
+		maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+		regMult=regMult
+	)
+
+	# evaluate: MULTIVARIATE
+	mainEvalModels(
+		simDir=paste0(scenarioDir, '/', simDir),
+		modelDir=paste0(scenarioDir, '/', modelDir),
+		evalDir=paste0(scenarioDir, '/', evalDir),
+		algos=algos,
+		type=c('multivariate', 'univariate'),
+		iters=iters,
+		perms=30,
+		ia=TRUE,
+		overwrite=FALSE,
+		filePrepend=NULL,
+		verbose=verbose
+	)
 
 # say('#####################')
 # say('### [sample size] ###')
@@ -305,8 +421,14 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
 	# trainPresSet <- sort(c(2^(3:9), 2^(3:8) + 2^(2:7)))
-	# # trainPresSet <- rev(trainPresSet)
 	
+	# # BRT parameters
+	# bestBrtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	# lr <- bestBrtParams$learningRate
+	# tc <- bestBrtParams$treeComplexity
+	# bf <- bestBrtParams$bagFraction
+	# maxTrees <- bestBrtParams$maxTrees
+
 	# # by TRAINING PRESENCE SAMPLE SIZE
 	# for (n in trainPresSet) {
 		
@@ -336,12 +458,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
+			# numBg=getNumBg(algos),
 			# filePrepend=paste0('n = ', prefix(n, 4)),
 			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
-			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
 		# )
 
 		# # evaluate
@@ -383,6 +506,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
 	
+	# # BRT parameters
+	# bestBrtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	# lr <- bestBrtParams$learningRate
+	# tc <- bestBrtParams$treeComplexity
+	# bf <- bestBrtParams$bagFraction
+	# maxTrees <- bestBrtParams$maxTrees
+
 	# # test each inflection point
 	# # inflection points chosen to match prevalence of 0.95, 0.85, 0.75, 0.625, 0.5, 0.375, 0.25, 0.15, 0.05 as closely as possible
 	# b11Set <- c(-1.74, -1.08, -0.7, -0.33, 0, 0.33, 0.7, 1.08, 1.74)
@@ -418,12 +548,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
+			# numBg=getNumBg(algos),
 			# filePrepend=paste0('b11 = ', sprintf('%.2f', thisB11)),
 			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
-			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
 		# )
 
 		# # evaluate: MULTIVARIATE
@@ -462,6 +593,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
 	# response <- logisticShift
 	
+	# # BRT parameters
+	# bestBrtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	# lr <- bestBrtParams$learningRate
+	# tc <- bestBrtParams$treeComplexity
+	# bf <- bestBrtParams$bagFraction
+	# maxTrees <- bestBrtParams$maxTrees
+
 	# # test each landscape size (increase number of cells and range of environment)
 	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
 	
@@ -499,12 +637,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
+			# numBg=getNumBg(algos),
 			# filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
 			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
-			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
 		# )
 
 		# # evaluate
@@ -542,6 +681,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
 	
+	# # BRT parameters
+	# bestBrtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	# lr <- bestBrtParams$learningRate
+	# tc <- bestBrtParams$treeComplexity
+	# bf <- bestBrtParams$bagFraction
+	# maxTrees <- bestBrtParams$maxTrees
+
 	# # test each grain size
 	# resolution <- 2^(7:13)
 	# # resolution <- rev(2^(7:13)
@@ -590,12 +736,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
+			# numBg=getNumBg(algos),
 			# filePrepend=paste0('resolution = ', prefix(thisRes, 5)),
 			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# verbose=verbose,
-			# maxTrees=4000, learningRate=0.001, treeComplexity=2, bagFraction=0.6,
-			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
 		# )
 
 		# # evaluate
@@ -615,144 +762,154 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			
 	# } # next resolution
 
-# say('##########################################')
-# say('### [tune brt for bivariate responses] ###')
-# say('##########################################')
+# say('###################################################')
+# say('### [tune brt for bivariate responses] modeling ###')
+# say('###################################################')
 
 	# say('Varying strength of variable 1 vs 2 on landscape with 2 linear variables')
 	# say('Covariates include landscape rotation and rho')
 
-	# thisOutDir <- 'tune brt for bivariate responses'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
-
-	# ### define species
-	# ##################
+	# ### for each number of background sites
+	# for (numBg in numBgToTestForBrt) {
 	
-	# b0 <- NA # intercept
-	# b1 <- NA # slope of P1
-	# b2 <- NA # slope of P2
-	# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- NA # slope of T1 * T2
-	# mu1 <- 0
-	# mu2 <- 0
-	# sigma1 <- NA
-	# sigma2 <- NA
-	# rho <- NA
+		# say('NUMBER OF TRAINING BG: ', numBg, level=2)
+	
+		# thisOutDir <- paste0('tune brt for bivariate responses/', prefix(numBg, 5), ' bg')
+		# scenarioDir <- paste0('./Results/', thisOutDir)
+		# dirCreate(scenarioDir)
+		# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
+		# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# response <- gaussian
+		# ### define species
+		# ##################
+		
+		# b0 <- NA # intercept
+		# b1 <- NA # slope of P1
+		# b2 <- NA # slope of P2
+		# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+		# b12 <- NA # slope of T1 * T2
+		# mu1 <- 0
+		# mu2 <- 0
+		# sigma1 <- NA
+		# sigma2 <- NA
+		# rho <- NA
 
-	# ### create progress frame
-	# #########################
-	# progress <- data.frame()
-	# rot <- c(22.5, 90, 157.5)
-	# rho <- c(-0.75, 0, 0.75)
-	# sigmaValues <- c(0.1, 0.3, 0.5)
+		# response <- gaussian
 
-	# for (rot in rot) {
-		# for (thisRho in rho) {
-			# for (countSigma1 in seq_along(sigmaValues)) {
-				# for (countSigma2 in countSigma1:length(sigmaValues)) {
-					
-					# line <- data.frame(
-						# rot=rot,
-						# rho=thisRho,
-						# sigma1=sigmaValues[countSigma1],
-						# sigma2=sigmaValues[countSigma2]
-					# )
-					# line$string <- paste(names(line), line, collapse=' ', sep='=')
-					# progress <- rbind(progress, line)
-					
+		# ### create progress frame
+		# #########################
+		# progress <- data.frame()
+		# rot <- c(22.5, 90, 157.5)
+		# rho <- c(-0.75, 0, 0.75)
+		# sigmaValues <- c(0.1, 0.3, 0.5)
+
+		# for (rot in rot) {
+			# for (thisRho in rho) {
+				# for (countSigma1 in seq_along(sigmaValues)) {
+					# for (countSigma2 in countSigma1:length(sigmaValues)) {
+						
+						# line <- data.frame(
+							# rot=rot,
+							# rho=thisRho,
+							# sigma1=sigmaValues[countSigma1],
+							# sigma2=sigmaValues[countSigma2]
+						# )
+						# line$string <- paste(names(line), line, collapse=' ', sep='=')
+						# progress <- rbind(progress, line)
+						
+					# }
 				# }
 			# }
 		# }
-	# }
 
-	# dirCreate(scenarioDir, '/!starts - brt')
-	# dirCreate(scenarioDir, '/!stops - brt')
+		# dirCreate(scenarioDir, '/!starts - brt')
+		# dirCreate(scenarioDir, '/!stops - brt')
 
-	# # sets in progress or completed
-	# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
-
-	# # for each SCENARIO
-	# while (length(started) < nrow(progress)) {
-	
-		# # get index of set needed doing
-		# if (length(started)==0) {
-			# doing <- 1
-		# } else {
-			# doing <- progress$string[-match(started, progress$string)][1]
-			# doing <- which(progress$string==doing)
-		# }
-		# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
-
-		# rot <- progress$rot[doing]
-		# thisRho <- progress$rho[doing]
-		# thisSigma1 <- progress$sigma1[doing]
-		# thisSigma2 <- progress$sigma2[doing]
-
-		# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
-	
-		# ### define geography
-		# ####################
-		# geography <- list(
-			# T1=list(type='linear', min=-1, max=1),
-			# T2=list(type='linear', min=-1, max=1, rot=rot)
-		# )
-
-		# # create data
-		# mainMakeData(
-			# response=response,
-			# geography=geography,
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# numTrainPres=200,
-			# numTestPres=200,
-			# numBg=10000,
-			# circle=TRUE,
-			# iters=iters,
-			# overwrite=FALSE,
-			# filePrepend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
-			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
-			# verbose=verbose
-		# )
-		
-		# # train full models
-		# mainTrainModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/', modelDir),
-			# vars=c('T1', 'T2'),
-			# algos='brt',
-			# type='multivariate',
-			# iters=iters,
-			# filePrepend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
-			# tempDir=tempDir,
-			# overwrite=FALSE,
-			# verbose=verbose,
-			# maxTrees=6000, learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=0.6
-		# )
-
-		# # evaluate
-		# mainEvalModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/', modelDir),
-			# evalDir=paste0(scenarioDir, '/', evalDir),
-			# algos='brt',
-			# type='multivariate',
-			# iters=iters,
-			# perms=30,
-			# ia=TRUE,
-			# overwrite=FALSE,
-			# filePrepend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
-			# verbose=verbose
-		# )
-			
-		# # indicate this set complete and save
-		# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
+		# # sets in progress or completed
 		# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
 
-	# } # next scenario
+		# # for each SCENARIO
+		# while (length(started) < nrow(progress)) {
+		
+			# # get index of set needed doing
+			# if (length(started)==0) {
+				# doing <- 1
+			# } else {
+				# doing <- progress$string[-match(started, progress$string)][1]
+				# doing <- which(progress$string==doing)
+			# }
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
+
+			# rot <- progress$rot[doing]
+			# thisRho <- progress$rho[doing]
+			# thisSigma1 <- progress$sigma1[doing]
+			# thisSigma2 <- progress$sigma2[doing]
+
+			# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
+		
+			# ### define geography
+			# ####################
+			# geography <- list(
+				# T1=list(type='linear', min=-1, max=1),
+				# T2=list(type='linear', min=-1, max=1, rot=rot)
+			# )
+
+			# filePrepend <- paste0('bg=', prefix(numBg, 5), ' rot(T2)=', rot, ' rho=', thisRho, ' s1=', thisSigma1, ' s2=', thisSigma2)
+			
+			# # create data
+			# mainMakeData(
+				# response=response,
+				# geography=geography,
+				# simDir=paste0(scenarioDir, '/', simDir),
+				# numTrainPres=200,
+				# numTestPres=200,
+				# numBg=10000,
+				# circle=TRUE,
+				# iters=iters,
+				# overwrite=FALSE,
+				# filePrepend=filePrepend,
+				# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
+				# verbose=verbose
+			# )
+			
+			# # train full models
+			# mainTrainModels(
+				# simDir=paste0(scenarioDir, '/', simDir),
+				# modelDir=paste0(scenarioDir, '/', modelDir),
+				# vars=c('T1', 'T2'),
+				# algos='brt',
+				# type='multivariate',
+				# iters=iters,
+				# numBg=numBg,
+				# filePrepend=filePrepend,
+				# tempDir=tempDir,
+				# overwrite=FALSE,
+				# verbose=verbose,
+				# maxTrees=8000, learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=0.6
+			# )
+
+			# # evaluate
+			# mainEvalModels(
+				# simDir=paste0(scenarioDir, '/', simDir),
+				# modelDir=paste0(scenarioDir, '/', modelDir),
+				# evalDir=paste0(scenarioDir, '/', evalDir),
+				# algos='brt',
+				# type='multivariate',
+				# iters=iters,
+				# perms=30,
+				# ia=TRUE,
+				# overwrite=FALSE,
+				# filePrepend=filePrepend,
+				# verbose=verbose
+			# )
+				
+			# # indicate this set complete and save
+			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
+			# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
+
+		# } # next scenario
+		
+	# } # next number of BG sites
 
 # say('#################################')
 # say('### [correlated TRUE & FALSE] ###')
@@ -815,11 +972,12 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 			# algos=algos,
 			# type=c('multivariate', 'univariate'),
 			# iters=iters,
+			# numBg=getNumBg(algos),
 			# filePrepend=filePrepend,
 			# overwrite=FALSE,
 			# verbose=verbose,
 			# maxTrees=6000, learningRate=c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005), treeComplexity=c(1, 2, 3, 6), bagFraction=0.6,
-			# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+			# regMult=regMult
 		# )
 
 		# # evaluate
@@ -956,12 +1114,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
 				# iters=iters,
+				# numBg=getNumBg(algo),
 				# filePrepend=paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2),
 				# tempDir=tempDir,
 				# overwrite=FALSE,
 				# verbose=verbose,
 				# maxTrees=6000, learningRate=0.005, treeComplexity=3, bagFraction=0.6,
-				# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+				# regMult=regMult
 			# )
 
 			# # evaluate
@@ -1128,11 +1287,12 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 				# algos=algo,
 				# type=c('multivariate', 'reduced', 'univariate'),
 				# iters=iters,
+				# numBg=getNumBg(algo),
 				# filePrepend=filePrepend,
 				# overwrite=FALSE,
 				# verbose=verbose,
 				# maxTrees=6000, learningRate=0.005, treeComplexity=3, bagFraction=0.6,
-				# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+				# regMult=regMult
 			# )
 
 			# # evaluate
@@ -1299,12 +1459,13 @@ source('C:/Ecology/Drive/R/enmSdmPredImport/R/mainEvalModels.r')
 				# algos=algo,
 				# type=c('multivariate', 'univariate'),
 				# iters=iters,
+				# numBg=getNumBg(algo),
 				# filePrepend=filePrepend,
 				# tempDir=tempDir,
 				# overwrite=FALSE,
 				# verbose=verbose,
 				# maxTrees=6000, learningRate=0.005, treeComplexity=3, bagFraction=0.6,
-				# regMult=c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+				# regMult=regMult
 			# )
 
 			# # evaluate
