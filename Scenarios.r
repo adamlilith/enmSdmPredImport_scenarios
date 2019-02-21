@@ -25,6 +25,7 @@
 ### [correlated TRUE & FALSE] ###
 
 ### [tune brt for bivariate responses] modeling ###
+### [tune brt for bivariate responses] selecting optimal number of background sites ###
 ### [bivariate] ###
 ### [extra false variable]
 ### [missing true variable] ###
@@ -34,14 +35,14 @@
 #######################
 
 	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	tempDrive <- 'C:'
-
-	# # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
-	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
 	# tempDrive <- 'C:'
-	# # tempDrive <- 'D:'
-	# # tempDrive <- 'E:'
+
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
+	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
+	# tempDrive <- 'D:'
+	tempDrive <- 'E:'
 
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
 	modelDir <- '' # subdirectory of each scenario's directory in which to store models
@@ -81,8 +82,8 @@
 	regMult <- c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
 	
 	# number of training background sites to test for BRTs in "tuning" exercises
-	# numBgToTestForBrt <- c(10000, 1000, 200)
-	numBgToTestForBrt <- c(1000, 200)
+	numBgToTestForBrt <- c(10000, 1000, 200)
+	# numBgToTestForBrt <- c(1000, 200)
 	
 #################
 ### functions ###
@@ -102,6 +103,9 @@
 
 	tempDir <- paste0(tempDrive, '/ecology/!Scratch/_TEMP\\') # maxent temp directory
 
+	ff <- listFiles('C:/ecology/Drive/R/enmSdmPredImport/R', pattern='.r')
+	for (f in ff) source(f)
+	
 	# get vector of number of training background sites customized for each algorithm
 	getNumBg <- function(algos, brtBg=200, gamBg=10000, maxentBg=10000, rfBg=200, otherBg=10000) {
 	
@@ -425,8 +429,9 @@
 	# # define landscape
 	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	# trainPresSet <- sort(c(2^(3:9), 2^(3:8) + 2^(2:7)))
-	# trainPresSet <- rev(trainPresSet)
+	# # trainPresSet <- sort(c(2^(3:10), 2^(3:8) + 2^(2:7))) # too many!
+	# trainPresSet <- 2^(3:10)
+	# # trainPresSet <- rev(trainPresSet)
 
 	# # BRT parameters for simple scenarios
 	# brtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
@@ -531,21 +536,21 @@
 		# # define species
 		# response <- logisticShift
 
-		# # # create data
-		# # mainMakeData(
-			# # response=response,
-			# # geography=geography,
-			# # simDir=paste0(scenarioDir, '/', simDir),
-			# # numTrainPres=200,
-			# # numTestPres=200,
-			# # numBg=10000,
-			# # iters=iters,
-			# # overwrite=FALSE,
-			# # filePrepend=paste0('b11 = ', sprintf('%.2f', thisB11)),
-			# # b0=b0, b1=b1, b2=b2, b11=thisB11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-			# # verbose=verbose,
-			# # circle=FALSE
-		# # )
+		# # create data
+		# mainMakeData(
+			# response=response,
+			# geography=geography,
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# numTrainPres=200,
+			# numTestPres=200,
+			# numBg=10000,
+			# iters=iters,
+			# overwrite=FALSE,
+			# filePrepend=paste0('b11 = ', sprintf('%.2f', thisB11)),
+			# b0=b0, b1=b1, b2=b2, b11=thisB11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+			# verbose=verbose,
+			# circle=FALSE
+		# )
 		
 		# # train full models
 		# mainTrainModels(
@@ -621,22 +626,22 @@
 
 		# # define species
 
-		# # # create data
-		# # mainMakeData(
-			# # response=response,
-			# # geography=geography,
-			# # simDir=paste0(scenarioDir, '/', simDir),
-			# # numTrainPres=200,
-			# # numTestPres=200,
-			# # numBg=10000,
-			# # iters=iters,
-			# # overwrite=FALSE,
-			# # filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
-			# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-			# # verbose=verbose,
-			# # circle=FALSE,
-			# # size=landSize$landSize[countLandSize]
-		# # )
+		# # create data
+		# mainMakeData(
+			# response=response,
+			# geography=geography,
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# numTrainPres=200,
+			# numTestPres=200,
+			# numBg=10000,
+			# iters=iters,
+			# overwrite=FALSE,
+			# filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
+			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+			# verbose=verbose,
+			# circle=FALSE,
+			# size=landSize$landSize[countLandSize]
+		# )
 		
 		# # train full models
 		# mainTrainModels(
@@ -771,161 +776,6 @@
 			
 	# } # next resolution
 
-# say('###################################################')
-# say('### [tune brt for bivariate responses] modeling ###')
-# say('###################################################')
-
-	# say('Varying strength of variable 1 vs 2 on landscape with 2 linear variables')
-	# say('Covariates include landscape rotation and rho')
-
-	# ### define species
-	# ##################
-	
-	# b0 <- NA # intercept
-	# b1 <- NA # slope of P1
-	# b2 <- NA # slope of P2
-	# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- NA # slope of T1 * T2
-	# mu1 <- 0
-	# mu2 <- 0
-	# sigma1 <- NA
-	# sigma2 <- NA
-	# rho <- NA
-
-	# response <- gaussian
-
-	# ### create progress frame
-	# #########################
-	# progress <- data.frame()
-	# rot <- c(22.5, 90, 157.5)
-	# rho <- c(-0.75, 0, 0.75)
-	# sigmaValues <- c(0.1, 0.3, 0.5)
-
-	# for (rot in rot) {
-		# for (thisRho in rho) {
-			# for (countSigma1 in seq_along(sigmaValues)) {
-				# for (countSigma2 in countSigma1:length(sigmaValues)) {
-					
-					# line <- data.frame(
-						# rot=rot,
-						# rho=thisRho,
-						# sigma1=sigmaValues[countSigma1],
-						# sigma2=sigmaValues[countSigma2]
-					# )
-					# line$string <- paste(names(line), line, collapse=' ', sep='=')
-					# progress <- rbind(progress, line)
-					
-				# }
-			# }
-		# }
-	# }
-
-	# # BRT tuning parameters
-	# lr <- c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005) # learning rate
-	# tc <- c(1, 2, 3, 6) # tree complexity
-	# bf <- 0.6 # bag fraction
-	# maxTrees <- 8000 # maximum number of trees
-
-	# ### for each number of background sites
-	# for (numBg in numBgToTestForBrt) {
-	
-		# say('NUMBER OF TRAINING BG: ', numBg, level=2)
-	
-		# thisOutDir <- paste0('tune brt for bivariate responses/', prefix(numBg, 5), ' bg')
-		# scenarioDir <- paste0('./Results/', thisOutDir)
-		# dirCreate(scenarioDir)
-		# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
-		# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
-
-		# dirCreate(scenarioDir, '/!starts - brt')
-		# dirCreate(scenarioDir, '/!stops - brt')
-
-		# # sets in progress or completed
-		# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
-
-		# # for each SCENARIO
-		# while (length(started) < nrow(progress)) {
-		
-			# # get index of set needed doing
-			# if (length(started)==0) {
-				# doing <- 1
-			# } else {
-				# doing <- progress$string[-match(started, progress$string)][1]
-				# doing <- which(progress$string==doing)
-			# }
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
-
-			# rot <- progress$rot[doing]
-			# thisRho <- progress$rho[doing]
-			# thisSigma1 <- progress$sigma1[doing]
-			# thisSigma2 <- progress$sigma2[doing]
-
-			# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
-		
-			# ### define geography
-			# ####################
-			# geography <- list(
-				# T1=list(type='linear', min=-1, max=1),
-				# T2=list(type='linear', min=-1, max=1, rot=rot)
-			# )
-
-			# filePrepend <- paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
-			
-			# # create data
-			# mainMakeData(
-				# response=response,
-				# geography=geography,
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# numTrainPres=200,
-				# numTestPres=200,
-				# numBg=10000,
-				# circle=TRUE,
-				# iters=iters,
-				# overwrite=FALSE,
-				# filePrepend=filePrepend,
-				# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
-				# verbose=verbose
-			# )
-			
-			# # train full models
-			# mainTrainModels(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# vars=c('T1', 'T2'),
-				# algos='brt',
-				# type='multivariate',
-				# iters=iters,
-				# numBg=numBg,
-				# filePrepend=filePrepend,
-				# tempDir=tempDir,
-				# overwrite=FALSE,
-				# verbose=verbose,
-				# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf
-			# )
-
-			# # evaluate
-			# mainEvalModels(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# evalDir=paste0(scenarioDir, '/', evalDir),
-				# algos='brt',
-				# type='multivariate',
-				# iters=iters,
-				# perms=30,
-				# ia=FALSE,
-				# overwrite=FALSE,
-				# filePrepend=filePrepend,
-				# verbose=verbose
-			# )
-				
-			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(scenarioDir, '/!starts - brt'))
-
-		# } # next scenario
-		
-	# } # next number of BG sites
-
 # say('#################################')
 # say('### [correlated TRUE & FALSE] ###')
 # say('#################################')
@@ -949,6 +799,13 @@
 
 	# rots <- seq(22.5, 157.5, by=22.5)
 	
+	# # BRT parameters for simple scenarios
+	# brtParams <- read.csv('./Results/tune brt for logistic responses/Parameters of Best BRT Models.csv')
+	# lr <- c(5 * brtParams$learningRate, brtParams$learningRate, brtParams$learningRate / 5)
+	# tc <- unique(c(max(1, brtParams$treeComplexity - 1), brtParams$treeComplexity, brtParams$treeComplexity + 1))
+	# bf <- brtParams$bagFraction
+	# maxTrees <- brtParams$maxTrees
+
 	# for (rot in rots) {
 	
 		# say('Rotation between TRUE and FALSE is ', rot, 'deg', level=1)
@@ -962,22 +819,22 @@
 			# F1=list(type='linear', min=-1, max=1, rot=rot)
 		# )
 
-		# # # create data
-		# # mainMakeData(
-			# # response=response,
-			# # geography=geography,
-			# # simDir=paste0(scenarioDir, '/', simDir),
-			# # numTrainPres=200,
-			# # numTestPres=200,
-			# # numBg=10000,
-			# # circle=TRUE,
-			# # iters=iters,
-			# # overwrite=FALSE,
-			# # tempDir=tempDir,
-			# # filePrepend=filePrepend,
-			# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-			# # verbose=verbose
-		# # )
+		# # create data
+		# mainMakeData(
+			# response=response,
+			# geography=geography,
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# numTrainPres=200,
+			# numTestPres=200,
+			# numBg=10000,
+			# circle=TRUE,
+			# iters=iters,
+			# overwrite=FALSE,
+			# tempDir=tempDir,
+			# filePrepend=filePrepend,
+			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+			# verbose=verbose
+		# )
 		
 		# # train full models
 		# mainTrainModels(
@@ -1012,6 +869,214 @@
 		# )
 			
 	# } # next scenario
+
+say('###################################################')
+say('### [tune brt for bivariate responses] modeling ###')
+say('###################################################')
+
+	say('Varying strength of variable 1 vs 2 on landscape with 2 linear variables')
+	say('Covariates include landscape rotation and rho')
+
+	### define species
+	##################
+	
+	b0 <- NA # intercept
+	b1 <- NA # slope of P1
+	b2 <- NA # slope of P2
+	b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- NA # slope of T1 * T2
+	mu1 <- 0
+	mu2 <- 0
+	sigma1 <- NA
+	sigma2 <- NA
+	rho <- NA
+
+	response <- gaussian
+
+	### create progress frame
+	#########################
+	progress <- data.frame()
+	rot <- c(22.5, 90, 157.5)
+	rho <- c(-0.75, 0, 0.75)
+	sigmaValues <- c(0.1, 0.3, 0.5)
+
+	for (rot in rot) {
+		for (thisRho in rho) {
+			for (countSigma1 in seq_along(sigmaValues)) {
+				for (countSigma2 in countSigma1:length(sigmaValues)) {
+					
+					line <- data.frame(
+						rot=rot,
+						rho=thisRho,
+						sigma1=sigmaValues[countSigma1],
+						sigma2=sigmaValues[countSigma2]
+					)
+					line$string <- paste(names(line), line, collapse=' ', sep='=')
+					progress <- rbind(progress, line)
+					
+				}
+			}
+		}
+	}
+
+	# BRT tuning parameters
+	lr <- c(0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005) # learning rate
+	tc <- c(1, 2, 3, 6) # tree complexity
+	bf <- 0.6 # bag fraction
+	maxTrees <- 8000 # maximum number of trees
+
+	### for each number of background sites
+	for (numBg in numBgToTestForBrt) {
+	
+		say('NUMBER OF TRAINING BG: ', numBg, level=2)
+	
+		thisOutDir <- paste0('tune brt for bivariate responses/', prefix(numBg, 5), ' bg')
+		scenarioDir <- paste0('./Results/', thisOutDir)
+		dirCreate(scenarioDir)
+		scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2))'
+		write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+
+		dirCreate(scenarioDir, '/!starts - brt')
+		dirCreate(scenarioDir, '/!stops - brt')
+
+		# sets in progress or completed
+		started <- list.files(paste0(scenarioDir, '/!starts - brt'))
+
+		# for each SCENARIO
+		while (length(started) < nrow(progress)) {
+		
+			# get index of set needed doing
+			if (length(started)==0) {
+				doing <- 1
+			} else {
+				doing <- progress$string[-match(started, progress$string)][1]
+				doing <- which(progress$string==doing)
+			}
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - brt/', progress$string[doing]), row.names=FALSE)
+
+			rot <- progress$rot[doing]
+			thisRho <- progress$rho[doing]
+			thisSigma1 <- progress$sigma1[doing]
+			thisSigma2 <- progress$sigma2[doing]
+
+			say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
+		
+			### define geography
+			####################
+			geography <- list(
+				T1=list(type='linear', min=-1, max=1),
+				T2=list(type='linear', min=-1, max=1, rot=rot)
+			)
+
+			filePrepend <- paste0('rot(T2)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
+			
+			# create data
+			mainMakeData(
+				response=response,
+				geography=geography,
+				simDir=paste0(scenarioDir, '/', simDir),
+				numTrainPres=200,
+				numTestPres=200,
+				numBg=10000,
+				circle=TRUE,
+				iters=iters,
+				overwrite=FALSE,
+				filePrepend=filePrepend,
+				b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
+				verbose=verbose
+			)
+			
+			# train full models
+			mainTrainModels(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				vars=c('T1', 'T2'),
+				algos='brt',
+				type='multivariate',
+				iters=iters,
+				numBg=numBg,
+				filePrepend=filePrepend,
+				tempDir=tempDir,
+				overwrite=FALSE,
+				verbose=verbose,
+				maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf
+			)
+
+			# evaluate
+			mainEvalModels(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				evalDir=paste0(scenarioDir, '/', evalDir),
+				algos='brt',
+				type='multivariate',
+				iters=iters,
+				perms=30,
+				ia=FALSE,
+				overwrite=FALSE,
+				filePrepend=filePrepend,
+				verbose=verbose
+			)
+				
+			# indicate this set complete and save
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - brt/', progress$string[doing]), row.names=FALSE)
+			started <- list.files(paste0(scenarioDir, '/!starts - brt'))
+
+		} # next scenario
+		
+	} # next number of BG sites
+
+# say('#######################################################################################')
+# say('### [tune brt for bivariate responses] selecting optimal number of background sites ###')
+# say('#######################################################################################')
+	
+	# thisOutDir <- 'tune brt for logistic responses'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+
+	# ### load evaluations
+	# evals <- data.frame()
+	# for (numBg in numBgToTestForBrt) {
+
+		# evalDir <- paste0('./Results/tune brt for bivariate responses/', prefix(numBg, 5), ' bg')
+
+		# thisEvals <- loadEvals(evalDir, algos='brt')
+		# evals <- if (nrow(evals) == 0) {
+			# thisEvals
+		# } else {
+			# merge(evals, thisEvals, all=TRUE)
+		# }
+	# }
+	# print(NON)
+	# ### plot
+	# png(paste0(scenarioDir, '/CBI ~ Number of Training Background Sites.png'))
+		# boxplot(cbiMulti ~ numTrainBg, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
+	# dev.off()
+
+	# ### assess by number of BG sites
+	# best <- data.frame()
+	# for (numBg in numBgToTestForBrt) {
+		
+		# x <- evals[evals$numTrainBg == numBg, ]
+		# avg <- mean(x$cbiMulti, na.rm=TRUE)
+		# std <- sd(x$cbiMulti, na.rm=TRUE)
+		
+		# say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
+		
+		# best <- rbind(
+			# best,
+			# data.frame(
+				# numTrainBg=numBg,
+				# cbiMean=avg,
+				# cbiSd=std
+			# )
+		# )
+		
+	# }
+	
+	# ### get best number of BG sites
+	# bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
+	
+	# say('Best number of BG sites is ', bestNumBg, '. Using mean parameter set from this set.')
+	
 
 # say('###################')
 # say('### [bivariate] ###')
