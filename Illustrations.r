@@ -12,17 +12,23 @@
 ### CONTENTS ###
 ### functions ###
 ### variables and settings ###
+
 ### [simple] landscape and species ###
 ### [simple] simulation results ###
+
 ### [extent] landscape and species ###
 ### [extent] simulation results ###
 ### [prevalence] landscape and species ###
+
 ### [prevalence] simulation results ###
+
+### [correlated] calculate correlation between variables as a function of their rotation ###
 ### [correlated TRUE & FALSE] landscape and species ###
-### calculate correlation between variables as a function of their rotation ###
 ### [correlated TRUE & FALSE] simulation results ###
+
 ### [bivariate] landscape and species: NO niche covariance, YES landscape correlation ###
 ### [bivariate] landscape and species: YES niche covariance, NO landscape correlation ###
+### [bivariate] collate evaluations ###
 
 #################
 ### functions ###
@@ -916,6 +922,47 @@
 		
 	# dev.off()
 
+# say('###############################################################################')
+# say('### [correlated] calculate correlation between variables as a function of their rotation ###')
+# say('###############################################################################')
+
+	# say('To speed further operations, pre-calculate correlation between two variables as a function of the rotation between them on the landscape.', breaks=80)
+
+	# rots <- seq(22.5, 157.5, by=22.5)
+	
+	# correlations <- data.frame()
+	# for (rot in rots) {
+	
+		# say(rot, post=0)
+	
+		# # generate landscape
+		# geography <- list(
+			# V1=list(type='linear', min=-1, max=1),
+			# V2=list(type='linear', min=-1, max=1, rot=rot)
+		# )
+		
+		# landscape <- genesis(geography, circle=TRUE)
+		
+		# correlation <- cor(
+			# c(as.matrix(landscape[['V1']])),
+			# c(as.matrix(landscape[['V2']])),
+			# use='pairwise.complete.obs'
+		# )
+		
+		# say(correlation)
+		
+		# correlations <- rbind(
+			# correlations,
+			# data.frame(
+				# rot=rot,
+				# cor=correlation
+			# )
+		# )
+	
+	# }
+	
+	# write.csv(correlations, './Results/Correlations between Variables as a Function of Rotation between Them.csv', row.names=FALSE)
+
 # say('#######################################################')
 # say('### [correlated TRUE & FALSE] landscape and species ###')
 # say('#######################################################')
@@ -1011,47 +1058,6 @@
 		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='', col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
 			
 	# dev.off()
-
-# say('###############################################################################')
-# say('### calculate correlation between variables as a function of their rotation ###')
-# say('###############################################################################')
-
-	# say('To speed further operations, pre-calculate correlation between two variables as a function of the rotation between them on the landscape.', breaks=80)
-
-	# rots <- seq(22.5, 157.5, by=22.5)
-	
-	# correlations <- data.frame()
-	# for (rot in rots) {
-	
-		# say(rot, post=0)
-	
-		# # generate landscape
-		# geography <- list(
-			# V1=list(type='linear', min=-1, max=1),
-			# V2=list(type='linear', min=-1, max=1, rot=rot)
-		# )
-		
-		# landscape <- genesis(geography, circle=TRUE)
-		
-		# correlation <- cor(
-			# c(as.matrix(landscape[['V1']])),
-			# c(as.matrix(landscape[['V2']])),
-			# use='pairwise.complete.obs'
-		# )
-		
-		# say(correlation)
-		
-		# correlations <- rbind(
-			# correlations,
-			# data.frame(
-				# rot=rot,
-				# cor=correlation
-			# )
-		# )
-	
-	# }
-	
-	# write.csv(correlations, './Results/Correlations between Variables as a Function of Rotation between Them.csv', row.names=FALSE)
 
 # say('####################################################')
 # say('### [correlated TRUE & FALSE] simulation results ###')
@@ -1445,6 +1451,14 @@
 		
 	# dev.off()
 
+say('#######################################')
+say('### [bivariate] collate evaluations ###')
+say('#######################################')
+
+	evalDir <- './Results/bivariate'
+	algos <- c('omniscient', 'brt', 'gam', 'maxent')
+
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 #################################
 say('DONE!!!', level=1, deco='&')
