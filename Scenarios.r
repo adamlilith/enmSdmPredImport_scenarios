@@ -68,9 +68,9 @@
 	# iters <- 51:75 # iterations to do
 	# iters <- 76:100 # iterations to do
 
-	# algos <- c('omniscient', 'maxent', 'brt', 'gam')
+	algos <- c('omniscient', 'maxent', 'brt', 'gam')
 	# algos <- c('gam', 'omniscient', 'maxent', 'brt')
-	algos <- c('omniscient', 'maxent', 'brt')
+	# algos <- c('omniscient', 'maxent', 'brt')
 	# algos <- c('omniscient', 'maxent')
 	# algos <- c('omniscient')
 	# algos <- c('maxent')
@@ -615,92 +615,92 @@
 			
 	# } # next inflection point
 
-say('################')
-say('### [extent] ###')
-say('################')
+# say('################')
+# say('### [extent] ###')
+# say('################')
 
-	thisOutDir <- 'extent'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
-	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# thisOutDir <- 'extent'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# define species
-	b0 <- 0 # intercept
-	b1 <- 2 # slope of P1
-	b2 <- 1 # slope of P2
-	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- 0 # slope of T1 * T2
-	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	response <- logisticShift
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logisticShift
 	
-	# BRT parameters for simple scenarios
-	brtParams('logistic')
+	# # BRT parameters for simple scenarios
+	# brtParams('logistic')
 
-	# test each landscape size (increase number of cells and range of environment)
-	landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
+	# # test each landscape size (increase number of cells and range of environment)
+	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
 	
-	landSize <- landSize[nrow(landSize):1, ]
+	# landSize <- landSize[nrow(landSize):1, ]
 	
-	for (countLandSize in 1:nrow(landSize)) {
+	# for (countLandSize in 1:nrow(landSize)) {
 	
-		say('EXTENT: Testing landscape size of ', landSize$landSize[countLandSize], ' cells...', level=1)
+		# say('EXTENT: Testing landscape size of ', landSize$landSize[countLandSize], ' cells...', level=1)
 		
-		# define landscape
-		geography <- list(T1=list(type='linear', min=landSize$min[countLandSize], max=landSize$max[countLandSize]), F1=list(type='random', min=-1, max=1))
+		# # define landscape
+		# geography <- list(T1=list(type='linear', min=landSize$min[countLandSize], max=landSize$max[countLandSize]), F1=list(type='random', min=-1, max=1))
 
-		# define species
+		# # define species
 
-		# create data
-		mainMakeData(
-			response=response,
-			geography=geography,
-			simDir=paste0(scenarioDir, '/', simDir),
-			numTrainPres=200,
-			numTestPres=200,
-			numBg=10000,
-			iters=iters,
-			overwrite=FALSE,
-			filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
-			b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-			verbose=verbose,
-			circle=FALSE,
-			size=landSize$landSize[countLandSize]
-		)
+		# # create data
+		# mainMakeData(
+			# response=response,
+			# geography=geography,
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# numTrainPres=200,
+			# numTestPres=200,
+			# numBg=10000,
+			# iters=iters,
+			# overwrite=FALSE,
+			# filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
+			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+			# verbose=verbose,
+			# circle=FALSE,
+			# size=landSize$landSize[countLandSize]
+		# )
 		
-		# train full models
-		mainTrainModels(
-			simDir=paste0(scenarioDir, '/', simDir),
-			modelDir=paste0(scenarioDir, '/', modelDir),
-			vars=c('T1', 'F1'),
-			algos=algos,
-			type=c('multivariate', 'univariate'),
-			iters=iters,
-			numBg=getNumBg(algos, brtBg=brtBg),
-			filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
-			tempDir=tempDir,
-			overwrite=FALSE,
-			verbose=verbose,
-			maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
-			regMult=regMult
-		)
+		# # train full models
+		# mainTrainModels(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/', modelDir),
+			# vars=c('T1', 'F1'),
+			# algos=algos,
+			# type=c('multivariate', 'univariate'),
+			# iters=iters,
+			# numBg=getNumBg(algos, brtBg=brtBg),
+			# filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
+			# tempDir=tempDir,
+			# overwrite=FALSE,
+			# verbose=verbose,
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
+		# )
 
-		# evaluate
-		mainEvalModels(
-			simDir=paste0(scenarioDir, '/', simDir),
-			modelDir=paste0(scenarioDir, '/', modelDir),
-			evalDir=paste0(scenarioDir, '/', evalDir),
-			algos=algos,
-			type=c('multivariate', 'univariate'),
-			iters=iters,
-			perms=30,
-			ia=FALSE,
-			overwrite=FALSE,
-			filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
-			verbose=verbose
-		)
+		# # evaluate
+		# mainEvalModels(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/', modelDir),
+			# evalDir=paste0(scenarioDir, '/', evalDir),
+			# algos=algos,
+			# type=c('multivariate', 'univariate'),
+			# iters=iters,
+			# perms=30,
+			# ia=FALSE,
+			# overwrite=FALSE,
+			# filePrepend=paste0('landscape size = ', prefix(landSize$landSize[countLandSize], 4), ' cells'),
+			# verbose=verbose
+		# )
 			
-	} # next inflection point
+	# } # next inflection point
 
 # say('####################')
 # say('### [resolution] ###')
@@ -797,44 +797,44 @@ say('################')
 			
 	# } # next resolution
 
-# say('#################################')
-# say('### [correlated TRUE & FALSE] ###')
-# say('#################################')
+say('#################################')
+say('### [correlated TRUE & FALSE] ###')
+say('#################################')
 
-	# say('Vary strength correlation between a TRUE and FALSE variable.')
+	say('Vary strength correlation between a TRUE and FALSE variable.')
 
-	# thisOutDir <- 'correlated TRUE & FALSE'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	thisOutDir <- 'correlated TRUE & FALSE'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	# response <- logistic
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	response <- logistic
 
-	# rots <- seq(22.5, 157.5, by=22.5)
+	rots <- seq(22.5, 157.5, by=22.5)
 	
-	# # BRT parameters for simple scenarios
-	# brtParams('logistic')
+	# BRT parameters for simple scenarios
+	brtParams('logistic')
 
-	# for (rot in rots) {
+	for (rot in rots) {
 	
-		# say('Rotation between TRUE and FALSE is ', rot, 'deg', level=1)
+		say('Rotation between TRUE and FALSE is ', rot, 'deg', level=1)
 	
-		# filePrepend <- paste0('rot(F1)=', rot)
+		filePrepend <- paste0('rot(F1)=', rot)
 	
-		# ### define geography
-		# ####################
-		# geography <- list(
-			# T1=list(type='linear', min=-1, max=1),
-			# F1=list(type='linear', min=-1, max=1, rot=rot)
-		# )
+		### define geography
+		####################
+		geography <- list(
+			T1=list(type='linear', min=-1, max=1),
+			F1=list(type='linear', min=-1, max=1, rot=rot)
+		)
 
 		# # create data
 		# mainMakeData(
@@ -853,39 +853,39 @@ say('################')
 			# verbose=verbose
 		# )
 		
-		# # train full models
-		# mainTrainModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/', modelDir),
-			# vars=c('T1', 'F1'),
-			# algos=algos,
-			# type=c('multivariate', 'univariate'),
-			# iters=iters,
-			# numBg=getNumBg(algos, brtBg=brtBg),
-			# filePrepend=filePrepend,
-			# overwrite=FALSE,
-			# verbose=verbose,
-			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
-			# regMult=regMult
-		# )
+		# train full models
+		mainTrainModels(
+			simDir=paste0(scenarioDir, '/', simDir),
+			modelDir=paste0(scenarioDir, '/', modelDir),
+			vars=c('T1', 'F1'),
+			algos=algos,
+			type=c('multivariate', 'univariate'),
+			iters=iters,
+			numBg=getNumBg(algos, brtBg=brtBg),
+			filePrepend=filePrepend,
+			overwrite=FALSE,
+			verbose=verbose,
+			maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			regMult=regMult
+		)
 
-		# # evaluate
-		# mainEvalModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/', modelDir),
-			# evalDir=paste0(scenarioDir, '/', evalDir),
-			# algos=algos,
-			# type=c('multivariate', 'univariate'),
-			# iters=iters,
-			# perms=30,
-			# ia=TRUE,
-			# strat=FALSE,
-			# overwrite=FALSE,
-			# filePrepend=filePrepend,
-			# verbose=verbose
-		# )
+		# evaluate
+		mainEvalModels(
+			simDir=paste0(scenarioDir, '/', simDir),
+			modelDir=paste0(scenarioDir, '/', modelDir),
+			evalDir=paste0(scenarioDir, '/', evalDir),
+			algos=algos,
+			type=c('multivariate', 'univariate'),
+			iters=iters,
+			perms=30,
+			ia=TRUE,
+			strat=FALSE,
+			overwrite=FALSE,
+			filePrepend=filePrepend,
+			verbose=verbose
+		)
 			
-	# } # next scenario
+	} # next scenario
 
 # say('###################################################')
 # say('### [tune brt for bivariate responses] modeling ###')
