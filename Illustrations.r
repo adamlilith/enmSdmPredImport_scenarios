@@ -248,15 +248,15 @@
 	algos <- c('omniscient', 'gam', 'maxent', 'brt')
 	sdmAlgos <- c('gam', 'maxent', 'brt')
 	
-	# ### colors of bars
-	# colTrue <- 'chartreuse3' # perturbed SDM vs TRUE
-	# borderTrue <- 'chartreuse4' # perturbed SDM vs TRUE
+	### colors of bars
+	colTrue <- '#66c2a5' # perturbed SDM vs TRUE (CB safe)
+	borderTrue <- '#1b9e77' # perturbed SDM vs TRUE (CB safe)
 	
-	# colFalse <- 'red' # perturbed SDM vs FALSE
-	# borderFalse <- 'darkred' # perturbed SDM vs FALSE
+	colFalse <- '#fc8d62' # perturbed SDM vs FALSE (CB safe)
+	borderFalse <- '#d95f02' # perturbed SDM vs FALSE (CB safe)
 
-	# colControl <- 'khaki1' # unperturbed SDM
-	# borderControl <- 'black' # unperturbed SDM
+	colControl <- '#8da0cb' # unperturbed SDM (CB safe)
+	borderControl <- '#7570b3' # unperturbed SDM (CB safe)
 	
 	# colOmniControl <- 'white' # unperturbed OMNI
 	# borderOmniControl <- 'black' # unperturbed OMNI
@@ -264,18 +264,8 @@
 	# colOmniResp <- 'gray' # perturbed OMNI
 	# borderOmniResp <- 'black' # perturbed OMNI
 	
-	### colors of bars
-	colTrue <- '#4daf4a' # perturbed SDM vs TRUE
-	borderTrue <- 'lightgreen' # perturbed SDM vs TRUE
-	
-	colFalse <- '#e41a1c' # perturbed SDM vs FALSE
-	borderFalse <- '#fc8d62' # perturbed SDM vs FALSE
-
-	colControl <- '#984ea3' # unperturbed SDM
-	borderControl <- '#8da0cb' # unperturbed SDM
-	
-	colOmniControl <- 'white' # unperturbed OMNI
-	borderOmniControl <- 'black' # unperturbed OMNI
+	colOmniControl <- 'black' # unperturbed OMNI
+	borderOmniControl <- 'white' # unperturbed OMNI
 	
 	colOmniResp <- 'gray' # perturbed OMNI
 	borderOmniResp <- 'black' # perturbed OMNI
@@ -355,7 +345,7 @@
 
 	# scenarioDir <- './Results/simple'
 
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=TRUE)
 
 	# # generalization
 	# width <- 0.14 # bar width
@@ -401,7 +391,7 @@
 		# # x: variable and algorithm labels
 		# axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
 		# text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE', length(algos)), cex=sublabCex, xpd=NA, srt=90, pos=1, col=borderTrue)
-		# if (!is.null(respControl)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('Control', length(algos)), cex=sublabCex, xpd=NA, srt=90, pos=1, col=borderControl)
+		# if (!is.null(respControl)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('Control', length(algos)), cex=sublabCex, xpd=NA, srt=90, pos=1, col='black')
 		# text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE', length(algos)), cex=sublabCex, xpd=NA, srt=90, pos=1, col=borderFalse)
 		# text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
 		
@@ -419,9 +409,9 @@
 			# if (!is.null(respControl)) control <- evals[evals$algo==algo, respControl]
 			# false <- evals[evals$algo==algo, respF1]
 		
-			# if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col=colOmniControl, border=borderOmniControl)
-			# rect(true, at=countAlgo - nudge, width=width, col=colTrue, border=borderTrue, xpd=NA)
-			# rect(false, at=countAlgo + nudge, width=width, col=colFalse, border=borderFalse, xpd=NA)
+			# if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col=colOmniControl, border=borderOmniControl, lwd=0.8)
+			# rect(true, at=countAlgo - nudge, width=width, col=colTrue, border=borderTrue, xpd=NA, lwd=0.8)
+			# rect(false, at=countAlgo + nudge, width=width, col=colFalse, border=borderFalse, xpd=NA, lwd=0.8)
 			
 		# }
 		
@@ -576,27 +566,27 @@
 	# avg <- mean(x)
 	# say('Mean AUCbg for unpermuted multivariate OMNI model is ', sprintf('%.2f', avg), '.')
 	
-	# x <- evals$brtMultiImportT1[evals$algo=='brt']
-	# avg <- mean(x)
+	# x <- evals$brtMultiNativeImportT1[evals$algo=='brt']
+	# avg <- mean(x, na.rm=TRUE)
 	# quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
 	# say('Mean algorithm-specific importance for multivariate BRT model for TRUE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
 	
-	# x <- evals$brtMultiImportF1[evals$algo=='brt']
-	# avg <- mean(x)
+	# x <- evals$brtMultiNativeImportF1[evals$algo=='brt']
+	# avg <- mean(x, na.rm=TRUE)
 	# quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
 	# say('Mean algorithm-specific importance for multivariate BRT model for FALSE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
 	
 	# x <- evals$aucPresAbsMulti[evals$algo=='brt']
 	# successes <- sum(!is.na(x))
-	# say('Number of times multivariate BRT converged (out of 100):', successes)
+	# say('Number of times multivariate BRT converged (out of 100): ', successes)
 	
 	# x <- evals$cbiUni_onlyT1[evals$algo=='brt']
 	# successes <- sum(!is.na(x))
-	# say('Number of times univariate BRT converged using just TRUE variable (out of 100):', successes)
+	# say('Number of times univariate BRT converged using just TRUE variable (out of 100): ', successes)
 	
 	# x <- evals$cbiUni_onlyF1[evals$algo=='brt']
 	# successes <- sum(!is.na(x))
-	# say('Number of times univariate BRT converged using just FALSE variable (out of 100):', successes)
+	# say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
 	
 # say('######################################')
 # say('### [extent] landscape and species ###')
@@ -711,7 +701,7 @@
 	# xlab <- 'Range of TRUE variable' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=TRUE)
 	# evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
 	# ### multivariate
@@ -843,7 +833,7 @@
 	# xlab <- 'Prevalence' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=TRUE)
 	
 	# # generalization
 	# width <- 0.22 # bar width
@@ -922,9 +912,9 @@
 		
 	# dev.off()
 
-# say('###############################################################################')
+# say('############################################################################################')
 # say('### [correlated] calculate correlation between variables as a function of their rotation ###')
-# say('###############################################################################')
+# say('############################################################################################')
 
 	# say('To speed further operations, pre-calculate correlation between two variables as a function of the rotation between them on the landscape.', breaks=80)
 
@@ -1070,7 +1060,7 @@
 	# xlab <- 'Correlation between TRUE and FALSE' # x-axis label
 
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 	# evals$correlation <- correlations$cor[match(evals$rotVar2, correlations$rot)]
@@ -1451,14 +1441,14 @@
 		
 	# dev.off()
 
-say('#######################################')
-say('### [bivariate] collate evaluations ###')
-say('#######################################')
+# say('#######################################')
+# say('### [bivariate] collate evaluations ###')
+# say('#######################################')
 
-	evalDir <- './Results/bivariate'
-	algos <- c('omniscient', 'brt', 'gam', 'maxent')
+	# evalDir <- './Results/bivariate'
+	# algos <- c('omniscient', 'brt', 'gam', 'maxent')
 
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
 	
 #################################
 say('DONE!!!', level=1, deco='&')
