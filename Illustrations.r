@@ -10,8 +10,9 @@
 	print(date())
 
 ### CONTENTS ###
-### functions ###
+### libraries ###
 ### variables and settings ###
+### case-specific functions ###
 
 ### [simple] landscape and species ###
 ### [extent] landscape and species ###
@@ -31,7 +32,7 @@
 ### [bivariate] landscape correlation x niche covariance ###
 
 #################
-### functions ###
+### libraries ###
 #################
 
 	library(compiler)
@@ -49,6 +50,65 @@
 	library(enmSdmPredImport)
 	library(legendary)
 
+##############################
+### variables and settings ###
+##############################
+
+	### working directory
+	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
+
+	# algorithms
+	algos <- c('omniscient', 'gam', 'maxent', 'brt')
+	sdmAlgos <- c('gam', 'maxent', 'brt')
+	
+	### colors of bars for scenarios with TRUE and FALSE variables
+	colTrue <- '#66c2a5' # perturbed SDM vs TRUE (CB safe)
+	borderTrue <- '#1b9e77' # perturbed SDM vs TRUE (CB safe)
+	
+	colFalse <- '#fc8d62' # perturbed SDM vs FALSE (CB safe)
+	borderFalse <- '#d95f02' # perturbed SDM vs FALSE (CB safe)
+
+	colSdmControl <- '#8da0cb' # unperturbed SDM (CB safe)
+	borderSdmControl <- '#7570b3' # unperturbed SDM (CB safe)
+	
+	colOmniControl <- 'black' # unperturbed OMNI
+	borderOmniControl <- 'gray' # unperturbed OMNI
+	
+	colOmniResp <- 'gray' # perturbed OMNI
+	borderOmniTrue <- '#1b9e77'# 'black' # perturbed OMNI
+	borderOmniFalse <- '#d95f02'# 'black' # perturbed OMNI
+
+	### colors for scenarios with TRUE1 and TRUE2 variables
+	colOmniT1 <- 'gray55'
+	borderOmniT1 <- 'gray15'
+	
+	colOmniT2 <- 'gray80'
+	borderOmniT2 <- 'gray40'
+	
+	colSdmT1 <- '#b2df8a' # light green (CB safe)
+	borderSdmT1 <- '#33a02c' # dark green (CB safe)
+	
+	colSdmT2 <- '#a6cee3' # light blue (CB safe)
+	borderSdmT2 <- '#1f78b4' # dark blue (CB safe)
+
+	### landscape and species colors
+	grays <- gray(seq(0, 1, by=0.01))
+
+	greens <- colorRampPalette(c('white', 'forestgreen'))
+	greens <- greens(101)
+
+	browns <- colorRampPalette(c('white', 'chocolate4'))
+	browns <- browns(101)
+	
+	# multiGrad <- colorRampPalette(c('#543005', '#de77ae', '#003c30'))
+	# multiGrad <- multiGrad(101)
+	
+	multiGrad <- rainbow(101)
+	
+###############################
+### case-specific functions ###
+###############################
+	
 	# create abbreviated function names
 	algosShort <- function(x) {
 	
@@ -198,9 +258,15 @@
 			}
 			
 			# unperturbed OMNI
-			if (!is.null(respControl)) rect(omniControl, at=countX - nudge - subnudge, width=width, col=colOmniControl, border=borderOmniControl, xpd=NA, lwd=0.5)
+			if (!is.null(respControl)) rect(omniControl, at=countX - nudge - subnudge, width=width, density=100, col=colOmniControl, border=borderOmniControl, xpd=NA, lwd=0.5)
 			
 			# perturbed OMNI
+			borderOmniResp <- if (variable == 'T1') {
+				borderOmniTrue
+			} else if (variable == 'F1') {
+				borderOmniFalse
+			}
+			
 			rect(omniResponse, at=countX - nudge + subnudge, width=width, col=colOmniResp, border=borderOmniResp, xpd=NA, lwd=0.5)
 		
 			# unperturbed SDM
@@ -237,58 +303,6 @@
 		}
 		
 	}
-	
-##############################
-### variables and settings ###
-##############################
-
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-
-	algos <- c('omniscient', 'gam', 'maxent', 'brt')
-	sdmAlgos <- c('gam', 'maxent', 'brt')
-	
-	### colors of bars for scenarios with TRUE and FALSE variables
-	colTrue <- '#66c2a5' # perturbed SDM vs TRUE (CB safe)
-	borderTrue <- '#1b9e77' # perturbed SDM vs TRUE (CB safe)
-	
-	colFalse <- '#fc8d62' # perturbed SDM vs FALSE (CB safe)
-	borderFalse <- '#d95f02' # perturbed SDM vs FALSE (CB safe)
-
-	colSdmControl <- '#8da0cb' # unperturbed SDM (CB safe)
-	borderSdmControl <- '#7570b3' # unperturbed SDM (CB safe)
-	
-	colOmniControl <- 'black' # unperturbed OMNI
-	borderOmniControl <- 'gray' # unperturbed OMNI
-	
-	colOmniResp <- 'gray' # perturbed OMNI
-	borderOmniResp <- 'black' # perturbed OMNI
-
-	### colors for scenarios with TRUE1 and TRUE2 variables
-	colOmniT1 <- 'gray55'
-	borderOmniT1 <- 'gray15'
-	
-	colOmniT2 <- 'gray80'
-	borderOmniT2 <- 'gray40'
-	
-	colSdmT1 <- '#b2df8a' # light green (CB safe)
-	borderSdmT1 <- '#33a02c' # dark green (CB safe)
-	
-	colSdmT2 <- '#a6cee3' # light blue (CB safe)
-	borderSdmT2 <- '#1f78b4' # dark blue (CB safe)
-
-	### landscape and species colors
-	grays <- gray(seq(0, 1, by=0.01))
-
-	greens <- colorRampPalette(c('white', 'forestgreen'))
-	greens <- greens(101)
-
-	browns <- colorRampPalette(c('white', 'chocolate4'))
-	browns <- browns(101)
-	
-	# multiGrad <- colorRampPalette(c('#543005', '#de77ae', '#003c30'))
-	# multiGrad <- multiGrad(101)
-	
-	multiGrad <- rainbow(101)
 	
 # say('######################################')
 # say('### [simple] landscape and species ###')
@@ -1212,81 +1226,81 @@
 	# successes <- sum(!is.na(x))
 	# say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
 	
-# say('###################################')
-# say('### [extent] simulation results ###')
-# say('###################################')
+say('###################################')
+say('### [extent] simulation results ###')
+say('###################################')
 
-	# # generalization
-	# scenarioDir <- './Results/extent' # scenario directory
-	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
-	# decs <- NULL # number of decimals to show in x-axis variable tick mark labels
-	# xlab <- 'Range of TRUE variable' # x-axis label
+	# generalization
+	scenarioDir <- './Results/extent' # scenario directory
+	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
+	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
+	xlab <- 'Range of TRUE variable' # x-axis label
 
-	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=TRUE)
-	# evals$rangeT1 <- evals$maxT1 - evals$minT1
+	# load evaluations and calculate x-axis variable
+	evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
-	# ### multivariate
-	# ################
+	### multivariate
+	################
 	
-	# # CBI multivariate
-	# ylim <- c(-1, 1)
-	# yTicks <- seq(-1, 1, by=0.25)
-	# ylab <- 'CBI'
-	# rand <- 0
-	# resp <- 'cbiMulti_perm'
-	# respControl <- 'cbiMulti'
+	# CBI multivariate
+	ylim <- c(-1, 1)
+	yTicks <- seq(-1, 1, by=0.25)
+	ylab <- 'CBI'
+	rand <- 0
+	resp <- 'cbiMulti_perm'
+	respControl <- 'cbiMulti'
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
+	png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
 		
-		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# for (countAlgo in seq_along(sdmAlgos)) {
+		for (countAlgo in seq_along(sdmAlgos)) {
 
-			# algo <- sdmAlgos[countAlgo]
+			algo <- sdmAlgos[countAlgo]
 		
-			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
-			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
-		# }
+		}
 		
-		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
 		
-	# dev.off()
+	dev.off()
 	
-	# # COR multivariate
-	# ylim <- c(-0.25, 1)
-	# yTicks <- seq(-0.25, 1, by=0.25)
-	# ylab <- bquote('COR'['bg'])
-	# rand <- 0
-	# resp <- 'corPresBgMulti_perm'
-	# respControl <- NULL
+	# COR multivariate
+	ylim <- c(-0.25, 1)
+	yTicks <- seq(-0.25, 1, by=0.25)
+	ylab <- bquote('COR'['bg'])
+	rand <- 0
+	resp <- 'corPresBgMulti_perm'
+	respControl <- NULL
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
+	png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
 		
-		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# for (countAlgo in seq_along(sdmAlgos)) {
+		for (countAlgo in seq_along(sdmAlgos)) {
 
-			# algo <- sdmAlgos[countAlgo]
+			algo <- sdmAlgos[countAlgo]
 		
-			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
-			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
-		# }
+		}
 		
-		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
 		
-	# dev.off()
-	
+	dev.off()
+print(NO)	
 # say('#######################################')
 # say('### [prevalence] simulation results ###')
 # say('#######################################')
