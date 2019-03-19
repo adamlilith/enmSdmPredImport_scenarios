@@ -62,21 +62,27 @@
 	sdmAlgos <- c('gam', 'maxent', 'brt')
 	
 	### colors of bars for scenarios with TRUE and FALSE variables
-	colTrue <- '#66c2a5' # perturbed SDM vs TRUE (CB safe)
-	borderTrue <- '#1b9e77' # perturbed SDM vs TRUE (CB safe)
+	# colTrue <- '#66c2a5' # perturbed SDM vs TRUE (CB safe)
+	# borderTrue <- '#1b9e77' # perturbed SDM vs TRUE (CB safe)
 	
-	colFalse <- '#fc8d62' # perturbed SDM vs FALSE (CB safe)
-	borderFalse <- '#d95f02' # perturbed SDM vs FALSE (CB safe)
+	# colFalse <- '#fc8d62' # perturbed SDM vs FALSE (CB safe)
+	# borderFalse <- '#d95f02' # perturbed SDM vs FALSE (CB safe)
 
-	colSdmControl <- '#8da0cb' # unperturbed SDM (CB safe)
-	borderSdmControl <- '#7570b3' # unperturbed SDM (CB safe)
+	colTrue <- '#7fbf7b' # perturbed SDM vs TRUE (CB safe)
+	borderTrue <- '#1b7837' # perturbed SDM vs TRUE (CB safe)
+	
+	colFalse <- '#d6604d' # perturbed SDM vs FALSE (CB safe)
+	borderFalse <- '#b2182b' # perturbed SDM vs FALSE (CB safe)
+
+	colSdmControl <- 'gray'# 'white'# '#8da0cb' # unperturbed SDM (CB safe)
+	borderSdmControl <- 'black'# '#7570b3' # unperturbed SDM (CB safe)
 	
 	colOmniControl <- 'black' # unperturbed OMNI
-	borderOmniControl <- 'gray' # unperturbed OMNI
+	borderOmniControl <- 'black'# 'gray' # unperturbed OMNI
 	
-	colOmniResp <- 'gray' # perturbed OMNI
-	borderOmniTrue <- '#1b9e77'# 'black' # perturbed OMNI
-	borderOmniFalse <- '#d95f02'# 'black' # perturbed OMNI
+	colOmniResp <- 'white' # perturbed OMNI
+	borderOmniTrue <- '#1b7837'# 'black' # perturbed OMNI
+	borderOmniFalse <- '#b2182b'# 'black' # perturbed OMNI
 
 	### colors for scenarios with TRUE1 and TRUE2 variables
 	colOmniT1 <- 'gray55'
@@ -168,6 +174,8 @@
 	xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
 	xlabY2 <- -0.23 # position of outer x-axis label
 	
+	lineDensity <- 110 # density of lines per inch for perturbed OMNI
+	
 	### generic plot function for plots with a scalar along the x-axis and variable importance along the y
 	### The x-axis can represent: prevalence, landscape extent, correlation between landscape variables, correlation between variables in shaping the niche, and so on. This function is intended to supply a thematic unity to plots of these types.
 	plotScalarResp <- function(
@@ -237,6 +245,7 @@
 
 		thisNudge <- length(algos) / 2
 		
+		# for each value of x
 		for (countX in seq_along(x)) {
 		
 			thisX <- x[countX]
@@ -258,7 +267,10 @@
 			}
 			
 			# unperturbed OMNI
-			if (!is.null(respControl)) rect(omniControl, at=countX - nudge - subnudge, width=width, density=100, col=colOmniControl, border=borderOmniControl, xpd=NA, lwd=0.5)
+			if (!is.null(respControl)) {
+				rect(omniControl, at=countX - nudge - subnudge, width=width, col='white', border=NA, xpd=NA, lwd=0.5)
+				rect(omniControl, at=countX - nudge - subnudge, width=width, density=lineDensity, col=colOmniControl, fill='white', border=borderOmniControl, xpd=NA, lwd=0.5)
+			}
 			
 			# perturbed OMNI
 			borderOmniResp <- if (variable == 'T1') {
@@ -267,7 +279,8 @@
 				borderOmniFalse
 			}
 			
-			rect(omniResponse, at=countX - nudge + subnudge, width=width, col=colOmniResp, border=borderOmniResp, xpd=NA, lwd=0.5)
+			rect(omniResponse, at=countX - nudge + subnudge, width=width, col='white', border=NA, xpd=NA, lwd=0.5)
+			rect(omniResponse, at=countX - nudge + subnudge, width=width, col=borderOmniResp, density=lineDensity, border=borderOmniResp, xpd=NA, lwd=0.5)
 		
 			# unperturbed SDM
 			if (!is.null(respControl)) rect(algoControl, at=countX + nudge - subnudge, width=width, col=colSdmControl, border=borderSdmControl, xpd=NA, lwd=0.5)
@@ -286,7 +299,7 @@
 			
 				par(lwd=0.5)
 			
-				legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=leg, cex=legCex, fill=c(colOmniControl, colOmniResp, colSdmControl, colResp), border=c(borderOmniControl, borderOmniResp, borderSdmControl, borderResp))
+				legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=leg, cex=legCex, fill=c(borderSdmControl, borderResp, colSdmControl, colResp), border=c(borderOmniControl, borderOmniResp, borderSdmControl, borderResp), density=c(lineDensity, lineDensity, NA, NA))
 				
 			} else {
 
@@ -1226,81 +1239,81 @@
 	# successes <- sum(!is.na(x))
 	# say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
 	
-say('###################################')
-say('### [extent] simulation results ###')
-say('###################################')
+# say('###################################')
+# say('### [extent] simulation results ###')
+# say('###################################')
 
-	# generalization
-	scenarioDir <- './Results/extent' # scenario directory
-	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
-	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
-	xlab <- 'Range of TRUE variable' # x-axis label
+	# # generalization
+	# scenarioDir <- './Results/extent' # scenario directory
+	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
+	# decs <- NULL # number of decimals to show in x-axis variable tick mark labels
+	# xlab <- 'Range of TRUE variable' # x-axis label
 
-	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
-	evals$rangeT1 <- evals$maxT1 - evals$minT1
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
-	### multivariate
-	################
+	# ### multivariate
+	# ################
 	
-	# CBI multivariate
-	ylim <- c(-1, 1)
-	yTicks <- seq(-1, 1, by=0.25)
-	ylab <- 'CBI'
-	rand <- 0
-	resp <- 'cbiMulti_perm'
-	respControl <- 'cbiMulti'
+	# # CBI multivariate
+	# ylim <- c(-1, 1)
+	# yTicks <- seq(-1, 1, by=0.25)
+	# ylab <- 'CBI'
+	# rand <- 0
+	# resp <- 'cbiMulti_perm'
+	# respControl <- 'cbiMulti'
 	
-	png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
 		
-		par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		for (countAlgo in seq_along(sdmAlgos)) {
+		# for (countAlgo in seq_along(sdmAlgos)) {
 
-			algo <- sdmAlgos[countAlgo]
+			# algo <- sdmAlgos[countAlgo]
 		
-			lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
-			lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
-		}
+		# }
 		
-		title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
 		
-	dev.off()
+	# dev.off()
 	
-	# COR multivariate
-	ylim <- c(-0.25, 1)
-	yTicks <- seq(-0.25, 1, by=0.25)
-	ylab <- bquote('COR'['bg'])
-	rand <- 0
-	resp <- 'corPresBgMulti_perm'
-	respControl <- NULL
+	# # COR multivariate
+	# ylim <- c(-0.25, 1)
+	# yTicks <- seq(-0.25, 1, by=0.25)
+	# ylab <- bquote('COR'['bg'])
+	# rand <- 0
+	# resp <- 'corPresBgMulti_perm'
+	# respControl <- NULL
 	
-	png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
 		
-		par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		for (countAlgo in seq_along(sdmAlgos)) {
+		# for (countAlgo in seq_along(sdmAlgos)) {
 
-			algo <- sdmAlgos[countAlgo]
+			# algo <- sdmAlgos[countAlgo]
 		
-			lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 
-			lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
+			# plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
 		
 		
-		}
+		# }
 		
-		title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
 		
-	dev.off()
-print(NO)	
+	# dev.off()
+
 # say('#######################################')
 # say('### [prevalence] simulation results ###')
 # say('#######################################')
@@ -1405,7 +1418,7 @@ print(NO)
 	# evals <- loadEvals(scenarioDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
-	# evals$correlation <- correlations$cor[match(evals$rotVar2, correlations$rot)]
+	# evals$correlation <- correlations$cor[match(evals$rotF1, correlations$rot)]
 	
 	# ### multivariate
 	# ################
@@ -1586,14 +1599,19 @@ say('############################################################')
 							}
 						}
 
+						s <- 0.75
+						
 						# plot annulus
 						annulusSeg(
 							x=sigma1,
 							y=sigma2,
 							inner=c(sdmControlInner, sdmT1Inner, sdmT2Inner, omniT2Inner, omniT1Inner, omniControlInner),
 							outer=c(sdmControlOuter, sdmT1Outer, sdmT2Outer, omniT2Outer, omniT1Outer, omniControlOuter),
-							col=c(colSdmControl, colSdmT1, colSdmT2, colOmniT2, colOmniT1, colOmniControl),
+							# col=c(colSdmControl, colSdmT1, colSdmT2, colOmniT2, colOmniT1, colOmniControl),
+							col=c(colSdmControl, colSdmT1, colSdmT2, borderSdmT2, borderSdmT1, borderSdmControl),
 							border=c(borderSdmControl, borderSdmT1, borderSdmT2, borderOmniT2, borderOmniT1, borderOmniControl),
+							density=c(NA, NA, NA, s * lineDensity, s * lineDensity, s * lineDensity),
+							angle=c(NA, NA, NA, 22.5, 180, 180 + 22.5),
 							force0=FALSE,
 							lwd=0.6,
 							xpd=NA
@@ -1609,6 +1627,7 @@ say('############################################################')
 							degMin <- (countType - 1 ) / length(modelTypes) * 360
 							degMax <- countType / length(modelTypes) * 360
 							
+							# colVar <- paste0('border', capIt(modelType))
 							colVar <- paste0('border', capIt(modelType))
 							col <- get(colVar)
 							
