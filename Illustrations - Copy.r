@@ -104,14 +104,13 @@
 	greens <- colorRampPalette(c('white', 'forestgreen'))
 	greens <- greens(101)
 
-	# browns <- colorRampPalette(c('white', 'chocolate4'))
-	# browns <- browns(101)
-
-	land <- colorRampPalette(c('#543005', '#bf812d', '#f5f5f5', '#35978f', '#003c30'))
-	land <- land(101)
+	browns <- colorRampPalette(c('white', 'chocolate4'))
+	browns <- browns(101)
 	
-	# land <- colorRampPalette(c('white', 'chocolate4'))
-	# land <- land(101)
+	# multiGrad <- colorRampPalette(c('#543005', '#de77ae', '#003c30'))
+	# multiGrad <- multiGrad(101)
+	
+	multiGrad <- rainbow(101)
 	
 ###############################
 ### case-specific functions ###
@@ -492,23 +491,23 @@
 		# par(mfrow=c(1, 3), oma=rep(0, 4), mar=c(1, 0, 2, 0), fg='white', col.axis='white')
 
 		# plot(ext)
-		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('a) TRUE variable', adj=c(0, -0.05), cex=0.9, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
 		# par(fg='white')
 		# plot(ext)
-		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('b) FALSE variable', adj=c(0, -0.05), cex=0.9, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
 		# par(fg='white')
 		# plot(ext)
-		# plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(species, breaks=seq(0, 1, length.out=length(browns) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('c) Species', adj=c(0, -0.05), cex=0.9, col='black')
 		# par(fg='black')
@@ -536,7 +535,7 @@
 
 	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
 	
-	# breaks <- seq(min(landSize$min), max(landSize$max), length.out=length(land) - 1)
+	# breaks <- seq(min(landSize$min), max(landSize$max), length.out=length(browns) - 1)
 	
 	# png(paste0(scenarioDir, '/Illustration - EXTENT Scenario Landscape and Species.png'), width=600 * 2, height=660, res=300)
 		
@@ -554,12 +553,12 @@
 		# # plot largest landscape
 		# par(mar=c(0, 0, 0, 1))
 		# plot(ext)
-		# plot(landscape[['T1']], breaks=breaks, col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(landscape[['T1']], breaks=breaks, col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# lab <- paste0('a) TRUE variable')
 		# labelFig(lab, adj=c(-0.02, -0), cex=0.5, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=-0.04, vert=FALSE, width=0.93, height=0.07, labels=seq(min(landSize$min), max(landSize$max), by=4), title='', col=land, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.4)
+		# legendGrad('bottom', inset=-0.04, vert=FALSE, width=0.93, height=0.07, labels=seq(min(landSize$min), max(landSize$max), by=4), title='', col=browns, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.4)
 
 		# thisExt <- ext
 		# for (countLand in 2:nrow(landSize)) {
@@ -680,129 +679,106 @@ say('### [resolution] landscape and species ###')
 say('##########################################')
 
 	say('Wanting a simple illustration of the landscape and species in the "resolution" scenario.')
-	say('Setup: 2 panels, one for TRUE, one for FALSE.')
-	say('Each panel: 3 columns for grain size, 4 rows for spatial autocorrelation.')
 	
 	thisOutDir <- 'resolution'
 	scenarioDir <- paste0('./Results/', thisOutDir)
 	dirCreate(scenarioDir)
 
 	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1, noise=0), F1=list(type='random', min=-1, max=1))
+	geography <- list(T1=list(type='linear', min=-1, max=1, noisy=TRUE, noisep=0.5), F1=list(type='random', min=-1, max=1))
+	
+source('C:/Ecology/Drive/R/enmSdmPredImport/R/genesis.r')
+source('C:/Ecology/Drive/R/enmSdmPredImport/R/noisy.r')
 	
 	landscapeNative <- genesis(geography, size=1024, circle=FALSE)
 	
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	response <- logistic
+	
+	# species <- response(x1=landscapeNative[['T1']], x2=landscapeNative[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
+		
 	# extent (for border)
 	ext <- extent(landscapeNative)
 	ext <- as(ext, 'SpatialPolygons')
 
-	resolutions <- 2^rev(c(14, 10, 6))
+	resolutions <- 2^rev(c(6, 8, 10, 12, 14))
 	resNative <- 1024
-
-	# plots one layer of landscape
-	subplotLand <- function(letter, grain, var, noise, main=NULL, ylab='') {
-			
-		# letter	letter for panel label (may be deprecated)
-		# grain		grain size (may be deprecated)
-		# var		which variable to plot (T1 or F1)
-		# noise		noise level (may be deprecated)
-		# main		title or NULL
-		# ylab		ylab or NULL
-			
-		thisNative <- landscapeNative
-		thisGeog <- geography
-		thisGeog[[var]]$noise <- noise
-		thisNative <- noisy(thisNative, thisGeog)
-		templateSampled <- raster(nrows=grain, ncols=grain, crs=raster::projection(landscapeNative), ext=extent(landscapeNative))
-		x <- resample(thisNative[[var]], templateSampled)
-
-		plot(ext)
-		mtext(main, side=3, xpd=NA, col='black', cex=0.75)
-		mtext(ylab, side=2, xpd=NA, col='black', cex=0.75)
-		plot(x, breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, maxpixels=ncell(x), add=TRUE)
-		plot(ext, border='black', col=NA, xpd=NA, ann=FALSE, add=TRUE)
-		# lab <- paste0(letter, ') TRUE: Resolution 1/', grain)
-		# labelFig(lab, adj=c(0, 0.02), cex=0.8, col='black')
-		
-	}
-
-	png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species.png'), width=2 * 3 * 380, height=4 * 400, res=300)
+	png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species.png'), width=5 * 400, height=800, res=300)
 	
-		par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white')
+		par(mfrow=c(2, 5), oma=c(0, 0, 0, 3.1), mar=c(0, 0, 1, 0), fg='white', col.axis='white')
 
-		### highest SAC
-		noise <- 0
-			
-			# TRUE rand = 1
-			subplotLand(letter='a', grain=2^14, var='T1', noise=noise, main=paste0('1/', 2^14), ylab=0)
-			subplotLand(letter='b', grain=2^10, var='T1', noise=noise, main=paste0('1/', 2^10))
-			subplotLand(letter='c', grain=2^6, var='T1', noise=noise, main=paste0('1/', 2^6))
-			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise, main=paste0('1/', 2^14))
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise, main=paste0('1/', 2^10))
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise, main=paste0('1/', 2^6))
-
-		### moderate high SAC
-		noise <- 1/3
-			
-			# TRUE rand = 1
-			subplotLand(letter='d', grain=2^14, var='T1', noise=noise, ylab=round(1/3, 2))
-			subplotLand(letter='e', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='f', grain=2^6, var='T1', noise=noise)
-			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		### moderate low SAC
-		noise <- 2/3
-			
-			# TRUE rand = 1
-			subplotLand(letter='g', grain=2^14, var='T1', noise=noise, ylab=round(2/3, 2))
-			subplotLand(letter='h', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='i', grain=2^6, var='T1', noise=noise)
-			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		### moderate low SAC
-		noise <- 1
-			
-			# TRUE rand = 1
-			subplotLand(letter='j', grain=2^14, var='T1', noise=noise, ylab=round(1, 2))
-			subplotLand(letter='k', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='l', grain=2^6, var='T1', noise=noise)
-			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		# axes
-		xlims <- c(-8, 1)
-		ylims <- c(0, 4.2)
+		# TRUE
+		for (countRes in seq_along(resolutions)) {
 		
-		lines(xlims, c(-0.2, -0.2), xpd=NA, col='black') # x
-		lines(rep(min(xlims) - 0.137, 2), ylims, xpd=NA, col='black') # y
-		text(mean(xlims), -0.4, labels='Resolution', xpd=NA, cex=0.8, col='black') # x label
-		text(min(xlims) - 0.2, mean(ylims), labels='Autocorrelation', xpd=NA, srt=90, cex=0.8, col='black') # y label
+			resolution <- resolutions[countRes]
 		
-		title('Grain size', outer=TRUE, line=3, cex.main=1.3, col='black', font=1)
-		title('TRUE                                                                             FALSE', outer=TRUE, line=2, cex.main=1.3, col='black', font=1)
-		text(-5.85, 2.12, labels='Proportion swapped\n\U2190lower autocorrelation                 higher autocorrelation\U2192', cex=1.3, srt=90, xpd=NA, col='black', font=2)
+			say('Resolution: ', resolution)
 		
+			templateSampled <- raster::raster(
+				nrows=resolution,
+				ncols=resolution,
+				crs=raster::projection(landscapeNative),
+				ext=extent(landscapeNative)
+			)
+
+			resSampled <- raster::res(templateSampled)[1]
+			landscapeSampled <- if (resNative != resSampled) {
+				raster::resample(landscapeNative, templateSampled)
+			} else {
+				landscapeNative
+			}			
+		
+			par(fg='white')
+			plot(ext)
+			plot(landscapeSampled[['T1']], breaks=seq(0, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, maxpixels=ncell(landscapeSampled), add=TRUE)
+			plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+			lab <- paste0(letters[2 * countRes - 1], ') TRUE: Resolution 1/', resolution)
+			labelFig(lab, adj=c(0, 0.02), cex=0.8, col='black')
+			
+			par(fg='black')
+			legendGrad('right', inset=-0.2, width=0.1, height=0.9, labels=c(-1, 0, 1), title='TRUE', titleAdj=c(0.5, 0.95), col=browns, labAdj=0.7, xpd=NA, adjX=c(0, 0.5), adjY=c(0.055, 0.8), boxBorder=NA, cex=0.8)
+
+		} # TRUE
+		
+		# FALSE
+		for (countRes in seq_along(resolutions)) {
+		
+			resolution <- resolutions[countRes]
+		
+			say('Resolution: ', resolution)
+		
+			templateSampled <- raster::raster(
+				nrows=resolution,
+				ncols=resolution,
+				crs=raster::projection(landscapeNative),
+				ext=extent(landscapeNative)
+			)
+
+			resSampled <- raster::res(templateSampled)[1]
+			landscapeSampled <- if (resNative != resSampled) {
+				raster::resample(landscapeNative, templateSampled)
+			} else {
+				landscapeNative
+			}			
+		
+			par(fg='white')
+			plot(ext)
+			plot(landscapeSampled[['F1']], breaks=seq(0, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, maxpixels=ncell(landscapeSampled), add=TRUE)
+			plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+			lab <- paste0(letters[2 * countRes], ') FALSE: Resolution 1/', resolution)
+			labelFig(lab, adj=c(0, 0.02), cex=0.8, col='black')
+		
+			par(fg='black')
+			legendGrad('right', inset=-0.2, width=0.1, height=0.9, labels=c(-1, 0, 1), title='FALSE', titleAdj=c(0.5, 0.95), col=browns, labAdj=0.7, xpd=NA, adjX=c(0, 0.5), adjY=c(0.055, 0.8), boxBorder=NA, cex=0.8)
+
+		}
+	
 	dev.off()
 	
 # say('############################################################################################')
@@ -886,22 +862,22 @@ say('##########################################')
 			
 		# # TRUE
 		# plot(ext)
-		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('a) TRUE variable', adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
 
 		# # first FALSE
 		# par(fg='white')
 		# plot(ext)
-		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
 		# lab <- paste0('b) FALSE: Correlation = ', sprintf('%.2f', correlation))
 		# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
 
 		# # next FALSES
 		# for (countRot in 2:length(rots)) {
@@ -919,13 +895,13 @@ say('##########################################')
 			# # FALSE
 			# par(fg='white')
 			# plot(ext)
-			# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+			# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, ann=FALSE, legend=FALSE, add=TRUE)
 			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 			# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
 			# lab <- paste0(letters[countRot + 1], ') FALSE: Correlation = ', sprintf('%.2f', correlation))
 			# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 			# par(fg='black')
-			# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+			# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=browns, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
 			
 		# }
 		
@@ -934,7 +910,7 @@ say('##########################################')
 		
 		# par(fg='white')
 		# plot(ext)
-		# plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(species, breaks=seq(0, 1, length.out=length(browns) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('e) Species', adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
@@ -1015,7 +991,7 @@ say('##########################################')
 			# # legend bar
 			# par(fg='black')
 			# frame()
-			# legendGrad('right', inset=0.035, vert=TRUE, width=0.17, height=1.7, labels=c(-1, 0, 1), title='', col=land, labAdj=0.5, xpd=NA, adjX=c(0, 0.5), adjY=c(0, 0.75), boxBorder=NA, cex=1.4, lwd=1, border=landscapeBorder)
+			# legendGrad('right', inset=0.035, vert=TRUE, width=0.17, height=1.7, labels=c(-1, 0, 1), title='', col=browns, labAdj=0.5, xpd=NA, adjX=c(0, 0.5), adjY=c(0, 0.75), boxBorder=NA, cex=1.4, lwd=1, border=landscapeBorder)
 			# text(-0.25, 0.3, 'Landscape', xpd=NA, cex=1.8, pos=4)
 
 			# # major panel label
@@ -1030,7 +1006,7 @@ say('##########################################')
 			
 			# # TRUE1
 			# plot(ext, border=NA)
-			# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, legend=FALSE, add=TRUE, axes=FALSE)
+			# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, legend=FALSE, add=TRUE, axes=FALSE)
 			# plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
 			# lab <- paste0('T1')
 			# labelFig(lab, adj=c(-0.03, -0.1), cex=1.8, col='black')
@@ -1041,7 +1017,7 @@ say('##########################################')
 			# # TRUE2
 			# par(mar=c(4, 1, 0, 0), fg=NA)
 			# plot(ext, border=NA)
-			# plot(landscape[['T2']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, legend=FALSE, add=TRUE, axes=FALSE)
+			# plot(landscape[['T2']], breaks=seq(-1, 1, length.out=length(browns) - 1), col=browns, legend=FALSE, add=TRUE, axes=FALSE)
 			# plot(ring, add=TRUE, border=landscapeBorder, lwd=1)
 			# lab <- paste0('T2')
 			# labelFig(lab, adj=c(-0.03, -0.1), cex=1.9, col='black')
