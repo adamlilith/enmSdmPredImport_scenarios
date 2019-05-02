@@ -3,7 +3,7 @@
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Illustrations.r')
 
 	memory.limit(memory.limit() * 2^30)
-	rm(list=ls())
+	# rm(list=ls())
 	options(keep.source=FALSE) # manage memory
 	gc()
 	print('')
@@ -92,6 +92,7 @@
 	# # borderSdmT2 <- borderOmniT2 <- '#1f78b4' # dark blue (CB safe)
 
 	### colors for scenarios with TRUE1 and TRUE2 variables
+	#######################################################
 	colSdmT1 <- colOmniT1 <- '#a6dba0' # light green (CB safe)
 	borderSdmT1 <- borderOmniT1 <- '#008837' # dark green (CB safe)
 	
@@ -101,11 +102,8 @@
 	### landscape and species colors
 	grays <- gray(seq(0, 1, by=0.01))
 
-	greens <- colorRampPalette(c('white', 'forestgreen'))
+	greens <- colorRampPalette(c('white', 'darkgreen'))
 	greens <- greens(101)
-
-	# browns <- colorRampPalette(c('white', 'chocolate4'))
-	# browns <- browns(101)
 
 	land <- colorRampPalette(c('#543005', '#bf812d', '#f5f5f5', '#35978f', '#003c30'))
 	land <- land(101)
@@ -600,7 +598,7 @@
 
 		# # labels: next largest landscape
 		# x <- -0.16
-		# y <- 0.75
+		# y <- 0.65
 		# down <- 0.1
 		# text(x, y, labels='next\nlargest\nlandscape', xpd=NA, cex=0.5)
 		# arrows(x0=x, y0=y - down, x1=0.25, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
@@ -675,135 +673,94 @@
 		
 	# dev.off()
 	
-say('##########################################')
-say('### [resolution] landscape and species ###')
-say('##########################################')
+# say('##########################################')
+# say('### [resolution] landscape and species ###')
+# say('##########################################')
 
-	say('Wanting a simple illustration of the landscape and species in the "resolution" scenario.')
-	say('Setup: 2 panels, one for TRUE, one for FALSE.')
-	say('Each panel: 3 columns for grain size, 4 rows for spatial autocorrelation.')
+	# say('Wanting a simple illustration of the landscape and species in the "resolution" scenario.')
+	# say('Setup: 2 panels, one for TRUE, one for FALSE.')
+	# say('Each panel: 3 columns for grain size, 4 rows for spatial autocorrelation.')
 	
-	thisOutDir <- 'resolution'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
+	# thisOutDir <- 'resolution'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 
-	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1, noise=0), F1=list(type='random', min=-1, max=1))
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1, noise=0), F1=list(type='random', min=-1, max=1))
 	
-	landscapeNative <- genesis(geography, size=1024, circle=FALSE)
+	# landscapeNative <- genesis(geography, size=1024, circle=FALSE)
 	
-	# extent (for border)
-	ext <- extent(landscapeNative)
-	ext <- as(ext, 'SpatialPolygons')
+	# # extent (for border)
+	# ext <- extent(landscapeNative)
+	# ext <- as(ext, 'SpatialPolygons')
 
-	resolutions <- 2^rev(c(14, 10, 6))
-	resNative <- 1024
-
-	# plots one layer of landscape
-	subplotLand <- function(letter, grain, var, noise, main=NULL, ylab='') {
+	# # plots one layer of landscape
+	# subplotLand <- function(grain, var, noise, main=' ', ylab=' ') {
 			
-		# letter	letter for panel label (may be deprecated)
-		# grain		grain size (may be deprecated)
-		# var		which variable to plot (T1 or F1)
-		# noise		noise level (may be deprecated)
-		# main		title or NULL
-		# ylab		ylab or NULL
+		# # grain		grain size
+		# # var		which variable to plot (T1 or F1)
+		# # noise		noise level
+		# # main		title or ' '
+		# # ylab		ylab or ' '
 			
-		thisNative <- landscapeNative
-		thisGeog <- geography
-		thisGeog[[var]]$noise <- noise
-		thisNative <- noisy(thisNative, thisGeog)
-		templateSampled <- raster(nrows=grain, ncols=grain, crs=raster::projection(landscapeNative), ext=extent(landscapeNative))
-		x <- resample(thisNative[[var]], templateSampled)
+		# thisNative <- landscapeNative
+		# thisGeog <- geography
+		# thisGeog[[var]]$noise <- noise
+		# thisNative <- noisy(thisNative, thisGeog)
+		# templateSampled <- raster(nrows=grain, ncols=grain, crs=raster::projection(landscapeNative), ext=extent(landscapeNative))
+		# x <- resample(thisNative[[var]], templateSampled)
 
-		plot(ext)
-		mtext(main, side=3, xpd=NA, col='black', cex=0.75)
-		mtext(ylab, side=2, xpd=NA, col='black', cex=0.75)
-		plot(x, breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, maxpixels=ncell(x), add=TRUE)
-		plot(ext, border='black', col=NA, xpd=NA, ann=FALSE, add=TRUE)
-		# lab <- paste0(letter, ') TRUE: Resolution 1/', grain)
-		# labelFig(lab, adj=c(0, 0.02), cex=0.8, col='black')
+		# plot(ext)
+		# mtext(main, side=3, xpd=NA, col='black', cex=0.65, line=-0.5)
+		# mtext(ylab, side=2, xpd=NA, col='black', cex=0.75)
+		# plot(x, breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, maxpixels=ncell(x), add=TRUE)
+		# plot(ext, border='black', col=NA, xpd=NA, ann=FALSE, add=TRUE)
 		
-	}
+	# }
 
-	png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species.png'), width=2 * 3 * 380, height=4 * 400, res=300)
+	# finest <- 2^14
+	# native <- 2^10
+	# coarsest <- 2^6
 	
-		par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white')
+	# png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species NEW.png'), width=2 * 3 * 380, height=4 * 400, res=300)
+	
+		# par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white', cex.main=0.8)
 
-		### highest SAC
-		noise <- 0
+		# noises <- c(0, 1/3, 2/3, 1)
 			
-			# TRUE rand = 1
-			subplotLand(letter='a', grain=2^14, var='T1', noise=noise, main=paste0('1/', 2^14), ylab=0)
-			subplotLand(letter='b', grain=2^10, var='T1', noise=noise, main=paste0('1/', 2^10))
-			subplotLand(letter='c', grain=2^6, var='T1', noise=noise, main=paste0('1/', 2^6))
+		# for (countNoise in seq_along(noises)) {
 			
-			# frame()
+			# noise <- noises[countNoise]
 
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise, main=paste0('1/', 2^14))
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise, main=paste0('1/', 2^10))
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise, main=paste0('1/', 2^6))
-
-		### moderate high SAC
-		noise <- 1/3
+			# if (countNoise == 1) {
+				# main1 <- 'TRUE'
+				# main2 <- 'FALSE'
+			# } else {
+				# main1 <- main2 <- ''
+			# }
 			
-			# TRUE rand = 1
-			subplotLand(letter='d', grain=2^14, var='T1', noise=noise, ylab=round(1/3, 2))
-			subplotLand(letter='e', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='f', grain=2^6, var='T1', noise=noise)
+			# par(mar=c(0, 1, 0, 0))
+			# subplotLand(grain=finest, var='T1', noise=noise, main=main1, ylab=round(noise, 2))
+			# par(mar=c(0, 0, 0, 1))
+			# subplotLand(grain=finest, var='F1', noise=noise, main=main2)
 			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		### moderate low SAC
-		noise <- 2/3
+			# par(mar=c(0, 1, 0, 0))
+			# subplotLand(grain=native, var='T1', noise=noise, main=main1)
+			# par(mar=c(0, 0, 0, 1))
+			# subplotLand(grain=native, var='F1', noise=noise, main=main2)
 			
-			# TRUE rand = 1
-			subplotLand(letter='g', grain=2^14, var='T1', noise=noise, ylab=round(2/3, 2))
-			subplotLand(letter='h', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='i', grain=2^6, var='T1', noise=noise)
+			# par(mar=c(0, 1, 0, 0))
+			# subplotLand(grain=coarsest, var='T1', noise=noise, main=main1)
+			# subplotLand(grain=coarsest, var='F1', noise=noise, main=main2)
 			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		### moderate low SAC
-		noise <- 1
+		# }
 			
-			# TRUE rand = 1
-			subplotLand(letter='j', grain=2^14, var='T1', noise=noise, ylab=round(1, 2))
-			subplotLand(letter='k', grain=2^10, var='T1', noise=noise)
-			subplotLand(letter='l', grain=2^6, var='T1', noise=noise)
-			
-			# frame()
-
-			# FALSE rand = 1
-			subplotLand(letter='a', grain=2^14, var='F1', noise=noise)
-			subplotLand(letter='b', grain=2^10, var='F1', noise=noise)
-			subplotLand(letter='c', grain=2^6, var='F1', noise=noise)
-
-		# axes
-		xlims <- c(-8, 1)
-		ylims <- c(0, 4.2)
+		# repeatSpace <- 41
+		# main <- paste0('Grain: 1/', finest, paste(rep(' ', repeatSpace), collapse=''), 'Grain: 1/', native, paste(rep(' ', repeatSpace), collapse=''),'Grain: 1/', coarsest)
+		# title(main, outer=TRUE, line=1.25, cex.main=1.2, col='black', font=1)
+		# text(-6.55, 2.35, labels='Proportion swapped\n\U2190lower autocorrelation                 higher autocorrelation\U2192', cex=1.3, srt=90, xpd=NA, col='black', font=2)
 		
-		lines(xlims, c(-0.2, -0.2), xpd=NA, col='black') # x
-		lines(rep(min(xlims) - 0.137, 2), ylims, xpd=NA, col='black') # y
-		text(mean(xlims), -0.4, labels='Resolution', xpd=NA, cex=0.8, col='black') # x label
-		text(min(xlims) - 0.2, mean(ylims), labels='Autocorrelation', xpd=NA, srt=90, cex=0.8, col='black') # y label
-		
-		title('Grain size', outer=TRUE, line=3, cex.main=1.3, col='black', font=1)
-		title('TRUE                                                                             FALSE', outer=TRUE, line=2, cex.main=1.3, col='black', font=1)
-		text(-5.85, 2.12, labels='Proportion swapped\n\U2190lower autocorrelation                 higher autocorrelation\U2192', cex=1.3, srt=90, xpd=NA, col='black', font=2)
-		
-	dev.off()
+	# dev.off()
 	
 # say('############################################################################################')
 # say('### [correlated] calculate correlation between variables as a function of their rotation ###')
@@ -1786,97 +1743,224 @@ say('##########################################')
 		
 	# dev.off()
 
-# say('#######################################')
-# say('### [resolution] simulation results ###')
-# say('#######################################')
+say('#######################################')
+say('### [resolution] simulation results ###')
+say('#######################################')
 
-	# # generalization
-	# scenarioDir <- './Results/resolution' # scenario directory
-	# evalDir <- paste0(scenarioDir, '/evaluations')
-	# xCol <- 'landscapeSize' # name of x-axis variable column in evaluation data frame
-	# decs <- 0 # number of decimals to show in x-axis variable tick mark labels
-	# xlab <- 'Resolution' # x-axis label
+	say('Basic layout: Three panels side-by-side, one per algorithm.')
+	say('Each panel has 3 columns (resolution) and 4 rows (SAC).')
+	say('Each subpanel is a barplot showing response of OMNI and the SDM.')
 
-	# # load evaluations and calculate x-axis variable
-	# nativeEvals <- loadEvals(paste0(scenarioDir, '/evaluations native'), algos='omniscient', save=TRUE, redo=FALSE)
-	# evals <- loadEvals(paste0(scenarioDir, '/evaluations sampled'), algos=algos, save=TRUE, redo=FALSE)
+	# generalization
+	scenarioDir <- './Results/resolution' # scenario directory
+
+	# load evaluations and calculate x-axis variable
+	evals <- loadEvals(
+		evalDir=paste0(scenarioDir, '/evaluations'),
+		algos=algos,
+		save=TRUE,
+		redo=FALSE
+	)
 	
-	# # generalization
-	# width <- 0.22 # bar width
-	# nudge <- 0.22 # nudge pair of bars for same algorithm left/right
-	# subnudge <- nudge / 3 # nudge bars within same algorithm left/right
-	# figLabPos <- c(-0.150, 0.05) # position of figure label
+	# SAC
+	noises <- c(0, 1/3, 2/3, 1)
+	noisesRounded <- round(noises, 2)
 	
-	# legCex <- 0.34 # legend
+	# grain size
+	grains <- c(2^14, 2^10, 2^6)
+
+	# plot settings
+	xSize <- 0.775 # maximum width of subplot containing bars
+	ySize <- 0.875 # maximum height of subplot containing bars
+	width <- 0.17 # width of bars as a proportion of subplot size (real width will be size * width)
+	tick <- 0.05 # length of subplot tick marks
+	lwd <- 0.4 # line width of bars
+	cexAxisLabel <- 0.5
+	cexPanelLabel <- 0.7
 	
-	# ylabX1 <- -0.15 # position of inner y-axis label
-	# ylabX2 <- -0.25 # position of outer y-axis label
-	# labCex <- 0.55 # size of algorithm, y-axis, and figure labels
+	# function to plots bars as scaled subplots in a larger plot
+	# basically this just rescales the size and position of values and bars and send the information to rect()
+	subRectNeg1To1 <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
 	
-	# xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
-	# xlabY2 <- -0.23 # position of outer x-axis label
-
-	# ### multivariate
-	# ################
+		# resp		values of response (not scaled)
+		# angle		NULL or angle of fill lines
+		# xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
+		# col, border  color for fill and border
+		# ...		other
 	
-	# # CBI multivariate
-	# ylim <- c(-1, 1)
-	# yTicks <- seq(-1, 1, by=0.25)
-	# ylab <- 'CBI'
-	# rand <- 0
-	# resp <- 'cbiMulti_perm'
-	# respControl <- 'cbiMulti'
-
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI.png'), width=900, height=1200, res=300)
+		respScaled <- resp * 0.5 * ySize + countNoise - 0 * 0.5 * ySize
+		at <- countGrain - 0.5 * xSize + xOffsetInSubplot * xSize
+		rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=col, border=border, angle=angle, density=s * lineDensity, lwd=lwd)
 		
-		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
-		
-		# for (countAlgo in seq_along(sdmAlgos)) {
-		# # for (countAlgo in 1) {
-
-			# algo <- sdmAlgos[countAlgo]
-		
-			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotScalarRespRes(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
-
-			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotScalarRespRes(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
-		
-		
-		# }
-		
-		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
-		
-	# dev.off()
+	}
 	
-	# # COR multivariate
-	# ylim <- c(-0.25, 1)
-	# yTicks <- seq(-0.25, 1, by=0.25)
-	# ylab <- bquote('COR'['bg'])
-	# rand <- 0
-	# resp <- 'corPresBgMulti_perm'
-	# respControl <- NULL
+	### plot CBI
+	############
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR.png'), width=900, height=1200, res=300)
-		
-		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
-		
-		# for (countAlgo in seq_along(sdmAlgos)) {
+	respControl <- 'cbiMulti'
+	resp <- 'cbiMulti_perm'
+	
+	sdms <- algos[!(algos %in% 'omniscient')]
 
-			# algo <- sdmAlgos[countAlgo]
-		
-			# lab <- paste0(letters[2 * countAlgo - 1], ') ', algosShort(algo), ' versus TRUE variable')
-			# plotScalarRespRes(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='T1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+	png(paste0(scenarioDir, '/Results - Bar Plot.png'), width=9 * 300, height=4 * 300, res=600)
+	
+		par(mfrow=c(1, 3), oma=c(2, 2, 1, 0), mar=c(0, 1.4, 0, 0), mgp=c(1, 0.2, 0), cex.axis=0.55)
 
-			# lab <- paste0(letters[2 * countAlgo] , ') ', algosShort(algo), ' versus FALSE variable')
-			# plotScalarRespRes(xCol=xCol, decs=decs, xlab=xlab, algo=algo, variable='F1', nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab, lab, rand, resp, respControl)
+		# by ALGO
+		for (countAlgo in seq_along(sdms)) {
 		
+			algo <- sdms[countAlgo]
 		
-		# }
+			algoNice <- algosShort(algo)
+	
+			xs <- seq_along(grains)
+			ys <- seq_along(noises)
+			xlim <- range(xs) + c(-0.5, 0.5)
+			ylim <- range(ys) + c(-0.5, 0.5)
+			
+			ylab <- 'Proportion swapped\n\U2190lower autocorrelation     higher autocorrelation\U2192'
+			
+			plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
+			axis(1, at=xs, labels=paste0('1/', grains), tck=-0.01, lwd=0.6, line=-0.25)
+			axis(2, at=ys, labels=noisesRounded, tck=-0.015, lwd=0.6, line=0.25)
+			mtext('Grain size', side=1, cex=0.4, line=0.7)
+			labelFig(paste0(letters[countAlgo], ') ', algoNice), adj=0.015, cex=0.625, xpd=NA)
+			
+			# by NOISE (SAC)
+			for (countNoise in seq_along(noises)) {
 		
-		# title(sub=date(), outer=TRUE, line=0, cex.sub=0.3)
+				noise <- noises[countNoise]
 		
-	# dev.off()
+				# by GRAIN
+				for (countGrain in seq_along(grains)) {
+				
+					grain <- grains[countGrain]
+
+					# get response data
+					omniControl <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
+					sdmControl <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
+					
+					omniT1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
+					omniF1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
+					
+					sdmT1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
+					sdmF1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
+
+					# calculate and assign variables for lower/upper limits and median
+					whats <- c('Inner', 'Median', 'Outer')
+					for (modelType in c('sdm', 'omni')) {
+						for (variable in c('Control', 'T1', 'F1')) {
+							
+							thisVar <- paste0(modelType, variable)
+							x <- get(thisVar)
+							quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
+
+							for (countWhat in seq_along(whats)) {
+						
+								what <- whats[countWhat]
+								assign(paste0(thisVar, what), quants[countWhat])
+								
+							}
+						}
+					}
+
+					s <- 0.8 # line density scalar for angled fills
+					
+					# subplot y-axis
+					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize), c(countNoise - 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
+					
+					# subplot y-axis tick lines and labels
+					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise + 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
+					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise, countNoise), lwd=lwd)
+					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise - 0.5 * ySize, countNoise - 0.5 * ySize), lwd=lwd)
+					
+					# subplot y-axis labels
+					cex <- 0.4
+					offset <- 2.5
+					if (countGrain == 1) {
+
+						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
+						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise, labels=0, cex=cex, xpd=NA)
+						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise - 0.5 * ySize, labels=-1, cex=cex, xpd=NA)
+						
+					}
+					
+					# gray background
+					offsetInSubplot <- 0.1
+					rand <- 0
+					left <- countGrain - 0.54 * xSize + offsetInSubplot * xSize
+					right <- countGrain + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
+					bottom <- countNoise - 0.5 * ySize
+					top <- countNoise + 0.5 * ySize
+					polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+					lines(c(left, right), c(countNoise, countNoise), lwd=1.5 * lwd, col='white')
+
+					# OMNI control (unpermuted)
+					subRectNeg1To1(
+						resp=omniControl,
+						angle=45,
+						xOffsetInSubplot=0.2,
+						col='black',
+						border='black'
+					)
+					
+					# SDM control (unpermuted)
+					subRectNeg1To1(
+						resp=sdmControl,
+						angle=NULL,
+						xOffsetInSubplot=0.35,
+						col=colSdmControl,
+						border=borderSdmControl
+					)
+					
+					# OMNI permuted T1
+					subRectNeg1To1(
+						resp=omniT1,
+						angle=45,
+						xOffsetInSubplot=0.55,
+						col=colTrue,
+						border=borderOmniTrue
+					)
+
+					# SDM permuted T1
+					subRectNeg1To1(
+						resp=sdmT1,
+						angle=NULL,
+						xOffsetInSubplot=0.7,
+						col=colTrue,
+						border=borderSdmT1
+					)
+					
+					# OMNI permuted F1
+					subRectNeg1To1(
+						resp=omniF1,
+						angle=45,
+						xOffsetInSubplot=0.9,
+						col=colFalse,
+						border=borderOmniFalse
+					)
+					
+					# SDM permuted F1
+					subRectNeg1To1(
+						resp=sdmF1,
+						angle=NULL,
+						xOffsetInSubplot=1.05,
+						col=colFalse,
+						border=borderFalse
+					)
+
+				} # next grain
+				
+			} # next noise level (SAC)
+			
+		} # next algorithm
+
+		# panel y-axis labels
+		mtext(ylab, side=2, cex=0.4, line=0, outer=TRUE)
+
+		title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
+	
+	dev.off()
 
 # say('####################################################')
 # say('### [correlated TRUE & FALSE] simulation results ###')
@@ -2303,8 +2387,8 @@ say('##########################################')
 	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
 	# # function to plots bars as scaled subplots in a larger plot
-	# # basically this just rescales the size and position of values and bars and send the information to rect()
-	# subRect <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
+	# basically this just rescales the size and position of values and bars and send the information to rect()
+	# subRect0to1 <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
 	
 		# # resp		values of response (not scaled)
 		# # angle		NULL or angle of fill lines
@@ -2430,7 +2514,7 @@ say('##########################################')
 						# lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
 						# # OMNI control (unpermuted)
-						# subRect(
+						# subRect0to1(
 							# resp=omniControl,
 							# angle=45,
 							# xOffsetInSubplot=0.2,
@@ -2439,7 +2523,7 @@ say('##########################################')
 						# )
 						
 						# # SDM control (unpermuted)
-						# subRect(
+						# subRect0to1(
 							# resp=sdmControl,
 							# angle=NULL,
 							# xOffsetInSubplot=0.35,
@@ -2448,7 +2532,7 @@ say('##########################################')
 						# )
 						
 						# # OMNI permuted T1
-						# subRect(
+						# subRect0to1(
 							# resp=omniT1,
 							# angle=45,
 							# xOffsetInSubplot=0.55,
@@ -2457,7 +2541,7 @@ say('##########################################')
 						# )
 
 						# # SDM permuted T1
-						# subRect(
+						# subRect0to1(
 							# resp=sdmT1,
 							# angle=NULL,
 							# xOffsetInSubplot=0.7,
@@ -2466,7 +2550,7 @@ say('##########################################')
 						# )
 						
 						# # OMNI permuted T2
-						# subRect(
+						# subRect0to1(
 							# resp=omniT2,
 							# angle=45,
 							# xOffsetInSubplot=0.9,
@@ -2475,7 +2559,7 @@ say('##########################################')
 						# )
 						
 						# # SDM permuted T2
-						# subRect(
+						# subRect0to1(
 							# resp=sdmT2,
 							# angle=NULL,
 							# xOffsetInSubplot=1.05,
