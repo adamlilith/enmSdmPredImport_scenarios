@@ -34,15 +34,15 @@
 ### master settings ###
 #######################
 
-	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	tempDrive <- 'C:'
+	# # source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
+	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
 
-	# # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
-	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
-	# # tempDrive <- 'C:'
-	# # tempDrive <- 'D:'
-	# tempDrive <- 'E:'
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/Scenarios.r')
+	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
+	# tempDrive <- 'D:'
+	tempDrive <- 'E:'
 
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
 	modelDir <- '' # subdirectory of each scenario's directory in which to store models
@@ -57,8 +57,8 @@
 	# debug <- TRUE; modelType <- 'gaussian' # for debugging using Gaussian response
 
 	# ## iterations
-	# iters <- 1:100 # iterations to do -- want 100 total
-	iters <- 1:2 # iterations to do -- want 100 total
+	iters <- 1:100 # iterations to do -- want 100 total
+	# iters <- 1:2 # iterations to do -- want 100 total
 	# iters <- 100:1 # iterations to do -- want 100 total
 
 	# iters <- 1:50 # iterations to do
@@ -69,7 +69,7 @@
 	# iters <- 51:75 # iterations to do
 	# iters <- 76:100 # iterations to do
 
-	# algos <- c('omniscient', 'maxent', 'brt', 'gam')
+	algos <- c('omniscient', 'maxent', 'brt', 'gam')
 	# algos <- c('omniscient', 'maxent', 'brt')
 	# algos <- c('omniscient', 'maxent', 'brt')
 	# algos <- c('omniscient', 'maxent')
@@ -77,7 +77,7 @@
 	# algos <- c('maxent')
 	# algos <- c('brt')
 	# algos <- c('gam')
-	algos <- c('rf')
+	# algos <- c('rf')
 	# algos <- c('glm')
 	# algos <- c('bioclim')
 
@@ -740,7 +740,7 @@ say('####################')
 
 	# test each grain size
 	sizeNative <- 2^10 # grain perceived by species
-	sizesSampled <- 2^c(6, 10, 14) # grain at which environmental data is available
+	sizesSampled <- 2^c(6, 8, 10, 14) # grain at which environmental data is available
 	
 	# manipulate SAC
 	noise <- c(0, 1/3, 2/3, 1)
@@ -1341,222 +1341,63 @@ say('####################')
 		
 	# } # next algorithm
 
-# say('##############################')
-# say('### [extra false variable] ###')
-# say('##############################')
+say('##############################')
+say('### [extra false variable] ###')
+say('##############################')
 
-	# say('Range is determined by 2 TRUE variables but model is presented with these variables plus one FALSE variable.')
-	# say('Covariates include landscape rotation and rho')
+	say('Range is determined by 2 TRUE variables but model is presented with these variables plus one FALSE variable.')
+	say('Covariates include landscape rotation and rho')
 
-	# thisOutDir <- 'extra false variable'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	thisOutDir <- 'extra false variable'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# ### define species
-	# ##################
+	### define species
+	##################
 	
-	# b0 <- NA # intercept
-	# b1 <- NA # slope of P1
-	# b2 <- NA # slope of P2
-	# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- NA # slope of T1 * T2
-	# mu1 <- 0
-	# mu2 <- 0
-	# sigma1 <- NA
-	# sigma2 <- NA
-	# rho <- NA
+	b0 <- NA # intercept
+	b1 <- NA # slope of P1
+	b2 <- NA # slope of P2
+	b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- NA # slope of T1 * T2
+	mu1 <- 0
+	mu2 <- 0
+	sigma1 <- NA
+	sigma2 <- NA
+	rho <- NA
 
-	# response <- gaussian
+	response <- gaussian
 
-	# ### create progress frame
-	# #########################
-	# progress <- data.frame()
-	# rot <- c(22.5, 45.0, 67.5, 112.5, 135.0, 157.5, 202.5, 225, 247.5)
-	# rho <- c(-0.5, 0, 0.5)
-	# sigmas <- c(0.1, 0.3, 0.5)
+	### create progress frame
+	#########################
+	progress <- data.frame()
+	rot <- c(22.5, 45.0, 67.5, 112.5, 135.0, 157.5, 202.5, 225, 247.5)
+	rho <- c(-0.5, 0, 0.5)
+	sigmas <- c(0.1, 0.3, 0.5)
 
-	# for (thisRot in rot) {
-		# for (thisRho in rho) {
-			# for (thisSigma1 in sigmas) {
-				# for (thisSigma2 in sigmas) {
+	for (thisRot in rot) {
+		for (thisRho in rho) {
+			for (thisSigma1 in sigmas) {
+				for (thisSigma2 in sigmas) {
 					
-					# line <- data.frame(
-						# rot=thisRot,
-						# rho=thisRho,
-						# sigma1=thisSigma1,
-						# sigma2=thisSigma2
-					# )
-					# line$string <- paste(names(line), line, collapse=' ', sep='=')
-					# progress <- rbind(progress, line)
+					line <- data.frame(
+						rot=thisRot,
+						rho=thisRho,
+						sigma1=thisSigma1,
+						sigma2=thisSigma2
+					)
+					line$string <- paste(names(line), line, collapse=' ', sep='=')
+					progress <- rbind(progress, line)
 					
-				# }
-			# }
-		# }
-	# }
+				}
+			}
+		}
+	}
 
-	# # progress <- progress[nrow(progress):1, ]
+	# progress <- progress[nrow(progress):1, ]
 	
-	# # ########################
-	# # ### CREATE SCENARIO DATA
-	# # ########################
-	
-	# # # by SCENARIO
-	# # for (doing in 1:nrow(progress)) {
-	
-		# # rot <- progress$rot[doing]
-		# # thisRho <- progress$rho[doing]
-		# # thisSigma1 <- progress$sigma1[doing]
-		# # thisSigma2 <- progress$sigma2[doing]
-
-		# # fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
-		
-		# # ### define geography
-		# # ####################
-		# # geography <- list(
-			# # T1=list(type='linear', min=-1, max=1),
-			# # T2=list(type='linear', min=-1, max=1, rot=90),
-			# # F1=list(type='linear', min=-1, max=1, rot=rot)
-		# # )
-
-		# # say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
-	
-		# # # create data
-		# # predImportMakeData(
-			# # response=response,
-			# # geography=geography,
-			# # simDir=paste0(scenarioDir, '/', simDir),
-			# # numTrainPres=200,
-			# # numTestPres=200,
-			# # numBg=10000,
-			# # circle=TRUE,
-			# # sizeNative=1001,
-			# # iters=iters,
-			# # tempDir=tempDir,
-			# # overwrite=FALSE,
-			# # fileFlag=fileFlag,
-			# # b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
-			# # verbose=verbose
-		# # )
-
-	# # } # next scenario
-		
-	# ##########################
-	# ### MODEL AND EVALUATE ###
-	# ##########################
-	
-	# ### brt parameters
-	# brtParams('bivariate')
-
-	# for (algo in algos) {
-		
-		# dirCreate(scenarioDir, '/!starts - ', algo)
-		# dirCreate(scenarioDir, '/!stops - ', algo)
-
-		# # sets in progress or completed
-		# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
-
-		# # by SCENARIO
-		# while (length(started) < nrow(progress)) {
-		
-			# # get index of set needed doing
-			# if (length(started)==0) {
-				# doing <- 1
-			# } else {
-				# doing <- progress$string[-match(started, progress$string)][1]
-				# doing <- which(progress$string==doing)
-			# }
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
-
-			# rot <- progress$rot[doing]
-			# thisRho <- progress$rho[doing]
-			# thisSigma1 <- progress$sigma1[doing]
-			# thisSigma2 <- progress$sigma2[doing]
-
-			# fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
-			
-			# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
-		
-			# # train full models
-			# predImportTrainModels(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# vars=c('T1', 'T2', 'F1'),
-				# algos=algo,
-				# type=c('multivariate', 'reduced', 'univariate'),
-				# iters=iters,
-				# numBg=getNumBg(algo, brtBg=brtBg),
-				# fileFlag=fileFlag,
-				# overwrite=FALSE,
-				# verbose=verbose,
-				# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
-				# regMult=regMult
-			# )
-
-			# # evaluate
-			# predImportEval(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# evalDir=paste0(scenarioDir, '/', evalDir),
-				# algos=algo,
-				# type=c('multivariate', 'reduced', 'univariate'),
-				# iters=iters,
-				# perms=30,
-				# ia=FALSE,
-				# strat=FALSE,
-				# overwrite=FALSE,
-				# fileFlag=fileFlag,
-				# verbose=verbose
-			# )
-				
-			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
-
-		# } # next scenario
-		
-	# } # next algorithm
-
-# say('###############################')
-# say('### [missing true variable] ###')
-# say('###############################')
-
-	# say('Range is determined by 2 TRUE variables but model is presented with the one TRUE variable and one FALSE variable.')
-	# say('Covariates include landscape rotation and rho')
-
-	# thisOutDir <- 'missing true variable'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
-
-	# ### define species
-	# ##################
-	
-	# b0 <- NA # intercept
-	# b1 <- NA # slope of P1
-	# b2 <- NA # slope of P2
-	# b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- NA # slope of T1 * T2
-	# mu1 <- 0
-	# mu2 <- 0
-	# sigma1 <- NA
-	# sigma2 <- NA
-	# rho <- NA
-
-	# response <- gaussian
-
-	# ### create progress frame
-	# #########################
-	# progress <- data.frame()
-	# rot <- c(22.5, 45.0, 67.5, 112.5, 135.0, 157.5, 202.5, 225, 247.5)
-	# rho <- c(-0.5, 0, 0.5)
-	# sigmas <- c(0.1, 0.3, 0.5)
-
-	# progress <- expand.grid(rot=rot, rho=rho, sigma1=sigmas, sigma2=sigmas)
-	# progress$string <- paste0('rot=', progress$rot, ' rho=', progress$rho, ' sigma1=', progress$sigma1, ' sigma2=', progress$sigma2)
-
 	# ########################
 	# ### CREATE SCENARIO DATA
 	# ########################
@@ -1592,6 +1433,7 @@ say('####################')
 			# circle=TRUE,
 			# sizeNative=1001,
 			# iters=iters,
+			# tempDir=tempDir,
 			# overwrite=FALSE,
 			# fileFlag=fileFlag,
 			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
@@ -1600,82 +1442,241 @@ say('####################')
 
 	# } # next scenario
 		
-	# ##########################
-	# ### MODEL AND EVALUATE ###
-	# ##########################
+	##########################
+	### MODEL AND EVALUATE ###
+	##########################
 	
-	# ### brt parameters
-	# brtParams('bivariate')
+	### brt parameters
+	brtParams('bivariate')
 
-	# for (algo in algos) {
+	for (algo in algos) {
 		
-		# dirCreate(scenarioDir, '/!starts - ', algo)
-		# dirCreate(scenarioDir, '/!stops - ', algo)
+		dirCreate(scenarioDir, '/!starts - ', algo)
+		dirCreate(scenarioDir, '/!stops - ', algo)
 
-		# # sets in progress or completed
-		# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
+		# sets in progress or completed
+		started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
-		# # by SCENARIO
-		# while (length(started) < nrow(progress)) {
+		# by SCENARIO
+		while (length(started) < nrow(progress)) {
 		
-			# # get index of set needed doing
-			# if (length(started)==0) {
-				# doing <- 1
-			# } else {
-				# doing <- progress$string[-match(started, progress$string)][1]
-				# doing <- which(progress$string==doing)
-			# }
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			# get index of set needed doing
+			if (length(started)==0) {
+				doing <- 1
+			} else {
+				doing <- progress$string[-match(started, progress$string)][1]
+				doing <- which(progress$string==doing)
+			}
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
 
-			# rot <- progress$rot[doing]
-			# thisRho <- progress$rho[doing]
-			# thisSigma1 <- progress$sigma1[doing]
-			# thisSigma2 <- progress$sigma2[doing]
+			rot <- progress$rot[doing]
+			thisRho <- progress$rho[doing]
+			thisSigma1 <- progress$sigma1[doing]
+			thisSigma2 <- progress$sigma2[doing]
 
-			# fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
+			fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
 			
-			# say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
+			say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
 		
-			# # train full models
-			# predImportTrainModels(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# vars=c('T1', 'F1'),
-				# algos=algo,
-				# type=c('multivariate', 'univariate'),
-				# iters=iters,
-				# numBg=getNumBg(algo, brtBg=brtBg),
-				# fileFlag=fileFlag,
-				# tempDir=tempDir,
-				# overwrite=FALSE,
-				# verbose=verbose,
-				# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
-				# regMult=regMult
-			# )
+			# train full models
+			predImportTrainModels(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				vars=c('T1', 'T2', 'F1'),
+				algos=algo,
+				type=c('multivariate', 'reduced', 'univariate'),
+				iters=iters,
+				numBg=getNumBg(algo, brtBg=brtBg),
+				fileFlag=fileFlag,
+				overwrite=FALSE,
+				verbose=verbose,
+				maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+				regMult=regMult
+			)
 
-			# # evaluate
-			# predImportEval(
-				# simDir=paste0(scenarioDir, '/', simDir),
-				# modelDir=paste0(scenarioDir, '/', modelDir),
-				# evalDir=paste0(scenarioDir, '/', evalDir),
-				# algos=algo,
-				# type=c('multivariate', 'univariate'),
-				# iters=iters,
-				# perms=30,
-				# ia=FALSE,
-				# strat=FALSE,
-				# overwrite=FALSE,
-				# fileFlag=fileFlag,
-				# verbose=verbose
-			# )
+			# evaluate
+			predImportEval(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				evalDir=paste0(scenarioDir, '/', evalDir),
+				algos=algo,
+				type=c('multivariate', 'reduced', 'univariate'),
+				iters=iters,
+				perms=30,
+				ia=FALSE,
+				strat=FALSE,
+				overwrite=FALSE,
+				fileFlag=fileFlag,
+				verbose=verbose
+			)
 				
-			# # indicate this set complete and save
-			# write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
-			# started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
+			# indicate this set complete and save
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
 
-		# } # next scenario
+		} # next scenario
 		
-	# } # next algorithm
+	} # next algorithm
+
+say('###############################')
+say('### [missing true variable] ###')
+say('###############################')
+
+	say('Range is determined by 2 TRUE variables but model is presented with the one TRUE variable and one FALSE variable.')
+	say('Covariates include landscape rotation and rho')
+
+	thisOutDir <- 'missing true variable'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	scenario <- 'RESPONSE gaussian(T1 T2) MODEL T1 T2 GEOG cor(linear(T1) linear(T2) linear(F1))'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+
+	### define species
+	##################
+	
+	b0 <- NA # intercept
+	b1 <- NA # slope of P1
+	b2 <- NA # slope of P2
+	b11 <- NA # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- NA # slope of T1 * T2
+	mu1 <- 0
+	mu2 <- 0
+	sigma1 <- NA
+	sigma2 <- NA
+	rho <- NA
+
+	response <- gaussian
+
+	### create progress frame
+	#########################
+	progress <- data.frame()
+	# rot <- c(22.5, 45.0, 67.5, 112.5, 135.0, 157.5, 202.5, 225, 247.5)
+	rot <- c(22.5, 45.0, 67.5, 112.5, 135.0, 157.5, 202.5, 225, 247.5)
+	rho <- c(-0.5, 0, 0.5)
+	sigmas <- c(0.1, 0.3, 0.5)
+
+	progress <- expand.grid(rot=rot, rho=rho, sigma1=sigmas, sigma2=sigmas)
+	progress$string <- paste0('rot=', progress$rot, ' rho=', progress$rho, ' sigma1=', progress$sigma1, ' sigma2=', progress$sigma2)
+
+	########################
+	### CREATE SCENARIO DATA
+	########################
+	
+	# by SCENARIO
+	for (doing in 1:nrow(progress)) {
+	
+		rot <- progress$rot[doing]
+		thisRho <- progress$rho[doing]
+		thisSigma1 <- progress$sigma1[doing]
+		thisSigma2 <- progress$sigma2[doing]
+
+		fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
+		
+		### define geography
+		####################
+		geography <- list(
+			T1=list(type='linear', min=-1, max=1),
+			T2=list(type='linear', min=-1, max=1, rot=90),
+			F1=list(type='linear', min=-1, max=1, rot=rot)
+		)
+
+		say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
+	
+		# create data
+		predImportMakeData(
+			response=response,
+			geography=geography,
+			simDir=paste0(scenarioDir, '/', simDir),
+			numTrainPres=200,
+			numTestPres=200,
+			numBg=10000,
+			circle=TRUE,
+			sizeNative=1001,
+			iters=iters,
+			overwrite=FALSE,
+			fileFlag=fileFlag,
+			b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=thisSigma1, sigma2=thisSigma2, rho=thisRho,
+			verbose=verbose
+		)
+
+	} # next scenario
+		
+	##########################
+	### MODEL AND EVALUATE ###
+	##########################
+	
+	### brt parameters
+	brtParams('bivariate')
+
+	for (algo in algos) {
+		
+		dirCreate(scenarioDir, '/!starts - ', algo)
+		dirCreate(scenarioDir, '/!stops - ', algo)
+
+		# sets in progress or completed
+		started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
+
+		# by SCENARIO
+		while (length(started) < nrow(progress)) {
+		
+			# get index of set needed doing
+			if (length(started)==0) {
+				doing <- 1
+			} else {
+				doing <- progress$string[-match(started, progress$string)][1]
+				doing <- which(progress$string==doing)
+			}
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!starts - ', algo, '/', progress$string[doing]), row.names=FALSE)
+
+			rot <- progress$rot[doing]
+			thisRho <- progress$rho[doing]
+			thisSigma1 <- progress$sigma1[doing]
+			thisSigma2 <- progress$sigma2[doing]
+
+			fileFlag <- paste0('rot(F1)=', rot, ' rho=', thisRho, ' sigma1=', thisSigma1, ' sigma2=', thisSigma2)
+			
+			say('rot = ', rot, ' | rho = ', thisRho, ' | sigma1 = ', thisSigma1, ' | sigma2 = ', thisSigma2, pre=2)
+		
+			# train full models
+			predImportTrainModels(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				vars=c('T1', 'F1'),
+				algos=algo,
+				type=c('multivariate', 'univariate'),
+				iters=iters,
+				numBg=getNumBg(algo, brtBg=brtBg),
+				fileFlag=fileFlag,
+				tempDir=tempDir,
+				overwrite=FALSE,
+				verbose=verbose,
+				maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+				regMult=regMult
+			)
+
+			# evaluate
+			predImportEval(
+				simDir=paste0(scenarioDir, '/', simDir),
+				modelDir=paste0(scenarioDir, '/', modelDir),
+				evalDir=paste0(scenarioDir, '/', evalDir),
+				algos=algo,
+				type=c('multivariate', 'univariate'),
+				iters=iters,
+				perms=30,
+				ia=FALSE,
+				strat=FALSE,
+				overwrite=FALSE,
+				fileFlag=fileFlag,
+				verbose=verbose
+			)
+				
+			# indicate this set complete and save
+			write.csv(progress$string[doing], paste0(scenarioDir, '/!stops - ', algo, '/', progress$string[doing]), row.names=FALSE)
+			started <- list.files(paste0(scenarioDir, '/!starts - ', algo))
+
+		} # next scenario
+		
+	} # next algorithm
 
 say('###############################################################################################')
 say('###############################################################################################')

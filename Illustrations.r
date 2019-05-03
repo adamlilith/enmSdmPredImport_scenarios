@@ -3,7 +3,7 @@
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/Illustrations.r')
 
 	memory.limit(memory.limit() * 2^30)
-	# rm(list=ls())
+	rm(list=ls())
 	options(keep.source=FALSE) # manage memory
 	gc()
 	print('')
