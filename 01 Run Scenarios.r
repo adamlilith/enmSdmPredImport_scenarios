@@ -40,15 +40,15 @@
 ### master settings ###
 #######################
 
-	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/01 Run Scenarios.r')
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	tempDrive <- 'C:'
-
-	# # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/01 Run Scenarios.r')
-	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# # source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/01 Run Scenarios.r')
+	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
 	# tempDrive <- 'C:'
-	# # tempDrive <- 'D:'
-	# # tempDrive <- 'E:'
+
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/01 Run Scenarios.r')
+	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	tempDrive <- 'C:'
+	# tempDrive <- 'D:'
+	# tempDrive <- 'E:'
 
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
 	modelDir <- '' # subdirectory of each scenario's directory in which to store models
@@ -68,11 +68,12 @@
 
 	# modeloing algorithms
 	# algos <- c('omniscient', 'bioclim', 'maxent', 'brt', 'gam', 'rf')
-	algos <- c('omniscient')
-	# algos <- c('glm') # not to run GLM you will need to remove all unnamed arguments in each predImportTrainModels() function, though tou can include other arguments that are accepted by glm()
+	# algos <- c('omniscient', 'maxent', 'gam')
+	# algos <- c('omniscient')
+	algos <- c('glm') # not to run GLM you will need to remove all unnamed arguments in each predImportTrainModels() function, though tou can include other arguments that are accepted by glm()
 
 	# values of Maxent master regularization multiplier to try (Warren & Siefert 2008)
-	regMult <- c(seq(0.5, 3, by=0.5), 4, 5, 7.5, 10)
+	regMult <- c(seq(0.5, 3, by=0.5), 4, 5)
 	
 #################
 ### functions ###

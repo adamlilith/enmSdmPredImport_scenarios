@@ -35,17 +35,17 @@
 ### master settings ###
 #######################
 
-	# directory for modeling
-	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
-	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	tempDrive <- 'C:'
-
 	# # directory for modeling
-	# # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
-	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# # source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
+	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
 	# tempDrive <- 'C:'
-	# # tempDrive <- 'D:'
-	# # tempDrive <- 'E:'
+
+	# directory for modeling
+	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
+	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
+	tempDrive <- 'D:'
+	# tempDrive <- 'E:'
 
 	# directory names for simulated data, model, and model evaluations
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
@@ -64,8 +64,8 @@
 	iters <- 1:100 # iterations to do -- want 100 total
 
 	# algorithms
-	# algos <- c('brt', 'rf')
-	algos <- c('brt')
+	algos <- c('brt', 'rf')
+	# algos <- c('brt')
 	# algos <- c('rf')
 	
 #########################
@@ -235,7 +235,7 @@ say('#########################################################')
 	
 	# for (iter in iters) {
 	
-		# load(paste0(scenarioDir, '/models with ', prefix(bestNumBg, 5), ' bg/multivariate brt/brt model ', prefix(iter, 3), '.Rdata'))
+		# load(paste0(scenarioDir, '/models with ', prefix(bestNumBg, 5), ' bg/multivariate brt/brt model ', prefix(iter, 4), '.Rdata'))
 	
 		# lr <- model$gbm.call$learning.rate
 		# tc <- model$gbm.call$tree.complexity
