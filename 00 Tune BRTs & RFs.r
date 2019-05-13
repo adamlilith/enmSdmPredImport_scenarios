@@ -65,7 +65,8 @@
 
 	# algorithms
 	# algos <- c('brt', 'rf')
-	algos <- c('rf')
+	algos <- c('brt')
+	# algos <- c('rf')
 	
 #########################
 ### tuning parameters ###
@@ -97,89 +98,90 @@
 	library(enmSdmPredImport)
 	library(legendary)
 
-# say('#########################################################')
-# say('### [tune brt and rf for logistic responses] modeling ###')
-# say('#########################################################')
+say('#########################################################')
+say('### [tune brt and rf for logistic responses] modeling ###')
+say('#########################################################')
 
-	# say('This experiment tunes the settings to be used for BRTs and RFs using the simplest landscape.')
+	say('This experiment tunes the settings to be used for BRTs and RFs using the simplest landscape.')
 
-	# thisOutDir <- 'tune brt & rf for logistic responses'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	thisOutDir <- 'tune brt & rf for logistic responses'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	simDir <- '/!scenario data - 10000 bg'
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	# response <- logistic
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	response <- logistic
 	
-	# # define landscape: one linear TRUE variable and one random FALSE variable
-	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# define landscape: one linear TRUE variable and one random FALSE variable
+	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	# # create data
-	# predImportMakeData(
-		# response=response,
-		# geography=geography,
-		# simDir=paste0(scenarioDir, '/!scenario data - 10000 bg'),
-		# numTrainPres=200,
-		# numTestPres=200,
-		# numBg=10000,
-		# iters=iters,
-		# sizeNative=1001,
-		# overwrite=FALSE,
-		# fileFlag='10000 bg',
-		# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-		# verbose=verbose,
-		# circle=FALSE
-	# )
+	# create data
+	predImportMakeData(
+		response=response,
+		geography=geography,
+		simDir=paste0(scenarioDir, '/', simDir),
+		numTrainPres=200,
+		numTestPres=200,
+		numBg=10000,
+		iters=iters,
+		sizeNative=1024,
+		overwrite=FALSE,
+		fileFlag='10000 bg',
+		b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+		verbose=verbose,
+		circle=FALSE
+	)
 
-	# # train full models
-	# for (numBg in numBgToTest) {
+	# train full models
+	for (numBg in numBgToTest) {
 	
-		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+		say('USING ', numBg, ' BACKGROUND SITES', level=2)
 
-		# predImportTrainModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# vars=c('T1', 'F1'),
-			# algos=algos,
-			# type=c('multivariate'),
-			# iters=iters,
-			# numBg=numBg,
-			# fileFlag=NULL,
-			# overwrite=FALSE,
-			# verbose=verbose,
-			# maxTrees=maxTrees,
-			# learningRate=lr, treeComplexity=tc, bagFraction=bf
-		# )
+		predImportTrainModels(
+			simDir=paste0(scenarioDir, '/', simDir),
+			modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			vars=c('T1', 'F1'),
+			algos=algos,
+			type=c('multivariate'),
+			iters=iters,
+			numBg=numBg,
+			fileFlag=NULL,
+			overwrite=FALSE,
+			verbose=verbose,
+			maxTrees=maxTrees,
+			learningRate=lr, treeComplexity=tc, bagFraction=bf
+		)
 		
-	# }
+	}
 
-	# # evaluate
-	# for (numBg in numBgToTest) {
+	# evaluate
+	for (numBg in numBgToTest) {
 	
-		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+		say('USING ', numBg, ' BACKGROUND SITES', level=2)
 
-		# predImportEval(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# evalDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# algos=algos,
-			# type=c('multivariate'),
-			# iters=iters,
-			# perms=30,
-			# ia=FALSE,
-			# overwrite=FALSE,
-			# fileFlag=NULL,
-			# verbose=verbose
-		# )
+		predImportEval(
+			simDir=paste0(scenarioDir, '/', simDir),
+			modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			evalDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			algos=algos,
+			type=c('multivariate'),
+			iters=iters,
+			perms=30,
+			ia=FALSE,
+			overwrite=FALSE,
+			fileFlag=NULL,
+			verbose=verbose
+		)
 	
-	# }
+	}
 	
 # say('######################################################################################')
 # say('### [tune brt for logistic responses] selecting optimal number of background sites ###')
@@ -340,8 +342,10 @@ say('########################################################')
 	### create progress frame
 	#########################
 	progress <- data.frame()
-	rot <- c(22.5, 90, 157.5)
-	rho <- c(-0.75, 0, 0.75)
+	# rot <- c(22.5, 90, 157.5)
+	rot <- c(45, 90, 135)
+	# rho <- c(-0.75, 0, 0.75)
+	rho <- c(-0.5, 0, 0.5)
 	sigmaValues <- c(0.1, 0.3, 0.5)
 
 	progress <- expand.grid(sizeResampled=sizesSampled, noise=noise)
@@ -411,7 +415,7 @@ say('########################################################')
 					numTestPres=200,
 					numBg=10000,
 					circle=TRUE,
-					sizeNative=1001,
+					sizeNative=1024,
 					iters=iters,
 					overwrite=FALSE,
 					fileFlag=fileFlag,
