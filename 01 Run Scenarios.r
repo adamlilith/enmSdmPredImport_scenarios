@@ -69,8 +69,11 @@
 	# modeloing algorithms
 	# algos <- c('omniscient', 'bioclim', 'maxent', 'brt', 'gam', 'rf')
 	# algos <- c('omniscient', 'maxent', 'gam')
-	# algos <- c('omniscient')
-	algos <- c('glm') # not to run GLM you will need to remove all unnamed arguments in each predImportTrainModels() function, though tou can include other arguments that are accepted by glm()
+	algos <- c('omniscient')
+	# algos <- c('gam')
+	# algos <- c('maxent')
+	# algos <- c('brt')
+	# algos <- c('glm') # not to run GLM you will need to remove all unnamed arguments in each predImportTrainModels() function, though tou can include other arguments that are accepted by glm()
 
 	# values of Maxent master regularization multiplier to try (Warren & Siefert 2008)
 	regMult <- c(seq(0.5, 3, by=0.5), 4, 5)
@@ -217,98 +220,98 @@ say('################')
 		type=c('multivariate', 'univariate'),
 		iters=iters,
 		perms=30,
-		ia=TRUE,
+		ia=FALSE,
 		overwrite=FALSE,
 		fileFlag=NULL,
 		verbose=verbose
 	)
 
-say('#####################')
-say('### [sample size] ###')
-say('#####################')
+# say('#####################')
+# say('### [sample size] ###')
+# say('#####################')
 
-	thisOutDir <- 'sample size'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
-	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	# thisOutDir <- 'sample size'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# define species
-	b0 <- 0 # intercept
-	b1 <- 2 # slope of P1
-	b2 <- 1 # slope of P2
-	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- 0 # slope of T1 * T2
-	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	response <- logistic
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logistic
 	
-	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	# trainPresSet <- sort(c(2^(3:10), 2^(3:8) + 2^(2:7))) # too many!
-	trainPresSet <- 2^(3:10)
-	# trainPresSet <- rev(trainPresSet)
+	# # trainPresSet <- sort(c(2^(3:10), 2^(3:8) + 2^(2:7))) # too many!
+	# trainPresSet <- 2^(3:10)
+	# # trainPresSet <- rev(trainPresSet)
 
-	# BRT parameters for simple scenarios
-	brtParams('logistic')
+	# # BRT parameters for simple scenarios
+	# brtParams('logistic')
 
-	# by TRAINING PRESENCE SAMPLE SIZE
-	for (n in trainPresSet) {
+	# # by TRAINING PRESENCE SAMPLE SIZE
+	# for (n in trainPresSet) {
 		
-		say('SAMPLE SIZE: Training presence sample size = ', n, level=1)
+		# say('SAMPLE SIZE: Training presence sample size = ', n, level=1)
 		
-		userdata <<- NULL
 		
-		# create data
-		predImportMakeData(
-			response=response,
-			geography=geography,
-			simDir=paste0(scenarioDir, '/', simDir),
-			numTrainPres=n,
-			numTestPres=200,
-			numBg=10000,
-			iters=iters,
-			sizeNative=1024,
-			overwrite=FALSE,
-			fileFlag=paste0('n = ', prefix(n, 4)),
-			b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-			verbose=verbose,
-			circle=FALSE
-		)
+		
+		# # create data
+		# predImportMakeData(
+			# response=response,
+			# geography=geography,
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# numTrainPres=n,
+			# numTestPres=200,
+			# numBg=10000,
+			# iters=iters,
+			# sizeNative=1024,
+			# overwrite=FALSE,
+			# fileFlag=paste0('n = ', prefix(n, 4)),
+			# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+			# verbose=verbose,
+			# circle=FALSE
+		# )
 
-		# train full models
-		predImportTrainModels(
-			simDir=paste0(scenarioDir, '/', simDir),
-			modelDir=paste0(scenarioDir, '/', modelDir),
-			vars=c('T1', 'F1'),
-			algos=algos,
-			type=c('multivariate', 'univariate'),
-			iters=iters,
-			numBg=getNumBg(algos, brtBg=brtBg),
-			fileFlag=paste0('n = ', prefix(n, 4)),
-			tempDir=tempDir,
-			overwrite=FALSE,
-			verbose=verbose,
-			maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
-			regMult=regMult
-		)
+		# # train full models
+		# predImportTrainModels(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/', modelDir),
+			# vars=c('T1', 'F1'),
+			# algos=algos,
+			# type=c('multivariate', 'univariate'),
+			# iters=iters,
+			# numBg=getNumBg(algos, brtBg=brtBg),
+			# fileFlag=paste0('n = ', prefix(n, 4)),
+			# tempDir=tempDir,
+			# overwrite=FALSE,
+			# verbose=verbose,
+			# maxTrees=maxTrees, learningRate=lr, treeComplexity=tc, bagFraction=bf,
+			# regMult=regMult
+		# )
 
-		# evaluate
-		predImportEval(
-			simDir=paste0(scenarioDir, '/', simDir),
-			modelDir=paste0(scenarioDir, '/', modelDir),
-			evalDir=paste0(scenarioDir, '/', evalDir),
-			algos=algos,
-			type=c('multivariate', 'univariate'),
-			iters=iters,
-			perms=30,
-			ia=TRUE,
-			overwrite=FALSE,
-			fileFlag=paste0('n = ', prefix(n, 4)),
-			verbose=verbose
-		)
+		# # evaluate
+		# predImportEval(
+			# simDir=paste0(scenarioDir, '/', simDir),
+			# modelDir=paste0(scenarioDir, '/', modelDir),
+			# evalDir=paste0(scenarioDir, '/', evalDir),
+			# algos=algos,
+			# type=c('multivariate', 'univariate'),
+			# iters=iters,
+			# perms=30,
+			# ia=FALSE,
+			# overwrite=FALSE,
+			# fileFlag=paste0('n = ', prefix(n, 4)),
+			# verbose=verbose
+		# )
 
-	}
+	# }
 
 # say('####################')
 # say('### [prevalence] ###')
@@ -347,7 +350,7 @@ say('#####################')
 		# # define species
 		# response <- logisticShift
 
-		# userdata <<- NULL
+		
 
 		# # create data
 		# predImportMakeData(
@@ -423,7 +426,9 @@ say('#####################')
 	# brtParams('logistic')
 
 	# # test each landscape size (increase number of cells and range of environment)
-	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
+	# landSizeWidth <- 2^(7:13)
+	# halfRange <- landSizeWidth / 2^10
+	# landSize <- data.frame(landSize=landSizeWidth, min=-1 * halfRange, max=halfRange)
 	
 	# landSize <- landSize[nrow(landSize):1, ]
 	
@@ -435,8 +440,6 @@ say('#####################')
 		# geography <- list(T1=list(type='linear', min=landSize$min[countLandSize], max=landSize$max[countLandSize]), F1=list(type='random', min=-1, max=1))
 
 		# # define species
-
-		# userdata <<- NULL
 
 		# # create data
 		# predImportMakeData(

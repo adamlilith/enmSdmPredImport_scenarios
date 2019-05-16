@@ -106,61 +106,61 @@
 		
 	}
 	
-# say('######################################')
-# say('### [simple] landscape and species ###')
-# say('######################################')
+say('######################################')
+say('### [simple] landscape and species ###')
+say('######################################')
 	
-	# say('Wanting a simple illustration of the landscape and species in a "simple" scenario.')
+	say('Wanting a simple illustration of the landscape and species in a "simple" scenario.')
 	
-	# thisOutDir <- 'simple'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
+	thisOutDir <- 'simple'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
 
-	# # define landscape
-	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-	# landscape <- genesis(geography, circle=FALSE)
+	# define landscape
+	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	landscape <- genesis(geography, circle=FALSE)
 	
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	# species <- logistic(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	species <- logistic(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
 
-	# # extent (for border)
-	# ext <- extent(landscape)
-	# ext <- as(ext, 'SpatialPolygons')
+	# extent (for border)
+	ext <- extent(landscape)
+	ext <- as(ext, 'SpatialPolygons')
 
-	# png(paste0(scenarioDir, '/Illustration - SIMPLE Scenario Landscape and Species.png'), width=1200, height=600, res=300)
+	png(paste0(scenarioDir, '/Illustration - SIMPLE Scenario Landscape and Species.png'), width=1200, height=600, res=300)
 	
-		# par(mfrow=c(1, 3), oma=rep(0, 4), mar=c(1, 0, 2, 0), fg='white', col.axis='white')
+		par(mfrow=c(1, 3), oma=rep(0, 4), mar=c(1, 0, 1, 0), fg='white', col.axis='white')
 
-		# plot(ext)
-		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		# labelFig('a) TRUE variable', adj=c(0, -0.05), cex=0.9, col='black')
-		# par(fg='black')
-		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		plot(ext)
+		plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		labelFig('a) TRUE variable', adj=c(0, -0.08), cex=0.95, col='black')
+		par(fg='black')
+		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='TRUE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
-		# par(fg='white')
-		# plot(ext)
-		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		# labelFig('b) FALSE variable', adj=c(0, -0.05), cex=0.9, col='black')
-		# par(fg='black')
-		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		par(fg='white')
+		plot(ext)
+		plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		labelFig('b) FALSE variable', adj=c(0, -0.08), cex=0.95, col='black')
+		par(fg='black')
+		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='FALSE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
-		# par(fg='white')
-		# plot(ext)
-		# plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		# labelFig('c) Species', adj=c(0, -0.05), cex=0.9, col='black')
-		# par(fg='black')
-		# legendGrad('bottom', inset=-0.001, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='', col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		par(fg='white')
+		plot(ext)
+		plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		labelFig('c) Species', adj=c(0, -0.08), cex=0.95, col='black')
+		par(fg='black')
+		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='Probability of presence', titleAdj=c(0.5, -0.3), col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 	
-	# dev.off()
+	dev.off()
 	
 # say('######################################')
 # say('### [extent] landscape and species ###')
@@ -180,7 +180,9 @@
 	# b12 <- 0 # slope of T1 * T2
 	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
 
-	# landSize <- data.frame(landSize=c(125, 251, 501, 1001, 2001, 4001, 8001), min=-1 * c(0.125, 0.25, 0.5, 1, 2, 4, 8), max=c(0.125, 0.25, 0.5, 1, 2, 4, 8))
+	# landSizeWidth <- 2^(7:13)
+	# halfRange <- landSizeWidth / 2^10
+	# landSize <- data.frame(landSize=landSizeWidth, min=-1 * halfRange, max=halfRange)
 	
 	# breaks <- seq(min(landSize$min), max(landSize$max), length.out=length(land) - 1)
 	
@@ -195,7 +197,7 @@
 		# ext <- extent(landscape)
 		# ext <- as(ext, 'SpatialPolygons')
 		
-		# par(mfrow=c(1, 2), oma=c(1, 0.1, 1, 0.1), lwd=0.8)
+		# par(mfrow=c(1, 2), oma=c(1.5, 0.1, 0.5, 0.1), lwd=0.8)
 		
 		# # plot largest landscape
 		# par(mar=c(0, 0, 0, 1))
@@ -203,9 +205,9 @@
 		# plot(landscape[['T1']], breaks=breaks, col=land, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# lab <- paste0('a) TRUE variable')
-		# labelFig(lab, adj=c(-0.02, -0), cex=0.5, col='black')
+		# labelFig(lab, adj=c(-0.02, -0), cex=0.625, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=-0.04, vert=FALSE, width=0.93, height=0.07, labels=seq(min(landSize$min), max(landSize$max), by=4), title='', col=land, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.4)
+		# legendGrad('bottom', inset=-0.06, vert=FALSE, width=0.93, height=0.07, labels=seq(min(landSize$min), max(landSize$max), by=4), title='TRUE', titleAdj=c(0.5, -1), col=land, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.55)
 
 		# thisExt <- ext
 		# for (countLand in 2:nrow(landSize)) {
@@ -223,9 +225,9 @@
 		# plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
 		# plot(ext, border='black', xpd=NA, add=TRUE)
 		# lab <- paste0('b) Species')
-		# labelFig(lab, adj=c(-0.02, -0), cex=0.5, col='black')
+		# labelFig(lab, adj=c(-0.02, -0), cex=0.625, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=-0.04, vert=FALSE, width=0.93, height=0.07, labels=seq(0, 1, by=0.25), title='', col=greens, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.4)
+		# legendGrad('bottom', inset=-0.06, vert=FALSE, width=0.93, height=0.07, labels=seq(0, 1, by=0.25), title='Probability of presence', titleAdj=c(0.5, -1), col=greens, labAdj=-1, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.55)
 	
 		# thisExt <- ext
 		# for (countLand in 2:nrow(landSize)) {
@@ -240,7 +242,7 @@
 		# x <- -0.16
 		# y <- 0.95
 		# down <- 0.07
-		# text(x, y, labels='largest\nlandscape', xpd=NA, cex=0.5)
+		# text(x, y, labels='largest\nlandscape', xpd=NA, cex=0.625)
 		# arrows(x0=x, y0=y - down, x1=0, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		# arrows(x0=x, y0=y - down, x1=2 * x, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
 
@@ -248,7 +250,7 @@
 		# x <- -0.16
 		# y <- 0.65
 		# down <- 0.1
-		# text(x, y, labels='next\nlargest\nlandscape', xpd=NA, cex=0.5)
+		# text(x, y, labels='next\nlargest\nlandscape', xpd=NA, cex=0.625)
 		# arrows(x0=x, y0=y - down, x1=0.25, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		# arrows(x0=x, y0=y - down, x1=-0.575, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		
@@ -256,11 +258,11 @@
 		# x <- -0.16
 		# y <- 0.1
 		# down <- -0.06
-		# text(x, y, labels='smallest\nlandscape', xpd=NA, cex=0.5)
+		# text(x, y, labels='smallest\nlandscape', xpd=NA, cex=0.625)
 		# arrows(x0=x, y0=y - down, x1=0.49, y1=0.49, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		# arrows(x0=x, y0=y - down, x1=-0.82, y1=0.49, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		
-		# title(sub=date(), cex.sub=0.2, outer=TRUE, line=0)
+		# # title(sub=date(), cex.sub=0.2, outer=TRUE, line=0)
 		
 	# dev.off()
 

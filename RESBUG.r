@@ -128,3 +128,14 @@ say('################')
 		dev.off()
 	
 	}
+	
+	for (i in iters) {
+		png(paste0('C:/ecology/!Scratch/xF1 new ', prefix(i, 3), '.png'))
+		par(mfrow=c(1, 2))
+		load(paste0(scenarioDir, '/!scenario data/sim ', prefix(i, 3), '.Rdata'))
+		hist(sim$trainData$F1[sim$trainData$presBg == 1], main='x')
+	dev.off()
+	
+	}
+	
+	
