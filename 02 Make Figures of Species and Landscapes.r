@@ -26,15 +26,6 @@
 ### [bivariate] landscape and species: YES niche covariance, NO landscape correlation ###
 ### [bivariate] collate evaluations ###
 
-### [simple] simulation results ###
-### [extent] simulation results ###
-### [prevalence] simulation results ###
-### [resolution] simulation results ###
-### [correlated TRUE & FALSE] simulation results ###
-### [bivariate] statistics ###
-### [bivariate] landscape correlation x niche covariance annulus plots ###
-### [bivariate] landscape correlation x niche covariance bar plots for CBI ###
-
 #################
 ### libraries ###
 #################
@@ -106,61 +97,118 @@
 		
 	}
 	
-say('######################################')
-say('### [simple] landscape and species ###')
-say('######################################')
+# say('######################################')
+# say('### [simple] landscape and species ###')
+# say('######################################')
 	
-	say('Wanting a simple illustration of the landscape and species in a "simple" scenario.')
+	# say('Wanting a simple illustration of the landscape and species in a "simple" scenario.')
 	
-	thisOutDir <- 'simple'
-	scenarioDir <- paste0('./Results/', thisOutDir)
-	dirCreate(scenarioDir)
+	# thisOutDir <- 'simple'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
 
-	# define landscape
-	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-	landscape <- genesis(geography, circle=FALSE)
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# landscape <- genesis(geography, circle=FALSE)
 	
-	# define species
-	b0 <- 0 # intercept
-	b1 <- 2 # slope of P1
-	b2 <- 1 # slope of P2
-	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	b12 <- 0 # slope of T1 * T2
-	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	species <- logistic(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# species <- logistic(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=b11, b12=b12)
 
-	# extent (for border)
-	ext <- extent(landscape)
-	ext <- as(ext, 'SpatialPolygons')
+	# # extent (for border)
+	# ext <- extent(landscape)
+	# ext <- as(ext, 'SpatialPolygons')
 
-	png(paste0(scenarioDir, '/Illustration - SIMPLE Scenario Landscape and Species.png'), width=1200, height=600, res=300)
+	# png(paste0(scenarioDir, '/Illustration - SIMPLE Scenario Landscape and Species.png'), width=2400, height=1200, res=600)
 	
-		par(mfrow=c(1, 3), oma=rep(0, 4), mar=c(1, 0, 1, 0), fg='white', col.axis='white')
+		# par(mfrow=c(1, 3), oma=rep(0, 4), mar=c(1, 0, 1, 0), fg='white', col.axis='white', lwd=0.6)
 
-		plot(ext)
-		plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		labelFig('a) TRUE variable', adj=c(0, -0.08), cex=0.95, col='black')
-		par(fg='black')
-		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='TRUE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		# plot(ext)
+		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# labelFig('a) TRUE variable', adj=c(0, -0.08), cex=0.95, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='TRUE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
-		par(fg='white')
-		plot(ext)
-		plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		labelFig('b) FALSE variable', adj=c(0, -0.08), cex=0.95, col='black')
-		par(fg='black')
-		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='FALSE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		# par(fg='white')
+		# plot(ext)
+		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# labelFig('b) FALSE variable', adj=c(0, -0.08), cex=0.95, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='FALSE', titleAdj=c(0.5, -0.3), col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 		
-		par(fg='white')
-		plot(ext)
-		plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
-		plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-		labelFig('c) Species', adj=c(0, -0.08), cex=0.95, col='black')
-		par(fg='black')
-		legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='Probability of presence', titleAdj=c(0.5, -0.3), col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
+		# par(fg='white')
+		# plot(ext)
+		# plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# labelFig('c) Species', adj=c(0, -0.08), cex=0.95, col='black')
+		# par(fg='black')
+		# legendGrad('bottom', inset=-0.01, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='Probability of presence', titleAdj=c(0.5, -0.3), col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.8)
 	
-	dev.off()
+	# dev.off()
+	
+# say('##########################################')
+# say('### [prevalence] landscape and species ###')		
+# say('##########################################')		
+
+	# say('Wanting a simple illustration of the landscape and species in the "prevalence" scenario.')
+	
+	# thisOutDir <- 'prevalence'
+	# scenarioDir <- paste0('./Results/', thisOutDir)
+	# dirCreate(scenarioDir)
+
+	# # define landscape
+	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# landscape <- genesis(geography, circle=FALSE)
+	
+	# # define species
+	# b0 <- 0 # intercept
+	# b1 <- 2 # slope of P1
+	# b2 <- 1 # slope of P2
+	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	# b12 <- 0 # slope of T1 * T2
+	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	# response <- logisticShift
+	
+	# # test each inflection point
+	# # inflection points chosen to match prevalence of 0.95, 0.85, 0.75, 0.625, 0.5, 0.375, 0.25, 0.15, 0.05 as closely as possible
+	# # b11Set <- c(-1.74, -1.08, -0.7, -0.33, 0, 0.33, 0.7, 1.08, 1.74)
+	# b11Set <- rev(c(-1.74, -0.7, 0, 0.7, 1.74)) # subsetted
+
+	# # extent (for border)
+	# ext <- extent(landscape)
+	# ext <- as(ext, 'SpatialPolygons')
+
+	# png(paste0(scenarioDir, '/Illustration - PREVALENCE Scenario Landscape and Species.png'), width=5 * 800, height=1200, res=600)
+	
+		# par(mfrow=c(1, 5), oma=c(0, 0, 0, 3.1), mar=c(0, 0, 2, 0), fg='white', col.axis='white', lwd=0.6)
+
+		# for (countB11 in seq_along(b11Set)) {
+		
+			# thisB11 <- b11Set[countB11]
+		
+			# species <- response(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=thisB11, b12=b12)
+			# prev <- cellStats(species, 'mean')
+		
+			# par(fg='white')
+			# plot(ext)
+			# plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
+			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+			# lab <- paste0(letters[countB11], ') Prevalence of ', sprintf('%.2f', prev))
+			# labelFig(lab, adj=c(-0.02, -0.1), cex=0.9, col='black')
+		
+		# }
+	
+		# par(fg='black')
+		# legendGrad('right', inset=-0.2, width=0.1, height=0.75, labels=c(0, 0.5, 1), title='Occurrence\nProbability', titleAdj=c(0.5, 0.95), col=greens, labAdj=0.7, xpd=NA, adjX=c(0, 0.5), adjY=c(0.055, 0.75), boxBorder=NA, cex=0.75)
+		
+	# dev.off()
 	
 # say('######################################')
 # say('### [extent] landscape and species ###')
@@ -186,7 +234,7 @@ say('######################################')
 	
 	# breaks <- seq(min(landSize$min), max(landSize$max), length.out=length(land) - 1)
 	
-	# png(paste0(scenarioDir, '/Illustration - EXTENT Scenario Landscape and Species.png'), width=600 * 2, height=660, res=300)
+	# png(paste0(scenarioDir, '/Illustration - EXTENT Scenario Landscape and Species.png'), width=2 * 1200, height=2 * 660, res=600)
 		
 		# # define largest landscape
 		# geography <- list(T1=list(type='linear', min=landSize$min[nrow(landSize)], max=landSize$max[nrow(landSize)]), F1=list(type='random', min=-1, max=1))
@@ -197,7 +245,7 @@ say('######################################')
 		# ext <- extent(landscape)
 		# ext <- as(ext, 'SpatialPolygons')
 		
-		# par(mfrow=c(1, 2), oma=c(1.5, 0.1, 0.5, 0.1), lwd=0.8)
+		# par(mfrow=c(1, 2), oma=c(1.5, 0.1, 0.5, 0.1), lwd=0.6)
 		
 		# # plot largest landscape
 		# par(mar=c(0, 0, 0, 1))
@@ -249,7 +297,7 @@ say('######################################')
 		# # labels: next largest landscape
 		# x <- -0.16
 		# y <- 0.65
-		# down <- 0.1
+		# down <- 0.11
 		# text(x, y, labels='next\nlargest\nlandscape', xpd=NA, cex=0.625)
 		# arrows(x0=x, y0=y - down, x1=0.25, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
 		# arrows(x0=x, y0=y - down, x1=-0.575, y1=y - down - 0.1, angle=15, length=0.075, xpd=NA, lwd=0.5)
@@ -266,63 +314,6 @@ say('######################################')
 		
 	# dev.off()
 
-# say('##########################################')
-# say('### [prevalence] landscape and species ###')		
-# say('##########################################')		
-
-	# say('Wanting a simple illustration of the landscape and species in the "prevalence" scenario.')
-	
-	# thisOutDir <- 'prevalence'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-
-	# # define landscape
-	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
-	# landscape <- genesis(geography, circle=FALSE)
-	
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	# response <- logisticShift
-	
-	# # test each inflection point
-	# # inflection points chosen to match prevalence of 0.95, 0.85, 0.75, 0.625, 0.5, 0.375, 0.25, 0.15, 0.05 as closely as possible
-	# # b11Set <- c(-1.74, -1.08, -0.7, -0.33, 0, 0.33, 0.7, 1.08, 1.74)
-	# b11Set <- rev(c(-1.74, -0.7, 0, 0.7, 1.74)) # subsetted
-
-	# # extent (for border)
-	# ext <- extent(landscape)
-	# ext <- as(ext, 'SpatialPolygons')
-
-	# png(paste0(scenarioDir, '/Illustration - PREVALENCE Scenario Landscape and Species.png'), width=5 * 400, height=600, res=300)
-	
-		# par(mfrow=c(1, 5), oma=c(0, 0, 0, 3.1), mar=c(0, 0, 2, 0), fg='white', col.axis='white')
-
-		# for (countB11 in seq_along(b11Set)) {
-		
-			# thisB11 <- b11Set[countB11]
-		
-			# species <- response(x1=landscape[['T1']], x2=landscape[['F1']], b0=b0, b1=b1, b11=thisB11, b12=b12)
-			# prev <- cellStats(species, 'mean')
-		
-			# par(fg='white')
-			# plot(ext)
-			# plot(species, breaks=seq(0, 1, length.out=length(greens) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
-			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
-			# lab <- paste0(letters[countB11], ') Prevalence of ', sprintf('%.2f', prev))
-			# labelFig(lab, adj=c(-0.02, -0.1), cex=0.9, col='black')
-		
-		# }
-	
-		# par(fg='black')
-		# legendGrad('right', inset=-0.2, width=0.1, height=0.75, labels=c(0, 0.5, 1), title='Occurrence\nProbability', titleAdj=c(0.5, 0.95), col=greens, labAdj=0.7, xpd=NA, adjX=c(0, 0.5), adjY=c(0.055, 0.75), boxBorder=NA, cex=0.75)
-		
-	# dev.off()
-	
 # say('##########################################')
 # say('### [resolution] landscape and species ###')
 # say('##########################################')
@@ -372,9 +363,9 @@ say('######################################')
 	# native <- 2^10
 	# coarsest <- 2^6
 	
-	# png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species NEW.png'), width=2 * 3 * 380, height=4 * 400, res=300)
+	# png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species NEW.png'), width=4 * 3 * 380, height=8 * 400, res=600)
 	
-		# par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white', cex.main=0.8)
+		# par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white', cex.main=0.8, lwd=0.6)
 
 		# noises <- c(0, 1/3, 2/3, 1)
 			
@@ -475,9 +466,14 @@ say('######################################')
 	# # rots <- seq(22.5, 157.5, by=22.5)
 	# rots <- c(22.5 + 22.5, 90, 157.5 - 22.5) # abbreviated
 
-	# png(paste0(scenarioDir, '/Illustration - correlated TRUE & FALSE Scenario Landscape and Species.png'), width=5 * 400, height=600, res=300)
+	# # outline around rasters
+	# pt <- cbind(0.5, 0.5)
+	# pt <- SpatialPoints(pt, getCRS('mollweide', TRUE))
+	# buff <- gBuffer(pt, width=0.499, quadsegs=100)
 		
-		# par(mfrow=c(1, 5), oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white')
+	# png(paste0(scenarioDir, '/Illustration - correlated TRUE & FALSE Scenario Landscape and Species.png'), width=5 * 800, height=1200, res=600)
+		
+		# par(mfrow=c(1, 5), oma=c(0.5, 0, 0, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white')
 		
 		# # generate landscape
 		# geography <- list(
@@ -492,23 +488,23 @@ say('######################################')
 		# ext <- as(ext, 'SpatialPolygons')
 			
 		# # TRUE
-		# plot(ext)
-		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
+		# plot(ext, border=NA, ann=NA, col=NA)
+		# plot(landscape[['T1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, border=NA, add=TRUE)
 		# labelFig('a) TRUE variable', adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+		# plot(buff, add=TRUE, xpd=NA, lwd=0.6)
+		# legendGrad('bottom', inset=0.04, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='TRUE', titleAdj=c(0.5, -0.25), col=land, lwd=0.4, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.75)
 
 		# # first FALSE
 		# par(fg='white')
 		# plot(ext)
 		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
 		# lab <- paste0('b) FALSE: Correlation = ', sprintf('%.2f', correlation))
 		# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+		# plot(buff, add=TRUE, xpd=NA, lwd=0.6)
+		# legendGrad('bottom', inset=0.04, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), , title='FALSE', titleAdj=c(0.5, -0.25), col=land, lwd=0.4, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.75)
 
 		# # next FALSES
 		# for (countRot in 2:length(rots)) {
@@ -516,23 +512,19 @@ say('######################################')
 			# rot <- rots[countRot]
 		
 			# # generate landscape
-			# geography <- list(
-				# T1=list(type='linear', min=-1, max=1),
-				# F1=list(type='linear', min=-1, max=1, rot=rot)
-			# )
-			
+			# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='linear', min=-1, max=1, rot=rot))
 			# landscape <- genesis(geography, circle=TRUE)
 
 			# # FALSE
 			# par(fg='white')
 			# plot(ext)
 			# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
-			# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 			# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
 			# lab <- paste0(letters[countRot + 1], ') FALSE: Correlation = ', sprintf('%.2f', correlation))
 			# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 			# par(fg='black')
-			# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='', col=land, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+			# plot(buff, add=TRUE, xpd=NA, lwd=0.6)
+			# legendGrad('bottom', inset=0.04, vert=FALSE, width=0.93, height=0.1, labels=c(-1, 0, 1), title='FALSE', titleAdj=c(0.5, -0.25), col=land, lwd=0.4, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.75)
 			
 		# }
 		
@@ -542,10 +534,10 @@ say('######################################')
 		# par(fg='white')
 		# plot(ext)
 		# plot(species, breaks=seq(0, 1, length.out=length(land) - 1), col=greens, ann=FALSE, legend=FALSE, add=TRUE)
-		# plot(ext, border='black', xpd=NA, ann=FALSE, add=TRUE)
 		# labelFig('e) Species', adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
-		# legendGrad('bottom', inset=0.07, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='', col=greens, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.7)
+		# plot(buff, add=TRUE, xpd=NA, lwd=0.6)
+		# legendGrad('bottom', inset=0.04, vert=FALSE, width=0.93, height=0.1, labels=c(0, 0.5, 1), title='Probability of occurrence', titleAdj=c(0.5, -0.25), col=greens, lwd=0.4, labAdj=-0.8, xpd=NA, adjX=c(0, 1), adjY=c(0.6, 1), boxBorder=NA, cex=0.75)
 			
 	# dev.off()
 
@@ -583,9 +575,9 @@ say('######################################')
 
 	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 	
-	# png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - No Niche Covariance with Landscape Correlation.png'), width=11 * 400, height=4 * 450, res=300)
+	# png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - No Niche Covariance with Landscape Correlation.png'), width=11 * 800, height=4 * 900, res=600)
 		
-		# par(mfrow=c(4, 11), oma=c(0, 3, 3, 0))
+		# par(mfrow=c(4, 11), oma=c(0, 3, 3, 0), lwd=0.4)
 
 		# for (countPanel in seq_along(rots)) {
 		# # for (countPanel in 1) {
@@ -623,7 +615,7 @@ say('######################################')
 			# par(fg='black')
 			# frame()
 			# legendGrad('right', inset=0.035, vert=TRUE, width=0.17, height=1.7, labels=c(-1, 0, 1), title='', col=land, labAdj=0.5, xpd=NA, adjX=c(0, 0.5), adjY=c(0, 0.75), boxBorder=NA, cex=1.4, lwd=1, border=landscapeBorder)
-			# text(-0.25, 0.3, 'Landscape', xpd=NA, cex=1.8, pos=4)
+			# text(-0.25, 0.3, 'T1 or T2', xpd=NA, cex=1.8, pos=4)
 
 			# # major panel label
 			# r <- correlations$cor[correlations$rot == rot]
@@ -738,7 +730,7 @@ say('######################################')
 	# # sigma2s <- seq(0.1, 0.5, by=0.1)
 	# sigmas <- c(0.1, 0.3, 0.5) # abbreviated
 	
-	# png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - Niche Covariance with No Landscape Correlation.png'), width=11 * 400, height=3 * 450, res=300)
+	# png(paste0(scenarioDir, '/Illustration - BIVARIATE Scenario Landscape and Species - Niche Covariance with No Landscape Correlation.png'), width=11 * 800, height=3 * 900, res=600)
 		
 		# par(mfrow=c(3, 11), oma=c(0, 3, 6, 0))
 

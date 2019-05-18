@@ -312,286 +312,287 @@
 		
 	}
 	
-# say('###################################')
-# say('### [simple] simulation results ###')
-# say('###################################')
+say('###################################')
+say('### [simple] simulation results ###')
+say('###################################')
 
+scenarioDir <- './Results/simpleTEST'
 	# scenarioDir <- './Results/simple'
-	# evalDir <- paste0(scenarioDir, '/evaluations')
+	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	# evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=TRUE)
+	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=TRUE)
 
-	# # generalization
-	# width <- 0.14 # bar width
-	# nudge <- 0.22 # nudge left/right
-	# figLabPos <- c(-0.15, 0.05) # position of figure label
+	# generalization
+	width <- 0.14 # bar width
+	nudge <- 0.22 # nudge left/right
+	figLabPos <- c(-0.15, 0.05) # position of figure label
 	
-	# ylabX1 <- -0.18 # position of inner y-axis label
-	# ylabX2 <- -0.28 # position of outer y-axis label
-	# labCex <- 0.55 # size of algorithm, y-axis, and figure labels
+	ylabX1 <- -0.18 # position of inner y-axis label
+	ylabX2 <- -0.28 # position of outer y-axis label
+	labCex <- 0.55 # size of algorithm, y-axis, and figure labels
 	
-	# sublabY <- -0.08 # position of TRUE/FALSE variable sublabels
-	# sublabCex <- 0.4 # size of TRUE/FALSE sublabels
+	sublabY <- -0.08 # position of TRUE/FALSE variable sublabels
+	sublabCex <- 0.4 # size of TRUE/FALSE sublabels
 
-	# # master plot function
-	# plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, respT1, respControl, respF1, controlLab) {
+	# master plot function
+	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, respT1, respControl, respF1, controlLab) {
 		
-		# # nudge 	amount to move bars in same group (algorithm) left or right
-		# # ylim		y-axis limits
-		# # ylab		y-axis label
-		# # yTicks	position of tick marks on y-axis
-		# # lab		figure label
-		# # rand		value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
-		# # respT1	field name of response for TRUE variable
-		# # respControl	field name of response for control case (or NULL if none)
-		# # respF1	field name of response for FALSE variable
-		# # controlLab character, name of bar representing "control" model/prediction
+		# nudge 	amount to move bars in same group (algorithm) left or right
+		# ylim		y-axis limits
+		# ylab		y-axis label
+		# yTicks	position of tick marks on y-axis
+		# lab		figure label
+		# rand		value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
+		# respT1	field name of response for TRUE variable
+		# respControl	field name of response for control case (or NULL if none)
+		# respF1	field name of response for FALSE variable
+		# controlLab character, name of bar representing "control" model/prediction
 		
-		# # adjust nudging of bars in same groups
-		# if (is.null(respControl)) nudge <- nudge / 2
+		# adjust nudging of bars in same groups
+		if (is.null(respControl)) nudge <- nudge / 2
 		
-		# # base plot
-		# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(algos)), ylim=ylim)
-		# labelFig(lab, adj=figLabPos, cex=labCex)
-		# usr <- par('usr')
+		# base plot
+		plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(algos)), ylim=ylim)
+		labelFig(lab, adj=figLabPos, cex=labCex)
+		usr <- par('usr')
 
-		# # gray background
-		# left <- 1 - (2 + ifelse(is.null(respControl), 0.75, 0)) * nudge
-		# right <- length(algos) + (2.5 + ifelse(is.null(respControl), 0.25, -0.3)) * nudge
-		# polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
-		# lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
-		# for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
-		# for (i in 1:(length(algos) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
+		# gray background
+		left <- 1 - (2 + ifelse(is.null(respControl), 0.75, 0)) * nudge
+		right <- length(algos) + (2.5 + ifelse(is.null(respControl), 0.25, -0.3)) * nudge
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
+		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
+		for (i in 1:(length(algos) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
 		
-		# # x: variable labels
-		# axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
-		# text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
-		# if (!is.null(respControl)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep(controlLab, length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col='black')
-		# text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
+		# x: variable labels
+		axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
+		text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
+		if (!is.null(respControl)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep(controlLab, length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col='black')
+		text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
 		
-		# # x: algorithm labels
-		# text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
+		# x: algorithm labels
+		text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
 		
-		# # y: y-axis labels
-		# axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
-		# text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
-		# text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
+		# y: y-axis labels
+		axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
+		text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
+		text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
 
-		# # responses
-		# for (countAlgo in seq_along(algos)) {
+		# responses
+		for (countAlgo in seq_along(algos)) {
 		
-			# algo <- algos[countAlgo]
+			algo <- algos[countAlgo]
 		
-			# true <- evals[evals$algo==algo, respT1]
-			# if (!is.null(respControl)) control <- evals[evals$algo==algo, respControl]
-			# false <- evals[evals$algo==algo, respF1]
+			true <- evals[evals$algo==algo, respT1]
+			if (!is.null(respControl)) control <- evals[evals$algo==algo, respControl]
+			false <- evals[evals$algo==algo, respF1]
 		
-			# if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col='gray', border=borderOmniControl, lwd=0.8)
-			# rect(true, at=countAlgo - nudge, width=width, col=colTrue, border=borderTrue, xpd=NA, lwd=0.8)
-			# rect(false, at=countAlgo + nudge, width=width, col=colFalse, border=borderFalse, xpd=NA, lwd=0.8)
+			if (!is.null(respControl)) rect(control, at=countAlgo, width=width, col='gray', border=borderOmniControl, lwd=0.8)
+			rect(true, at=countAlgo - nudge, width=width, col=colTrue, border=borderTrue, xpd=NA, lwd=0.8)
+			rect(false, at=countAlgo + nudge, width=width, col=colFalse, border=borderFalse, xpd=NA, lwd=0.8)
 			
-		# }
+		}
 		
-	# }
+	}
 	
-	# ### multivariate: all metrics
-	# #############################
+	### multivariate: all metrics
+	#############################
 	
-	# algoLabY <- -0.30 # position of algorithm labels
+	algoLabY <- -0.30 # position of algorithm labels
 
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - All Metrics.png'), width=900, height=1200, res=300)
+	png(paste0(scenarioDir, '/Results - Multivariate Models - All Metrics.png'), width=1800, height=2400, res=600)
 		
-		# par(mfrow=c(3, 2), oma=0.4 * c(1, 1, 1, 1.4), mar=c(2.5, 2, 1.2, 1.4), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		par(mfrow=c(3, 2), oma=0.4 * c(1, 1, 1, 1.4), mar=c(2.5, 2, 1.2, 1.4), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# # COR presence/absence multivariate
-		# lab <- bquote('a) Multivariate COR'['pa'])
-		# ylab <- bquote('COR'['pa'])
-		# ylim <- c(-0.5, 1.1)
-		# yTicks <- seq(-0.5, 1, by=0.5)
-		# respT1 <- 'corPresAbsMulti_permT1'
-		# respControl <- NULL
-		# respF1 <- 'corPresAbsMulti_permF1'
+		# COR presence/absence multivariate
+		lab <- bquote('a) Multivariate COR'['pa'])
+		ylab <- bquote('COR'['pa'])
+		ylim <- c(-0.5, 1.1)
+		yTicks <- seq(-0.5, 1, by=0.5)
+		respT1 <- 'corPresAbsMulti_permT1'
+		respControl <- NULL
+		respF1 <- 'corPresAbsMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# # COR presence/bg multivariate
-		# lab <- bquote('b) Multivariate COR'['bg'])
-		# ylab <- bquote('COR'['bg'])
-		# ylim <- c(-0.5, 1.1)
-		# yTicks <- seq(-0.5, 1, by=0.5)
-		# respT1 <- 'corPresBgMulti_permT1'
-		# respControl <- NULL
-		# respF1 <- 'corPresBgMulti_permF1'
+		# COR presence/bg multivariate
+		lab <- bquote('b) Multivariate COR'['bg'])
+		ylab <- bquote('COR'['bg'])
+		ylim <- c(-0.5, 1.1)
+		yTicks <- seq(-0.5, 1, by=0.5)
+		respT1 <- 'corPresBgMulti_permT1'
+		respControl <- NULL
+		respF1 <- 'corPresBgMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# # AUCpa multivariate
-		# lab <- bquote('c) Multivariate AUC'['pa'])
-		# ylab <- bquote('AUC'['pa'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresAbsMulti_permT1'
-		# respControl <- 'aucPresAbsMulti'
-		# respF1 <- 'aucPresAbsMulti_permF1'
+		# AUCpa multivariate
+		lab <- bquote('c) Multivariate AUC'['pa'])
+		ylab <- bquote('AUC'['pa'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresAbsMulti_permT1'
+		respControl <- 'aucPresAbsMulti'
+		respF1 <- 'aucPresAbsMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 
-		# # AUCbg multivariate
-		# lab <- bquote('d) Multivariate AUC'['bg'])
-		# ylab <- bquote('AUC'['bg'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresBgMulti_permT1'
-		# respControl <- 'aucPresBgMulti'
-		# respF1 <- 'aucPresBgMulti_permF1'
+		# AUCbg multivariate
+		lab <- bquote('d) Multivariate AUC'['bg'])
+		ylab <- bquote('AUC'['bg'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresBgMulti_permT1'
+		respControl <- 'aucPresBgMulti'
+		respF1 <- 'aucPresBgMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# # CBI multivariate
-		# lab <- bquote('e) Multivariate CBI')
-		# ylab <- bquote('CBI')
-		# ylim <- c(-0.5, 1)
-		# yTicks <- seq(-0.5, 1, by=0.5)
-		# respT1 <- 'cbiMulti_permT1'
-		# respControl <- 'cbiMulti'
-		# respF1 <- 'cbiMulti_permF1'
+		# CBI multivariate
+		lab <- bquote('e) Multivariate CBI')
+		ylab <- bquote('CBI')
+		ylim <- c(-0.5, 1)
+		yTicks <- seq(-0.5, 1, by=0.5)
+		respT1 <- 'cbiMulti_permT1'
+		respControl <- 'cbiMulti'
+		respF1 <- 'cbiMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.6)
+		title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.6)
 		
-	# dev.off()
+	dev.off()
 
-	# ### multivariate: CBI and AUC
-	# #############################
+	### multivariate: CBI and AUC
+	#############################
 	
-	# algoLabY <- -0.30 # position of algorithm labels
+	algoLabY <- -0.30 # position of algorithm labels
 
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI & AUC.png'), width=1200, height=400, res=300)
+	png(paste0(scenarioDir, '/Results - Multivariate Models - CBI & AUC.png'), width=2400, height=800, res=600)
 		
-		# par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# # CBI multivariate
-		# lab <- bquote('a) Multivariate models: CBI')
-		# ylab <- bquote('CBI')
-		# ylim <- c(-0.5, 1)
-		# yTicks <- seq(-0.5, 1, by=0.5)
-		# respT1 <- 'cbiMulti_permT1'
-		# respControl <- 'cbiMulti'
-		# respF1 <- 'cbiMulti_permF1'
+		# CBI multivariate
+		lab <- bquote('a) Multivariate models: CBI')
+		ylab <- bquote('CBI')
+		ylim <- c(-0.5, 1)
+		yTicks <- seq(-0.5, 1, by=0.5)
+		respT1 <- 'cbiMulti_permT1'
+		respControl <- 'cbiMulti'
+		respF1 <- 'cbiMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# # AUCpa multivariate
-		# lab <- bquote('b) Multivariate models: AUC'['pa'])
-		# ylab <- bquote('AUC'['pa'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresAbsMulti_permT1'
-		# respControl <- 'aucPresAbsMulti'
-		# respF1 <- 'aucPresAbsMulti_permF1'
+		# AUCpa multivariate
+		lab <- bquote('b) Multivariate models: AUC'['pa'])
+		ylab <- bquote('AUC'['pa'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresAbsMulti_permT1'
+		respControl <- 'aucPresAbsMulti'
+		respF1 <- 'aucPresAbsMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 
-		# # AUCbg multivariate
-		# lab <- bquote('c) Multivariate models: AUC'['bg'])
-		# ylab <- bquote('AUC'['bg'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresBgMulti_permT1'
-		# respControl <- 'aucPresBgMulti'
-		# respF1 <- 'aucPresBgMulti_permF1'
+		# AUCbg multivariate
+		lab <- bquote('c) Multivariate models: AUC'['bg'])
+		ylab <- bquote('AUC'['bg'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresBgMulti_permT1'
+		respControl <- 'aucPresBgMulti'
+		respF1 <- 'aucPresBgMulti_permF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.7)
+		title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.7)
 		
-	# dev.off()
+	dev.off()
 
-	# ### univariate
-	# ##############
+	### univariate
+	##############
 	
-	# algoLabY <- -0.31 # position of algorithm labels
+	algoLabY <- -0.31 # position of algorithm labels
 
-	# png(paste0(scenarioDir, '/Results - Univariate Models.png'), width=1200, height=400, res=300)
+	png(paste0(scenarioDir, '/Results - Univariate Models.png'), width=2400, height=800, res=600)
 		
-		# par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# # CBI univariate
-		# lab <- bquote('a) Univariate models: CBI')
-		# ylab <- bquote('CBI')
-		# ylim <- c(-1, 1)
-		# yTicks <- seq(-1, 1, by=0.5)
-		# respT1 <- 'cbiUni_onlyT1'
-		# respControl <- 'cbiMulti'
-		# respF1 <- 'cbiUni_onlyF1'
+		# CBI univariate
+		lab <- bquote('a) Univariate models: CBI')
+		ylab <- bquote('CBI')
+		ylim <- c(-1, 1)
+		yTicks <- seq(-1, 1, by=0.5)
+		respT1 <- 'cbiUni_onlyT1'
+		respControl <- 'cbiMulti'
+		respF1 <- 'cbiUni_onlyF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
 		
-		# # AUCpa univariate
-		# lab <- bquote('b) Univariate models: AUC'['pa'])
-		# ylab <- bquote('AUC'['pa'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresAbsUni_onlyT1'
-		# respControl <- 'aucPresAbsMulti'
-		# respF1 <- 'aucPresAbsUni_onlyF1'
+		# AUCpa univariate
+		lab <- bquote('b) Univariate models: AUC'['pa'])
+		ylab <- bquote('AUC'['pa'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresAbsUni_onlyT1'
+		respControl <- 'aucPresAbsMulti'
+		respF1 <- 'aucPresAbsUni_onlyF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
 
-		# # AUCbg univariate
-		# lab <- bquote('c) Univariate models: AUC'['bg'])
-		# ylab <- bquote('AUC'['bg'])
-		# ylim <- c(0.25, 1)
-		# yTicks <- seq(0.25, 1, by=0.25)
-		# respT1 <- 'aucPresBgUni_onlyT1'
-		# respControl <- 'aucPresBgMulti'
-		# respF1 <- 'aucPresBgUni_onlyF1'
+		# AUCbg univariate
+		lab <- bquote('c) Univariate models: AUC'['bg'])
+		ylab <- bquote('AUC'['bg'])
+		ylim <- c(0.25, 1)
+		yTicks <- seq(0.25, 1, by=0.25)
+		respT1 <- 'aucPresBgUni_onlyT1'
+		respControl <- 'aucPresBgMulti'
+		respF1 <- 'aucPresBgUni_onlyF1'
 
-		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
 		
-		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=0)
+		title(sub=date(), outer=TRUE, cex.sub=0.3, line=0)
 		
-	# dev.off()
+	dev.off()
 
-	# ### report statistics
-	# #####################
+	### report statistics
+	#####################
 	
-	# say('STATISTICS:', pre=2)
+	say('STATISTICS:', pre=2)
 	
-	# x <- evals$aucPresAbsMulti[evals$algo=='omniscient']
-	# avg <- mean(x)
-	# say('Mean AUCpa for unpermuted multivariate OMNI model is ', sprintf('%.2f', avg), '.')
+	x <- evals$aucPresAbsMulti[evals$algo=='omniscient']
+	avg <- mean(x)
+	say('Mean AUCpa for unpermuted multivariate OMNI model is ', sprintf('%.2f', avg), '.')
 	
-	# x <- evals$aucPresBgMulti[evals$algo=='omniscient']
-	# avg <- mean(x)
-	# say('Mean AUCbg for unpermuted multivariate OMNI model is ', sprintf('%.2f', avg), '.')
+	x <- evals$aucPresBgMulti[evals$algo=='omniscient']
+	avg <- mean(x)
+	say('Mean AUCbg for unpermuted multivariate OMNI model is ', sprintf('%.2f', avg), '.')
 	
-	# x <- evals$brtMultiNativeImportT1[evals$algo=='brt']
-	# avg <- mean(x, na.rm=TRUE)
-	# quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
-	# say('Mean algorithm-specific importance for multivariate BRT model for TRUE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
+	x <- evals$brtMultiNativeImportT1[evals$algo=='brt']
+	avg <- mean(x, na.rm=TRUE)
+	quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
+	say('Mean algorithm-specific importance for multivariate BRT model for TRUE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
 	
-	# x <- evals$brtMultiNativeImportF1[evals$algo=='brt']
-	# avg <- mean(x, na.rm=TRUE)
-	# quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
-	# say('Mean algorithm-specific importance for multivariate BRT model for FALSE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
+	x <- evals$brtMultiNativeImportF1[evals$algo=='brt']
+	avg <- mean(x, na.rm=TRUE)
+	quants <- quantile(x, c(0.025, 0.975), na.rm=TRUE)
+	say('Mean algorithm-specific importance for multivariate BRT model for FALSE variable is ', sprintf('%.2f', avg), ' (inner 95% range:', sprintf('%.2f', quants[1]), '-', sprintf('%.2f', quants[2]), ')')
 	
-	# x <- evals$aucPresAbsMulti[evals$algo=='brt']
-	# successes <- sum(!is.na(x))
-	# say('Number of times multivariate BRT converged (out of 100): ', successes)
+	x <- evals$aucPresAbsMulti[evals$algo=='brt']
+	successes <- sum(!is.na(x))
+	say('Number of times multivariate BRT converged (out of 100): ', successes)
 	
-	# x <- evals$cbiMulti[evals$algo=='omniscient']
-	# stats <- quantile(x, c(0.025, 0.5, 0.975))
-	# say('Min/median/max CBI for multivariate control OMNISCIENT model: ', paste(sprintf('%.2f', stats), collapse=' '))
+	x <- evals$cbiMulti[evals$algo=='omniscient']
+	stats <- quantile(x, c(0.025, 0.5, 0.975))
+	say('Min/median/max CBI for multivariate control OMNISCIENT model: ', paste(sprintf('%.2f', stats), collapse=' '))
 	
-	# x <- evals$cbiUni_onlyT1[evals$algo=='brt']
-	# successes <- sum(!is.na(x))
-	# say('Number of times univariate BRT converged using just TRUE variable (out of 100): ', successes)
+	x <- evals$cbiUni_onlyT1[evals$algo=='brt']
+	successes <- sum(!is.na(x))
+	say('Number of times univariate BRT converged using just TRUE variable (out of 100): ', successes)
 	
-	# x <- evals$cbiUni_onlyF1[evals$algo=='brt']
-	# say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
-	# successes <- sum(!is.na(x))
+	x <- evals$cbiUni_onlyF1[evals$algo=='brt']
+	say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
+	successes <- sum(!is.na(x))
 	
 # say('########################################')
 # say('### [sample size] simulation results ###')
@@ -835,222 +836,222 @@
 		
 	# dev.off()
 
-say('#######################################')
-say('### [resolution] simulation results ###')
-say('#######################################')
+# say('#######################################')
+# say('### [resolution] simulation results ###')
+# say('#######################################')
 
-	say('Basic layout: Three panels side-by-side, one per algorithm.')
-	say('Each panel has 3 columns (resolution) and 4 rows (SAC).')
-	say('Each subpanel is a barplot showing response of OMNI and the SDM.')
+	# say('Basic layout: Three panels side-by-side, one per algorithm.')
+	# say('Each panel has 3 columns (resolution) and 4 rows (SAC).')
+	# say('Each subpanel is a barplot showing response of OMNI and the SDM.')
 
-	# generalization
-	scenarioDir <- './Results/resolution' # scenario directory
+	# # generalization
+	# scenarioDir <- './Results/resolution' # scenario directory
 
-	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(
-		evalDir=paste0(scenarioDir, '/evaluations'),
-		algos=algos,
-		save=TRUE,
-		redo=FALSE
-	)
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(
+		# evalDir=paste0(scenarioDir, '/evaluations'),
+		# algos=algos,
+		# save=TRUE,
+		# redo=FALSE
+	# )
 	
-	# SAC
-	noises <- c(0, 1/3, 2/3, 1)
-	noisesRounded <- round(noises, 2)
+	# # SAC
+	# noises <- c(0, 1/3, 2/3, 1)
+	# noisesRounded <- round(noises, 2)
 	
-	# grain size
-	grains <- c(2^14, 2^10, 2^6)
+	# # grain size
+	# grains <- c(2^14, 2^10, 2^6)
 
-	# plot settings
-	xSize <- 0.775 # maximum width of subplot containing bars
-	ySize <- 0.875 # maximum height of subplot containing bars
-	width <- 0.17 # width of bars as a proportion of subplot size (real width will be size * width)
-	tick <- 0.05 # length of subplot tick marks
-	lwd <- 0.4 # line width of bars
-	cexAxisLabel <- 0.5
-	cexPanelLabel <- 0.7
+	# # plot settings
+	# xSize <- 0.775 # maximum width of subplot containing bars
+	# ySize <- 0.875 # maximum height of subplot containing bars
+	# width <- 0.17 # width of bars as a proportion of subplot size (real width will be size * width)
+	# tick <- 0.05 # length of subplot tick marks
+	# lwd <- 0.4 # line width of bars
+	# cexAxisLabel <- 0.5
+	# cexPanelLabel <- 0.7
 	
-	# function to plots bars as scaled subplots in a larger plot
-	# basically this just rescales the size and position of values and bars and send the information to rect()
-	subRectNeg1To1 <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
+	# # function to plots bars as scaled subplots in a larger plot
+	# # basically this just rescales the size and position of values and bars and send the information to rect()
+	# subRectNeg1To1 <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
 	
-		# resp		values of response (not scaled)
-		# angle		NULL or angle of fill lines
-		# xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
-		# col, border  color for fill and border
-		# ...		other
+		# # resp		values of response (not scaled)
+		# # angle		NULL or angle of fill lines
+		# # xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
+		# # col, border  color for fill and border
+		# # ...		other
 	
-		respScaled <- resp * 0.5 * ySize + countNoise - 0 * 0.5 * ySize
-		at <- countGrain - 0.5 * xSize + xOffsetInSubplot * xSize
-		rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=col, border=border, angle=angle, density=s * lineDensity, lwd=lwd)
+		# respScaled <- resp * 0.5 * ySize + countNoise - 0 * 0.5 * ySize
+		# at <- countGrain - 0.5 * xSize + xOffsetInSubplot * xSize
+		# rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=col, border=border, angle=angle, density=s * lineDensity, lwd=lwd)
 		
-	}
+	# }
 	
-	### plot CBI
-	############
+	# ### plot CBI
+	# ############
 	
-	respControl <- 'cbiMulti'
-	resp <- 'cbiMulti_perm'
+	# respControl <- 'cbiMulti'
+	# resp <- 'cbiMulti_perm'
 	
-	png(paste0(scenarioDir, '/Results - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=9 * 300, height=4 * 300, res=600)
+	# png(paste0(scenarioDir, '/Results - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=9 * 300, height=4 * 300, res=600)
 	
-		par(mfrow=c(1, 3), oma=c(2, 2, 1, 0), mar=c(0, 1.4, 0, 0), mgp=c(1, 0.2, 0), cex.axis=0.55)
+		# par(mfrow=c(1, 3), oma=c(2, 2, 1, 0), mar=c(0, 1.4, 0, 0), mgp=c(1, 0.2, 0), cex.axis=0.55)
 
-		# by ALGO
-		for (countAlgo in seq_along(sdmAlgos)) {
+		# # by ALGO
+		# for (countAlgo in seq_along(sdmAlgos)) {
 		
-			algo <- sdmAlgos[countAlgo]
+			# algo <- sdmAlgos[countAlgo]
 		
-			algoNice <- algosShort(algo)
+			# algoNice <- algosShort(algo)
 	
-			xs <- seq_along(grains)
-			ys <- seq_along(noises)
-			xlim <- range(xs) + c(-0.5, 0.5)
-			ylim <- range(ys) + c(-0.5, 0.5)
+			# xs <- seq_along(grains)
+			# ys <- seq_along(noises)
+			# xlim <- range(xs) + c(-0.5, 0.5)
+			# ylim <- range(ys) + c(-0.5, 0.5)
 			
-			ylab <- 'Proportion swapped\n\U2190lower autocorrelation     higher autocorrelation\U2192'
+			# ylab <- 'Proportion swapped\n\U2190lower autocorrelation     higher autocorrelation\U2192'
 			
-			plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
-			axis(1, at=xs, labels=paste0('1/', grains), tck=-0.01, lwd=0.6, line=-0.25)
-			axis(2, at=ys, labels=noisesRounded, tck=-0.015, lwd=0.6, line=0.25)
-			mtext('Grain size', side=1, cex=0.4, line=0.7)
-			labelFig(paste0(letters[countAlgo], ') ', algoNice), adj=0.015, cex=0.625, xpd=NA)
+			# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
+			# axis(1, at=xs, labels=paste0('1/', grains), tck=-0.01, lwd=0.6, line=-0.25)
+			# axis(2, at=ys, labels=noisesRounded, tck=-0.015, lwd=0.6, line=0.25)
+			# mtext('Grain size', side=1, cex=0.4, line=0.7)
+			# labelFig(paste0(letters[countAlgo], ') ', algoNice), adj=0.015, cex=0.625, xpd=NA)
 			
-			# by NOISE (SAC)
-			for (countNoise in seq_along(noises)) {
+			# # by NOISE (SAC)
+			# for (countNoise in seq_along(noises)) {
 		
-				noise <- noises[countNoise]
+				# noise <- noises[countNoise]
 		
-				# by GRAIN
-				for (countGrain in seq_along(grains)) {
+				# # by GRAIN
+				# for (countGrain in seq_along(grains)) {
 				
-					grain <- grains[countGrain]
+					# grain <- grains[countGrain]
 
-					# get response data
-					omniControl <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
-					sdmControl <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
+					# # get response data
+					# omniControl <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
+					# sdmControl <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, respControl]
 					
-					omniT1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
-					omniF1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
+					# omniT1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
+					# omniF1 <- evals[evals$algo == 'omniscient' & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
 					
-					sdmT1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
-					sdmF1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
+					# sdmT1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'T1')]
+					# sdmF1 <- evals[evals$algo == algo & evals$sizeResampled %==% grain & evals$noise %==% noise, paste0(resp, 'F1')]
 
-					# calculate and assign variables for lower/upper limits and median
-					whats <- c('Inner', 'Median', 'Outer')
-					for (modelType in c('sdm', 'omni')) {
-						for (variable in c('Control', 'T1', 'F1')) {
+					# # calculate and assign variables for lower/upper limits and median
+					# whats <- c('Inner', 'Median', 'Outer')
+					# for (modelType in c('sdm', 'omni')) {
+						# for (variable in c('Control', 'T1', 'F1')) {
 							
-							thisVar <- paste0(modelType, variable)
-							x <- get(thisVar)
-							quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
+							# thisVar <- paste0(modelType, variable)
+							# x <- get(thisVar)
+							# quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
 
-							for (countWhat in seq_along(whats)) {
+							# for (countWhat in seq_along(whats)) {
 						
-								what <- whats[countWhat]
-								assign(paste0(thisVar, what), quants[countWhat])
+								# what <- whats[countWhat]
+								# assign(paste0(thisVar, what), quants[countWhat])
 								
-							}
-						}
-					}
+							# }
+						# }
+					# }
 
-					s <- 0.8 # line density scalar for angled fills
+					# s <- 0.8 # line density scalar for angled fills
 					
-					# subplot y-axis
-					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize), c(countNoise - 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
+					# # subplot y-axis
+					# lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize), c(countNoise - 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
 					
-					# subplot y-axis tick lines and labels
-					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise + 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
-					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise, countNoise), lwd=lwd)
-					lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise - 0.5 * ySize, countNoise - 0.5 * ySize), lwd=lwd)
+					# # subplot y-axis tick lines and labels
+					# lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise + 0.5 * ySize, countNoise + 0.5 * ySize), lwd=lwd)
+					# lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise, countNoise), lwd=lwd)
+					# lines(c(countGrain - 0.5 * xSize, countGrain - 0.5 * xSize - tick * xSize), c(countNoise - 0.5 * ySize, countNoise - 0.5 * ySize), lwd=lwd)
 					
-					# subplot y-axis labels
-					cex <- 0.4
-					offset <- 2.5
-					if (countGrain == 1) {
+					# # subplot y-axis labels
+					# cex <- 0.4
+					# offset <- 2.5
+					# if (countGrain == 1) {
 
-						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
-						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise, labels=0, cex=cex, xpd=NA)
-						text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise - 0.5 * ySize, labels=-1, cex=cex, xpd=NA)
+						# text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
+						# text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise, labels=0, cex=cex, xpd=NA)
+						# text(countGrain - 0.5 * xSize - offset * tick * xSize, countNoise - 0.5 * ySize, labels=-1, cex=cex, xpd=NA)
 						
-					}
+					# }
 					
-					# gray background
-					offsetInSubplot <- 0.1
-					rand <- 0
-					left <- countGrain - 0.54 * xSize + offsetInSubplot * xSize
-					right <- countGrain + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
-					bottom <- countNoise - 0.5 * ySize
-					top <- countNoise + 0.5 * ySize
-					polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
-					lines(c(left, right), c(countNoise, countNoise), lwd=1.5 * lwd, col='white')
+					# # gray background
+					# offsetInSubplot <- 0.1
+					# rand <- 0
+					# left <- countGrain - 0.54 * xSize + offsetInSubplot * xSize
+					# right <- countGrain + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
+					# bottom <- countNoise - 0.5 * ySize
+					# top <- countNoise + 0.5 * ySize
+					# polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+					# lines(c(left, right), c(countNoise, countNoise), lwd=1.5 * lwd, col='white')
 
-					# OMNI control (unpermuted)
-					subRectNeg1To1(
-						resp=omniControl,
-						angle=45,
-						xOffsetInSubplot=0.2,
-						col='black',
-						border='black'
-					)
+					# # OMNI control (unpermuted)
+					# subRectNeg1To1(
+						# resp=omniControl,
+						# angle=45,
+						# xOffsetInSubplot=0.2,
+						# col='black',
+						# border='black'
+					# )
 					
-					# SDM control (unpermuted)
-					subRectNeg1To1(
-						resp=sdmControl,
-						angle=NULL,
-						xOffsetInSubplot=0.35,
-						col=colSdmControl,
-						border=borderSdmControl
-					)
+					# # SDM control (unpermuted)
+					# subRectNeg1To1(
+						# resp=sdmControl,
+						# angle=NULL,
+						# xOffsetInSubplot=0.35,
+						# col=colSdmControl,
+						# border=borderSdmControl
+					# )
 					
-					# OMNI permuted T1
-					subRectNeg1To1(
-						resp=omniT1,
-						angle=45,
-						xOffsetInSubplot=0.55,
-						col=colTrue,
-						border=borderOmniTrue
-					)
+					# # OMNI permuted T1
+					# subRectNeg1To1(
+						# resp=omniT1,
+						# angle=45,
+						# xOffsetInSubplot=0.55,
+						# col=colTrue,
+						# border=borderOmniTrue
+					# )
 
-					# SDM permuted T1
-					subRectNeg1To1(
-						resp=sdmT1,
-						angle=NULL,
-						xOffsetInSubplot=0.7,
-						col=colTrue,
-						border=borderSdmT1
-					)
+					# # SDM permuted T1
+					# subRectNeg1To1(
+						# resp=sdmT1,
+						# angle=NULL,
+						# xOffsetInSubplot=0.7,
+						# col=colTrue,
+						# border=borderSdmT1
+					# )
 					
-					# OMNI permuted F1
-					subRectNeg1To1(
-						resp=omniF1,
-						angle=45,
-						xOffsetInSubplot=0.9,
-						col=colFalse,
-						border=borderOmniFalse
-					)
+					# # OMNI permuted F1
+					# subRectNeg1To1(
+						# resp=omniF1,
+						# angle=45,
+						# xOffsetInSubplot=0.9,
+						# col=colFalse,
+						# border=borderOmniFalse
+					# )
 					
-					# SDM permuted F1
-					subRectNeg1To1(
-						resp=sdmF1,
-						angle=NULL,
-						xOffsetInSubplot=1.05,
-						col=colFalse,
-						border=borderFalse
-					)
+					# # SDM permuted F1
+					# subRectNeg1To1(
+						# resp=sdmF1,
+						# angle=NULL,
+						# xOffsetInSubplot=1.05,
+						# col=colFalse,
+						# border=borderFalse
+					# )
 
-				} # next grain
+				# } # next grain
 				
-			} # next noise level (SAC)
+			# } # next noise level (SAC)
 			
-		} # next algorithm
+		# } # next algorithm
 
-		# panel y-axis labels
-		mtext(ylab, side=2, cex=0.4, line=0, outer=TRUE)
+		# # panel y-axis labels
+		# mtext(ylab, side=2, cex=0.4, line=0, outer=TRUE)
 
-		title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
+		# title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
 	
-	dev.off()
+	# dev.off()
 
 # say('####################################################')
 # say('### [correlated TRUE & FALSE] simulation results ###')
