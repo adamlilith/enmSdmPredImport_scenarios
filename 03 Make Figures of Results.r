@@ -316,8 +316,7 @@ say('###################################')
 say('### [simple] simulation results ###')
 say('###################################')
 
-scenarioDir <- './Results/simpleTEST'
-	# scenarioDir <- './Results/simple'
+	scenarioDir <- './Results/simple'
 	evalDir <- paste0(scenarioDir, '/evaluations')
 
 	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=TRUE)
