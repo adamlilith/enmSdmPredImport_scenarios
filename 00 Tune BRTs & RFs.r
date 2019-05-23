@@ -35,17 +35,17 @@
 ### master settings ###
 #######################
 
-	# # directory for modeling
-	# # source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
-	# setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
-	# tempDrive <- 'C:'
-
 	# directory for modeling
-	# source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
-	setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
+	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
 	tempDrive <- 'C:'
-	# tempDrive <- 'D:'
-	# tempDrive <- 'E:'
+
+	# # directory for modeling
+	# # source('H:/Global Change Program/Research/ENMs - Predictor Inference/Scripts/00 Tune BRTs & RFs.r')
+	# setwd('H:/Global Change Program/Research/ENMs - Predictor Inference')
+	# tempDrive <- 'C:'
+	# # tempDrive <- 'D:'
+	# # tempDrive <- 'E:'
 
 	# directory names for simulated data, model, and model evaluations
 	simDir <- '!scenario data' # subdirectory of each scenario's directory in which to store simulation data
@@ -62,9 +62,7 @@
 
 	# iterations
 	iters <- 1:100 # iterations to do -- want 100 total
-	# iters <- rev(40:60) # iterations to do -- want 100 total
-	# iters <- rev(61:80) # iterations to do -- want 100 total
-	# iters <- rev(81:100) # iterations to do -- want 100 total
+	# iters <- rev(1:100) # iterations to do -- want 100 total
 
 	# algorithms
 	algos <- c('brt', 'rf')
@@ -76,7 +74,8 @@
 #########################	
 
 	# number of training background sites to test for BRTs in "tuning" exercises
-	numBgToTest <- rev(c(10000, 1000, 200))
+	numBgToTest <- c(10000, 1000, 200)
+	# numBgToTest <- rev(c(10000, 1000, 200))
 	# numBgToTest <- c(10000)
 	# numBgToTest <- c(1000)
 	# numBgToTest <- c(200)
@@ -97,230 +96,230 @@
 	library(rJava)
 	options(java.parameters='-Xmx1g' )
 	library(gbm)
-	library(party)
+	# library(party)
 	library(dismo)
 	library(omnibus)
 	library(enmSdm)
 	library(enmSdmPredImport)
 	library(legendary)
 
-# say('#########################################################')
-# say('### [tune brt and rf for logistic responses] modeling ###')
-# say('#########################################################')
+say('#########################################################')
+say('### [tune brt and rf for logistic responses] modeling ###')
+say('#########################################################')
 
-	# say('This experiment tunes the settings to be used for BRTs and RFs using the simplest landscape.')
+	say('This experiment tunes the settings to be used for BRTs and RFs using the simplest landscape.')
 
-	# thisOutDir <- 'tune brt & rf for logistic responses'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
-	# simDir <- '/!scenario data - 10000 bg'
-	# scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
-	# write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
+	thisOutDir <- 'tune brt & rf for logistic responses'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
+	simDir <- '/!scenario data - 10000 bg'
+	scenario <- 'RESPONSE logistic(T1) MODEL T1 F1 GEOG linear(T1) random(F1)'
+	write.csv(scenario, paste0(scenarioDir, '/!scenario - ', scenario, '.txt'), row.names=FALSE)
 
-	# # define species
-	# b0 <- 0 # intercept
-	# b1 <- 2 # slope of P1
-	# b2 <- 1 # slope of P2
-	# b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
-	# b12 <- 0 # slope of T1 * T2
-	# mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
-	# response <- logistic
+	# define species
+	b0 <- 0 # intercept
+	b1 <- 2 # slope of P1
+	b2 <- 1 # slope of P2
+	b11 <- 0 # shift parameter... offset of inflection from 0 on landscape relative to T1
+	b12 <- 0 # slope of T1 * T2
+	mu1 <- mu2 <- sigma1 <- sigma2 <- rho <- NA
+	response <- logistic
 	
-	# # define landscape: one linear TRUE variable and one random FALSE variable
-	# geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
+	# define landscape: one linear TRUE variable and one random FALSE variable
+	geography <- list(T1=list(type='linear', min=-1, max=1), F1=list(type='random', min=-1, max=1))
 
-	# # create data
-	# predImportMakeData(
-		# response=response,
-		# geography=geography,
-		# simDir=paste0(scenarioDir, '/', simDir),
-		# numTrainPres=200,
-		# numTestPres=200,
-		# numBg=10000,
-		# iters=iters,
-		# sizeNative=1024,
-		# overwrite=FALSE,
-		# fileFlag=NULL,
-		# b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
-		# verbose=verbose,
-		# circle=FALSE
-	# )
+	# create data
+	predImportMakeData(
+		response=response,
+		geography=geography,
+		simDir=paste0(scenarioDir, '/!scenario data'),
+		numTrainPres=200,
+		numTestPres=200,
+		numBg=10000,
+		iters=iters,
+		sizeNative=1024,
+		overwrite=FALSE,
+		fileFlag=NULL,
+		b0=b0, b1=b1, b2=b2, b11=b11, b12=b12, mu1=mu1, mu2=mu2, sigma1=sigma1, sigma2=sigma2, rho=rho,
+		verbose=verbose,
+		circle=FALSE
+	)
 
-	# # train full models
-	# for (numBg in numBgToTest) {
+	# train full models
+	for (numBg in numBgToTest) {
 	
-		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+		say('USING ', numBg, ' BACKGROUND SITES', level=2)
 
-		# predImportTrainModels(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# vars=c('T1', 'F1'),
-			# algos=algos,
-			# type=c('multivariate'),
-			# iters=iters,
-			# numBg=numBg,
-			# fileFlag=NULL,
-			# overwrite=FALSE,
-			# verbose=verbose,
-			# maxTrees=maxTrees,
-			# learningRate=lr, treeComplexity=tc, bagFraction=bf
-		# )
+		predImportTrainModels(
+			simDir=paste0(scenarioDir, '/!scenario data'),
+			modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			vars=c('T1', 'F1'),
+			algos=algos,
+			type=c('multivariate'),
+			iters=iters,
+			numBg=numBg,
+			fileFlag=NULL,
+			overwrite=FALSE,
+			verbose=verbose,
+			maxTrees=maxTrees,
+			learningRate=lr, treeComplexity=tc, bagFraction=bf
+		)
 		
-	# }
+	}
 
-	# # evaluate
-	# for (numBg in numBgToTest) {
+	# evaluate
+	for (numBg in numBgToTest) {
 	
-		# say('USING ', numBg, ' BACKGROUND SITES', level=2)
+		say('USING ', numBg, ' BACKGROUND SITES', level=2)
 
-		# predImportEval(
-			# simDir=paste0(scenarioDir, '/', simDir),
-			# modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# evalDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
-			# algos=algos,
-			# type=c('multivariate'),
-			# iters=iters,
-			# perms=30,
-			# ia=FALSE,
-			# overwrite=FALSE,
-			# fileFlag=NULL,
-			# verbose=verbose
-		# )
+		predImportEval(
+			simDir=paste0(scenarioDir, '/!scenario data'),
+			modelDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			evalDir=paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg'),
+			algos=algos,
+			type=c('multivariate'),
+			iters=iters,
+			perms=30,
+			ia=FALSE,
+			overwrite=FALSE,
+			fileFlag=NULL,
+			verbose=verbose
+		)
 	
-	# }
+	}
 	
-# say('######################################################################################')
-# say('### [tune brt for logistic responses] selecting optimal number of background sites ###')
-# say('######################################################################################')
+say('######################################################################################')
+say('### [tune brt for logistic responses] selecting optimal number of background sites ###')
+say('######################################################################################')
 
-	# thisOutDir <- 'tune brt & rf for logistic responses'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
+	thisOutDir <- 'tune brt & rf for logistic responses'
+	scenarioDir <- paste0('./Results/', thisOutDir)
 
-	# ### load evaluations
-	# evals <- data.frame()
-	# for (numBg in numBgToTest) {
+	### load evaluations
+	evals <- data.frame()
+	for (numBg in numBgToTest) {
 	
-		# load(paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg/Evaluations for multivariate BRT.RData'))
-		# evals <- rbind(evals, perform)
+		load(paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg/Evaluations for multivariate BRT.RData'))
+		evals <- rbind(evals, perform)
 		
-	# }
+	}
 
-	# ### plot
-	# png(paste0(scenarioDir, '/BRT - CBI ~ Number of Training Background Sites.png'))
-		# boxplot(cbiMulti ~ numTrainBgMulti, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
-	# dev.off()
+	### plot
+	png(paste0(scenarioDir, '/BRT - CBI ~ Number of Training Background Sites.png'))
+		boxplot(cbiMulti ~ numTrainBgMulti, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
+	dev.off()
 
-	# ### assess by number of BG sites
-	# best <- data.frame()
-	# for (numBg in numBgToTest) {
+	### assess by number of BG sites
+	best <- data.frame()
+	for (numBg in numBgToTest) {
 		
-		# x <- evals[evals$numTrainBgMulti == numBg, ]
-		# avg <- mean(x$cbiMulti, na.rm=TRUE)
-		# std <- sd(x$cbiMulti, na.rm=TRUE)
+		x <- evals[evals$numTrainBgMulti == numBg, ]
+		avg <- mean(x$cbiMulti, na.rm=TRUE)
+		std <- sd(x$cbiMulti, na.rm=TRUE)
 		
-		# say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
+		say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
 		
-		# best <- rbind(
-			# best,
-			# data.frame(
-				# numTrainBg=numBg,
-				# cbiMean=avg,
-				# cbiSd=std
-			# )
-		# )
+		best <- rbind(
+			best,
+			data.frame(
+				numTrainBg=numBg,
+				cbiMean=avg,
+				cbiSd=std
+			)
+		)
 		
-	# }
+	}
 	
-	# ### get best number of BG sites
-	# bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
+	### get best number of BG sites
+	bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
 	
-	# say('Best number of BG sites for BRT is ', bestNumBg, '. Using mean parameter set from this set.')
+	say('Best number of BG sites for BRT is ', bestNumBg, '. Using mean parameter set from this set.')
 	
-	# ### calculate BRT parameters for best set of BRT models
-	# params <- data.frame()
+	### calculate BRT parameters for best set of BRT models
+	params <- data.frame()
 	
-	# for (iter in iters) {
+	for (iter in iters) {
 	
-		# load(paste0(scenarioDir, '/models with ', prefix(bestNumBg, 5), ' bg/multivariate brt/brt model ', prefix(iter, 4), '.Rdata'))
+		load(paste0(scenarioDir, '/models with ', prefix(bestNumBg, 5), ' bg/multivariate brt/brt model ', prefix(iter, 4), '.Rdata'))
 	
-		# lr <- model$gbm.call$learning.rate
-		# tc <- model$gbm.call$tree.complexity
-		# bf <- model$gbm.call$bag.fraction
-		# nTrees <- model$gbm.call$best.trees
+		lr <- model$gbm.call$learning.rate
+		tc <- model$gbm.call$tree.complexity
+		bf <- model$gbm.call$bag.fraction
+		nTrees <- model$gbm.call$best.trees
 	
-		# params <- rbind(
-			# params,
-			# data.frame(
-				# bestNumBg=bestNumBg,
-				# learningRate=lr,
-				# treeComplexity=tc,
-				# bagFraction=bf,
-				# nTrees=nTrees
-			# )
-		# )
+		params <- rbind(
+			params,
+			data.frame(
+				bestNumBg=bestNumBg,
+				learningRate=lr,
+				treeComplexity=tc,
+				bagFraction=bf,
+				nTrees=nTrees
+			)
+		)
 	
-	# }
+	}
 
-	# bestParams <- data.frame(
-		# bestNumBg=bestNumBg,
-		# learningRate_025quant=quantile(params$learningRate, 0.25),
-		# learningRate_mean=mean(params$learningRate),
-		# learningRate_075quant=quantile(params$learningRate, 0.75),
-		# treeComplexity_025quant=round(quantile(params$treeComplexity, 0.25)),
-		# treeComplexity_mean=round(mean(params$treeComplexity)),
-		# treeComplexity_075quant=round(quantile(params$treeComplexity, 0.75)),
-		# bagFraction=mean(params$bagFraction),
-		# maxTrees=50 * ceiling(1.1 * max(params$nTrees) / 50)
-	# )
+	bestParams <- data.frame(
+		bestNumBg=bestNumBg,
+		learningRate_025quant=quantile(params$learningRate, 0.25),
+		learningRate_mean=mean(params$learningRate),
+		learningRate_075quant=quantile(params$learningRate, 0.75),
+		treeComplexity_025quant=round(quantile(params$treeComplexity, 0.25)),
+		treeComplexity_mean=round(mean(params$treeComplexity)),
+		treeComplexity_075quant=round(quantile(params$treeComplexity, 0.75)),
+		bagFraction=mean(params$bagFraction),
+		maxTrees=50 * ceiling(1.1 * max(params$nTrees) / 50)
+	)
 	
-	# write.csv(bestParams, paste0(scenarioDir, '/Parameters of Best BRT Models.csv'), row.names=FALSE)
+	write.csv(bestParams, paste0(scenarioDir, '/Parameters of Best BRT Models.csv'), row.names=FALSE)
 
-# say('#####################################################################################')
-# say('### [tune rf for logistic responses] selecting optimal number of background sites ###')
-# say('#####################################################################################')
+say('#####################################################################################')
+say('### [tune rf for logistic responses] selecting optimal number of background sites ###')
+say('#####################################################################################')
 
-	# thisOutDir <- 'tune brt & rf for logistic responses'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
+	thisOutDir <- 'tune brt & rf for logistic responses'
+	scenarioDir <- paste0('./Results/', thisOutDir)
 
-	# ### load evaluations
-	# evals <- data.frame()
-	# for (numBg in numBgToTest) {
+	### load evaluations
+	evals <- data.frame()
+	for (numBg in numBgToTest) {
 	
-		# load(paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg/Evaluations for multivariate RF.RData'))
-		# evals <- rbind(evals, perform)
+		load(paste0(scenarioDir, '/models with ', prefix(numBg, 5), ' bg/Evaluations for multivariate RF.RData'))
+		evals <- rbind(evals, perform)
 		
-	# }
+	}
 
-	# ### plot
-	# png(paste0(scenarioDir, '/RF - CBI ~ Number of Training Background Sites.png'))
-		# boxplot(cbiMulti ~ numTrainBgMulti, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
-	# dev.off()
+	### plot
+	png(paste0(scenarioDir, '/RF - CBI ~ Number of Training Background Sites.png'))
+		boxplot(cbiMulti ~ numTrainBgMulti, data=evals, ylab='CBI (Multivariate)', xlab='Number of training background sites')
+	dev.off()
 
-	# ### assess by number of BG sites
-	# best <- data.frame()
-	# for (numBg in numBgToTest) {
+	### assess by number of BG sites
+	best <- data.frame()
+	for (numBg in numBgToTest) {
 		
-		# x <- evals[evals$numTrainBgMulti == numBg, ]
-		# avg <- mean(x$cbiMulti, na.rm=TRUE)
-		# std <- sd(x$cbiMulti, na.rm=TRUE)
+		x <- evals[evals$numTrainBgMulti == numBg, ]
+		avg <- mean(x$cbiMulti, na.rm=TRUE)
+		std <- sd(x$cbiMulti, na.rm=TRUE)
 		
-		# say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
+		say('Multivariate model CBI for ', numBg, ' background sites (mean +- SD): ', sprintf('%.3f', avg), ' +- ', sprintf('%.3f', std))
 		
-		# best <- rbind(
-			# best,
-			# data.frame(
-				# numTrainBg=numBg,
-				# cbiMean=avg,
-				# cbiSd=std
-			# )
-		# )
+		best <- rbind(
+			best,
+			data.frame(
+				numTrainBg=numBg,
+				cbiMean=avg,
+				cbiSd=std
+			)
+		)
 		
-	# }
+	}
 	
-	# ### get best number of BG sites
-	# bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
+	### get best number of BG sites
+	bestNumBg <- best$numTrainBg[which.max(best$cbiMean)]
 	
-	# say('Best number of BG sites for RF is ', bestNumBg, '.')
+	say('Best number of BG sites for RF is ', bestNumBg, '.')
 	
 # say('########################################################')
 # say('### [tune brt & rf for bivariate responses] modeling ###')
