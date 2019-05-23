@@ -327,11 +327,11 @@ say('###################################')
 	figLabPos <- c(-0.15, 0.05) # position of figure label
 	
 	ylabX1 <- -0.18 # position of inner y-axis label
-	ylabX2 <- -0.28 # position of outer y-axis label
-	labCex <- 0.55 # size of algorithm, y-axis, and figure labels
+	ylabX2 <- -0.26 # position of outer y-axis label
+	labCex <- 0.45 # size of algorithm, y-axis, and figure labels
 	
-	sublabY <- -0.08 # position of TRUE/FALSE variable sublabels
-	sublabCex <- 0.4 # size of TRUE/FALSE sublabels
+	sublabY <- -0.07 # position of TRUE/FALSE variable sublabels
+	sublabCex <- 0.38 # size of TRUE/FALSE sublabels
 
 	# master plot function
 	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, respT1, respControl, respF1, controlLab) {
@@ -394,82 +394,174 @@ say('###################################')
 		
 	}
 	
-	### multivariate: all metrics
-	#############################
+	# ### multivariate: all metrics
+	# #############################
 	
-	algoLabY <- -0.30 # position of algorithm labels
+	# algoLabY <- -0.30 # position of algorithm labels
 
-	png(paste0(scenarioDir, '/Results - Multivariate Models - All Metrics.png'), width=1800, height=2400, res=600)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - All Metrics.png'), width=1800, height=2400, res=600)
 		
-		par(mfrow=c(3, 2), oma=0.4 * c(1, 1, 1, 1.4), mar=c(2.5, 2, 1.2, 1.4), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		# par(mfrow=c(3, 2), oma=0.4 * c(1, 1, 1, 1.4), mar=c(2.5, 2, 1.2, 1.4), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
-		# COR presence/absence multivariate
-		lab <- bquote('a) Multivariate COR'['pa'])
-		ylab <- bquote('COR'['pa'])
-		ylim <- c(-0.5, 1.1)
-		yTicks <- seq(-0.5, 1, by=0.5)
-		respT1 <- 'corPresAbsMulti_permT1'
-		respControl <- NULL
-		respF1 <- 'corPresAbsMulti_permF1'
+		# # COR presence/absence multivariate
+		# lab <- bquote('a) Multivariate COR'['pa'])
+		# ylab <- bquote('COR'['pa'])
+		# ylim <- c(-0.5, 1.1)
+		# yTicks <- seq(-0.5, 1, by=0.5)
+		# respT1 <- 'corPresAbsMulti_permT1'
+		# respControl <- NULL
+		# respF1 <- 'corPresAbsMulti_permF1'
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# COR presence/bg multivariate
-		lab <- bquote('b) Multivariate COR'['bg'])
-		ylab <- bquote('COR'['bg'])
-		ylim <- c(-0.5, 1.1)
-		yTicks <- seq(-0.5, 1, by=0.5)
-		respT1 <- 'corPresBgMulti_permT1'
-		respControl <- NULL
-		respF1 <- 'corPresBgMulti_permF1'
+		# # COR presence/bg multivariate
+		# lab <- bquote('b) Multivariate COR'['bg'])
+		# ylab <- bquote('COR'['bg'])
+		# ylim <- c(-0.5, 1.1)
+		# yTicks <- seq(-0.5, 1, by=0.5)
+		# respT1 <- 'corPresBgMulti_permT1'
+		# respControl <- NULL
+		# respF1 <- 'corPresBgMulti_permF1'
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# AUCpa multivariate
-		lab <- bquote('c) Multivariate AUC'['pa'])
-		ylab <- bquote('AUC'['pa'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresAbsMulti_permT1'
-		respControl <- 'aucPresAbsMulti'
-		respF1 <- 'aucPresAbsMulti_permF1'
+		# # AUCpa multivariate
+		# lab <- bquote('c) Multivariate AUC'['pa'])
+		# ylab <- bquote('AUC'['pa'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresAbsMulti_permT1'
+		# respControl <- 'aucPresAbsMulti'
+		# respF1 <- 'aucPresAbsMulti_permF1'
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 
-		# AUCbg multivariate
-		lab <- bquote('d) Multivariate AUC'['bg'])
-		ylab <- bquote('AUC'['bg'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresBgMulti_permT1'
-		respControl <- 'aucPresBgMulti'
-		respF1 <- 'aucPresBgMulti_permF1'
+		# # AUCbg multivariate
+		# lab <- bquote('d) Multivariate AUC'['bg'])
+		# ylab <- bquote('AUC'['bg'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresBgMulti_permT1'
+		# respControl <- 'aucPresBgMulti'
+		# respF1 <- 'aucPresBgMulti_permF1'
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# CBI multivariate
-		lab <- bquote('e) Multivariate CBI')
-		ylab <- bquote('CBI')
-		ylim <- c(-0.5, 1)
-		yTicks <- seq(-0.5, 1, by=0.5)
-		respT1 <- 'cbiMulti_permT1'
-		respControl <- 'cbiMulti'
-		respF1 <- 'cbiMulti_permF1'
+		# # CBI multivariate
+		# lab <- bquote('e) Multivariate CBI')
+		# ylab <- bquote('CBI')
+		# ylim <- c(-0.5, 1)
+		# yTicks <- seq(-0.5, 1, by=0.5)
+		# respT1 <- 'cbiMulti_permT1'
+		# respControl <- 'cbiMulti'
+		# respF1 <- 'cbiMulti_permF1'
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.6)
+		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.6)
 		
-	dev.off()
+	# dev.off()
 
-	### multivariate: CBI and AUC
-	#############################
+	# ### multivariate: CBI and AUC
+	# #############################
 	
-	algoLabY <- -0.30 # position of algorithm labels
+	# algoLabY <- -0.30 # position of algorithm labels
 
-	png(paste0(scenarioDir, '/Results - Multivariate Models - CBI & AUC.png'), width=2400, height=800, res=600)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI & AUC.png'), width=2400, height=800, res=600)
 		
-		par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		# par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# # CBI multivariate
+		# lab <- bquote('a) Multivariate models: CBI')
+		# ylab <- bquote('CBI')
+		# ylim <- c(-0.5, 1)
+		# yTicks <- seq(-0.5, 1, by=0.5)
+		# respT1 <- 'cbiMulti_permT1'
+		# respControl <- 'cbiMulti'
+		# respF1 <- 'cbiMulti_permF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		
+		# # AUCpa multivariate
+		# lab <- bquote('b) Multivariate models: AUC'['pa'])
+		# ylab <- bquote('AUC'['pa'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresAbsMulti_permT1'
+		# respControl <- 'aucPresAbsMulti'
+		# respF1 <- 'aucPresAbsMulti_permF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+
+		# # AUCbg multivariate
+		# lab <- bquote('c) Multivariate models: AUC'['bg'])
+		# ylab <- bquote('AUC'['bg'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresBgMulti_permT1'
+		# respControl <- 'aucPresBgMulti'
+		# respF1 <- 'aucPresBgMulti_permF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
+		
+		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.7)
+		
+	# dev.off()
+
+	# ### univariate
+	# ##############
+	
+	# algoLabY <- -0.31 # position of algorithm labels
+
+	# png(paste0(scenarioDir, '/Results - Univariate Models.png'), width=2400, height=800, res=600)
+		
+		# par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
+		
+		# # CBI univariate
+		# lab <- bquote('a) Univariate models: CBI')
+		# ylab <- bquote('CBI')
+		# ylim <- c(-1, 1)
+		# yTicks <- seq(-1, 1, by=0.5)
+		# respT1 <- 'cbiUni_onlyT1'
+		# respControl <- 'cbiMulti'
+		# respF1 <- 'cbiUni_onlyF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+		
+		# # AUCpa univariate
+		# lab <- bquote('b) Univariate models: AUC'['pa'])
+		# ylab <- bquote('AUC'['pa'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresAbsUni_onlyT1'
+		# respControl <- 'aucPresAbsMulti'
+		# respF1 <- 'aucPresAbsUni_onlyF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+
+		# # AUCbg univariate
+		# lab <- bquote('c) Univariate models: AUC'['bg'])
+		# ylab <- bquote('AUC'['bg'])
+		# ylim <- c(0.25, 1)
+		# yTicks <- seq(0.25, 1, by=0.25)
+		# respT1 <- 'aucPresBgUni_onlyT1'
+		# respControl <- 'aucPresBgMulti'
+		# respF1 <- 'aucPresBgUni_onlyF1'
+
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
+		
+		# title(sub=date(), outer=TRUE, cex.sub=0.3, line=0)
+		
+	# dev.off()
+
+	### multivariate & univariate: CBI
+	##################################
+	
+	algoLabY <- -0.34 # position of algorithm labels
+
+	png(paste0(scenarioDir, '/Results - Multivariate & Univariate Models - CBI.png'), width=1800, height=900, res=600)
+		
+		par(mfrow=c(1, 2), oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
 		
 		# CBI multivariate
 		lab <- bquote('a) Multivariate models: CBI')
@@ -482,43 +574,8 @@ say('###################################')
 
 		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
 		
-		# AUCpa multivariate
-		lab <- bquote('b) Multivariate models: AUC'['pa'])
-		ylab <- bquote('AUC'['pa'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresAbsMulti_permT1'
-		respControl <- 'aucPresAbsMulti'
-		respF1 <- 'aucPresAbsMulti_permF1'
-
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
-
-		# AUCbg multivariate
-		lab <- bquote('c) Multivariate models: AUC'['bg'])
-		ylab <- bquote('AUC'['bg'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresBgMulti_permT1'
-		respControl <- 'aucPresBgMulti'
-		respF1 <- 'aucPresBgMulti_permF1'
-
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Control')
-		
-		title(sub=date(), outer=TRUE, cex.sub=0.3, line=-0.7)
-		
-	dev.off()
-
-	### univariate
-	##############
-	
-	algoLabY <- -0.31 # position of algorithm labels
-
-	png(paste0(scenarioDir, '/Results - Univariate Models.png'), width=2400, height=800, res=600)
-		
-		par(mfrow=c(1, 3), oma=0.2 * c(1, 1, 0.6, 1.4), mar=c(2.5, 2, 1, 1), mgp=c(2, 0.2, 0), cex.axis=0.425)
-		
 		# CBI univariate
-		lab <- bquote('a) Univariate models: CBI')
+		lab <- bquote('b) Univariate models: CBI')
 		ylab <- bquote('CBI')
 		ylim <- c(-1, 1)
 		yTicks <- seq(-1, 1, by=0.5)
@@ -528,29 +585,7 @@ say('###################################')
 
 		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
 		
-		# AUCpa univariate
-		lab <- bquote('b) Univariate models: AUC'['pa'])
-		ylab <- bquote('AUC'['pa'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresAbsUni_onlyT1'
-		respControl <- 'aucPresAbsMulti'
-		respF1 <- 'aucPresAbsUni_onlyF1'
-
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
-
-		# AUCbg univariate
-		lab <- bquote('c) Univariate models: AUC'['bg'])
-		ylab <- bquote('AUC'['bg'])
-		ylim <- c(0.25, 1)
-		yTicks <- seq(0.25, 1, by=0.25)
-		respT1 <- 'aucPresBgUni_onlyT1'
-		respControl <- 'aucPresBgMulti'
-		respF1 <- 'aucPresBgUni_onlyF1'
-
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0.5, respT1=respT1, respControl=respControl, respF1=respF1, controlLab='Multivar')
-		
-		title(sub=date(), outer=TRUE, cex.sub=0.3, line=0)
+		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
 	dev.off()
 
@@ -583,6 +618,10 @@ say('###################################')
 	
 	x <- evals$cbiMulti[evals$algo=='omniscient']
 	stats <- quantile(x, c(0.025, 0.5, 0.975))
+	say('2.5th/median/97.5th quantiles of CBI for multivariate control OMNISCIENT model: ', paste(sprintf('%.2f', stats), collapse=' '))
+	
+	x <- evals$cbiMulti[evals$algo=='omniscient']
+	stats <- quantile(x, c(0, 0.5, 1))
 	say('Min/median/max CBI for multivariate control OMNISCIENT model: ', paste(sprintf('%.2f', stats), collapse=' '))
 	
 	x <- evals$cbiUni_onlyT1[evals$algo=='brt']
@@ -618,7 +657,7 @@ say('###################################')
 	# resp <- 'cbiMulti_perm'
 	# respControl <- 'cbiMulti'
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -647,7 +686,7 @@ say('###################################')
 	# resp <- 'corPresBgMulti_perm'
 	# respControl <- NULL
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -694,7 +733,7 @@ say('###################################')
 	# resp <- 'cbiMulti_perm'
 	# respControl <- 'cbiMulti'
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -723,7 +762,7 @@ say('###################################')
 	# resp <- 'corPresBgMulti_perm'
 	# respControl <- NULL
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -784,7 +823,7 @@ say('###################################')
 	# resp <- 'cbiMulti_perm'
 	# respControl <- 'cbiMulti'
 
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -814,7 +853,7 @@ say('###################################')
 	# resp <- 'corPresBgMulti_perm'
 	# respControl <- NULL
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -1080,7 +1119,7 @@ say('###################################')
 	# resp <- 'cbiMulti_perm'
 	# respControl <- 'cbiMulti'
 
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste0(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - CBI - ', paste0(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
@@ -1110,7 +1149,7 @@ say('###################################')
 	# resp <- 'corPresBgMulti_perm'
 	# respControl <- NULL
 	
-	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=900, height=1200, res=300)
+	# png(paste0(scenarioDir, '/Results - Multivariate Models - COR - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=1800, height=2400, res=600)
 		
 		# par(mfrow=c(3, 2), oma=c(1, 0.5, 0.2, 0.1), mar=c(2.5, 2, 1, 1.2), mgp=c(2, 0.2, 0), cex.axis=0.425)
 		
