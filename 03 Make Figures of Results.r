@@ -27,6 +27,7 @@
 ### [bivariate] collate evaluations ###
 ### [bivariate] statistics ###
 ### [bivariate] landscape correlation x niche covariance bar plots for CBI ###
+### [bivariate] landscape correlation x niche covariance bar plots for AUC ###
 ### [bivariate] landscape correlation x niche covariance bar plots for COR ###
 
 #################
@@ -938,35 +939,47 @@
 	
 	# legend('topright', legend=landscapeSizes, col=cols, lwd=3)
 
-# say('######################################')
-# say('### sensitivity of CBI to outliers ###')
-# say('######################################')
+say('######################################')
+say('### sensitivity of CBI to outliers ###')
+say('######################################')
 
-	# say('The analysis "### [extent] investigating decline in performance of OMNI control at large extents ###" was based on a hypothesis that is correct, but not well-indicated by the analysis in that section. I discovered through trial-and-error that CBI is very sensitivity to improbable test presences (test presences in areas with very low probability of presence. This analysis will demonstrate this.', breaks=100)
+	say('The analysis "### [extent] investigating decline in performance of OMNI control at large extents ###" was based on a hypothesis that is correct, but not well-indicated by the analysis in that section. I discovered through trial-and-error that CBI is very sensitivity to improbable test presences (test presences in areas with very low probability of presence. This analysis will demonstrate this.', breaks=100)
 
-	# # probability of presence of a single improbable presence
-	# improbPres <- c(0.9, 10^(-1:-9))
+	scenarioDir <- './Results/extent' # scenario directory
+
+	# probability of presence of a single improbable presence
+	improbPres <- c(10^(-1:-4))
 	
-	# # probability of presence of probable presences
-	# probPres <- seq(0.9, 1, length.out=199)
+	# background probability of presence
+	bg <- seq(0, 1, length.out=10000)
+
+	from <- 0.5
+	to <- 1
 	
-	# # background probability of presence
-	# bg <- seq(eps(), 1, length.out=100000)
-	
-	# plot(1, 1, col='white', xlab=bquote('Probability of improbable presence (log'['10']*')'), ylab='CBI', xlim=range(log10(improbPres)), ylim=c(0, 1))
-	
-	# for (i in seq_along(improbPres)) {
-	
-		# improb <- improbPres[i]
-		# say(improb)
-		# cbi <- contBoyce(pres=c(probPres, improb), bg=bg, numBins=1001)
-		# points(log10(improb), cbi, pch=16, col='red')
+	png(paste0(scenarioDir, '/Sensitivity of CBI to Improbable Test Presences.png'), width=1200, height=1200, res=600)
 		
-		# cbi <- contBoyce(pres=probPres, bg=bg, numBins=1001)
-		# points(log10(improb), cbi)
+		par(oma=rep(0, 4), mar=c(4, 4, 1, 1), cex=0.5)
 		
-	# }
-	
+		plot(1, 1, col='white', xlab=bquote('Probability of improbable presence (log'['10']*')'), ylab='CBI', xlim=range(log10(improbPres)), ylim=c(0, 1))
+		
+		for (i in seq_along(improbPres)) {
+		
+			improb <- improbPres[i]
+			say(improb)
+			probPres <- seq(from, to, length.out=199)
+			cbi <- contBoyce(c(improb, probPres), bg, numBins=1001)
+			points(log10(improb), cbi, pch=16, col='red')
+			
+			probPres <- seq(from, to, length.out=200)
+			cbi <- contBoyce(probPres, bg, numBins=1001)
+			points(log10(improb), cbi)
+			
+		}
+		
+		legend('bottomright', legend=c('with improbable presence', 'without improbable presence'), pch=c(16, 1), col=c('red', 'black'), bty='n')
+		
+	dev.off()
+		
 # say('#######################################')
 # say('### [prevalence] simulation results ###')
 # say('#######################################')
@@ -1656,369 +1669,660 @@
 	# evalDir <- './Results/bivariate/evaluations'
 	# evals <- loadEvals(evalDir, algos=c('omniscient', 'brt', 'gam', 'maxent'), save=TRUE, redo=FALSE)
 
-say('##############################')
-say('### [bivariate] statistics ###')
-say('##############################')
+# say('##############################')
+# say('### [bivariate] statistics ###')
+# say('##############################')
 
-	scenarioDir <- './Results/bivariate'
-	load(paste0(scenarioDir, '/evaluations/!Collated Evaluations.RData'))
+	# scenarioDir <- './Results/bivariate'
+	# load(paste0(scenarioDir, '/evaluations/!Collated Evaluations.RData'))
 
-	# prevalence: all scenarios
-	x <- round(max(master$prev), 2)
-	say('Maximum real prevalence (mean suitability) across all simulations: ', sprintf('%.2f', x), post=2, pre=2)
+	# # prevalence: all scenarios
+	# x <- round(max(master$prev), 2)
+	# say('Maximum real prevalence (mean suitability) across all simulations: ', sprintf('%.2f', x), post=2, pre=2)
 
-	say('SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE', level=2)
+	# say('SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE', level=2)
 		
-		# OMNI multivariate CBI for "control" (unpermuted) model
-		x1 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.1 & master$sigma1 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]), 2)
-		x2 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.3 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]), 2)
-		x3 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]), 2)
+		# # OMNI multivariate CBI for "control" (unpermuted) model
+		# x1 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.1 & master$sigma1 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]), 2)
+		# x2 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.3 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]), 2)
+		# x3 <- round(median(master$cbiMulti[master$algo == 'omniscient' & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]), 2)
 
-		say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.1 and rho = 0: ', sprintf('%.2f', x1))
-		say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.3 and rho = 0: ', sprintf('%.2f', x2))
-		say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.5 and rho = 0: ', sprintf('%.2f', x3), post=2)
+		# say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.1 and rho = 0: ', sprintf('%.2f', x1))
+		# say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.3 and rho = 0: ', sprintf('%.2f', x2))
+		# say('Median CBI for OMNISCIENT, unpermuted for sigma1 = sigma2 = 0.5 and rho = 0: ', sprintf('%.2f', x3), post=2)
 
-		# multivariate CBI for "treatment" (permuted) model
-		for (algo in algos) {
+		# # multivariate CBI for "treatment" (permuted) model
+		# for (algo in algos) {
 		
-			# multivariate CBI for permuted models, symmetrical niches
-			say(toupper(algo), ', symmetrical niche width, unpermuted')
-			x1 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]), 2)
-			x2 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.3 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]), 2)
-			x3 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.1 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]), 2)
+			# # multivariate CBI for permuted models, symmetrical niches
+			# say(toupper(algo), ', symmetrical niche width, unpermuted')
+			# x1 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90], na.rm=TRUE), 2)
+			# x2 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.3 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90], na.rm=TRUE), 2)
+			# x3 <- round(median(master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.1 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90], na.rm=TRUE), 2)
 
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1))
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.3, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2))
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.1, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3), post=2)
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1))
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.3, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2))
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.1, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3), post=2)
 			
-		}
+		# }
 		
-	say('*A*SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE, T1', level=2)
+	# say('*A*SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE, T1', level=2)
 
-		for (algo in algos) {
+		# for (algo in algos) {
 		
-			# multivariate CBI for permuted models, asymmetrical niches
-			say(toupper(algo), ', asymmetrical niche width, permuted')
-			x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]
-			x1med <- median(x, na.rm=TRUE)
-			x1low <- quantile(x, 0.025, na.rm=TRUE)
-			x1high <- quantile(x, 0.975, na.rm=TRUE)
+			# # multivariate CBI for permuted models, asymmetrical niches
+			# say(toupper(algo), ', asymmetrical niche width, permuted')
+			# x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]
+			# x1med <- median(x, na.rm=TRUE)
+			# x1low <- quantile(x, 0.025, na.rm=TRUE)
+			# x1high <- quantile(x, 0.975, na.rm=TRUE)
 			
-			x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]
-			x2med <- median(x, na.rm=TRUE)
-			x2low <- quantile(x, 0.025, na.rm=TRUE)
-			x2high <- quantile(x, 0.975, na.rm=TRUE)
+			# x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]
+			# x2med <- median(x, na.rm=TRUE)
+			# x2low <- quantile(x, 0.025, na.rm=TRUE)
+			# x2high <- quantile(x, 0.975, na.rm=TRUE)
 			
-			x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]
-			x3med <- median(x, na.rm=TRUE)
-			x3low <- quantile(x, 0.025, na.rm=TRUE)
-			x3high <- quantile(x, 0.975, na.rm=TRUE)
+			# x <- master$cbiMulti_permT1[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]
+			# x3med <- median(x, na.rm=TRUE)
+			# x3low <- quantile(x, 0.025, na.rm=TRUE)
+			# x3high <- quantile(x, 0.975, na.rm=TRUE)
 
-			say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1med), ' (inner 95% CI: ', sprintf('%.2f', x1low), '-', sprintf('%.2f', x1high), ')')
-			say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2med), ' (inner 95% CI: ', sprintf('%.2f', x2low), '-', sprintf('%.2f', x2high), ')')
-			say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3med), ' (inner 95% CI: ', sprintf('%.2f', x3low), '-', sprintf('%.2f', x3high), ')', post=2)
+			# say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1med), ' (inner 95% CI: ', sprintf('%.2f', x1low), '-', sprintf('%.2f', x1high), ')')
+			# say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2med), ' (inner 95% CI: ', sprintf('%.2f', x2low), '-', sprintf('%.2f', x2high), ')')
+			# say('Median CBI for ', toupper(algo), ', permuted T1, for sigma1 = 0.5, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3med), ' (inner 95% CI: ', sprintf('%.2f', x3low), '-', sprintf('%.2f', x3high), ')', post=2)
 			
-		}
+		# }
 			
-	say('*A*SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE, T2', level=2)
+	# say('*A*SYMMETRICAL NICHE WIDTH, NO CORRELATION, NO COVARIANCE, T2', level=2)
 
-		for (algo in algos) {
+		# for (algo in algos) {
 		
-			# multivariate CBI for permuted models, asymmetrical niches
-			say(toupper(algo), ', asymmetrical niche width, permuted')
-			x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]
-			x1med <- median(x, na.rm=TRUE)
-			x1low <- quantile(x, 0.025, na.rm=TRUE)
-			x1high <- quantile(x, 0.975, na.rm=TRUE)
+			# # multivariate CBI for permuted models, asymmetrical niches
+			# say(toupper(algo), ', asymmetrical niche width, permuted')
+			# x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.5 & master$rho == 0 & master$rotT2 %==% 90]
+			# x1med <- median(x, na.rm=TRUE)
+			# x1low <- quantile(x, 0.025, na.rm=TRUE)
+			# x1high <- quantile(x, 0.975, na.rm=TRUE)
 			
-			x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]
-			x2med <- median(x, na.rm=TRUE)
-			x2low <- quantile(x, 0.025, na.rm=TRUE)
-			x2high <- quantile(x, 0.975, na.rm=TRUE)
+			# x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.3 & master$rho == 0 & master$rotT2 %==% 90]
+			# x2med <- median(x, na.rm=TRUE)
+			# x2low <- quantile(x, 0.025, na.rm=TRUE)
+			# x2high <- quantile(x, 0.975, na.rm=TRUE)
 			
-			x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]
-			x3med <- median(x, na.rm=TRUE)
-			x3low <- quantile(x, 0.025, na.rm=TRUE)
-			x3high <- quantile(x, 0.975, na.rm=TRUE)
+			# x <- master$cbiMulti_permT2[master$algo == algo & master$sigma1 %==% 0.5 & master$sigma2 %==% 0.1 & master$rho == 0 & master$rotT2 %==% 90]
+			# x3med <- median(x, na.rm=TRUE)
+			# x3low <- quantile(x, 0.025, na.rm=TRUE)
+			# x3high <- quantile(x, 0.975, na.rm=TRUE)
 
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1med), ' (inner 95% CI: ', sprintf('%.2f', x1low), '-', sprintf('%.2f', x1high), ')')
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2med), ' (inner 95% CI: ', sprintf('%.2f', x2low), '-', sprintf('%.2f', x2high), ')')
-			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3med), ' (inner 95% CI: ', sprintf('%.2f', x3low), '-', sprintf('%.2f', x3high), ')', post=2)
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.5, rho = 0: ', sprintf('%.2f', x1med), ' (inner 95% CI: ', sprintf('%.2f', x1low), '-', sprintf('%.2f', x1high), ')')
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.3, rho = 0: ', sprintf('%.2f', x2med), ' (inner 95% CI: ', sprintf('%.2f', x2low), '-', sprintf('%.2f', x2high), ')')
+			# say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3med), ' (inner 95% CI: ', sprintf('%.2f', x3low), '-', sprintf('%.2f', x3high), ')', post=2)
 			
-		}
+		# }
 			
-say('##############################################################################')
-say('### [bivariate] landscape correlation x niche covariance bar plots for CBI ###')
-say('##############################################################################')
+# say('##############################################################################')
+# say('### [bivariate] landscape correlation x niche covariance bar plots for CBI ###')
+# say('##############################################################################')
 
-	scenarioDir <- './Results/bivariate'
-	load(paste0(scenarioDir, '/evaluations/!Collated Evaluations.RData'))
+	# scenarioDir <- './Results/bivariate'
+	# load(paste0(scenarioDir, '/evaluations/!Collated Evaluations.RData'))
 	
-	# STRATEGY:
-	# 3x3-panel plot with each panel representing a different combination of landscape correlation (r) and niche covariance (rho)
-	# landscape correlation changes across rows, niche covariance across columns
-	# each panel is an xy plot with sigma1 and sigma2 as axes
-	# each pair of simga1 and sigma2 have a bar plot displaying results for OMNI plus the focal algorithm
-	# will be making one plot per algorithm
+	# # STRATEGY:
+	# # 3x3-panel plot with each panel representing a different combination of landscape correlation (r) and niche covariance (rho)
+	# # landscape correlation changes across rows, niche covariance across columns
+	# # each panel is an xy plot with sigma1 and sigma2 as axes
+	# # each pair of simga1 and sigma2 have a bar plot displaying results for OMNI plus the focal algorithm
+	# # will be making one plot per algorithm
 
-	# generalization
-	rhos <- c(-0.5, 0, 0.5)
-	rots <- c(45, 90, 135)
+	# # generalization
+	# rhos <- c(-0.5, 0, 0.5)
+	# rots <- c(45, 90, 135)
 	
-	# settings
-	sigmas <- c(1, 3, 5) / 10
-	xSize <- 0.13 # maximum width of subplot containing bars
-	ySize <- 0.15 # maximum height of subplot containing bars
-	width <- 0.2 # width of bars as a proportion of subplot size (real width will be size * width)
-	tick <- 0.075 # length of subplot tick marks
-	lwd <- 0.3 # line width of bars
-	cexAxisLabel <- 0.25
-	cexPanelLabel <- 0.3
+	# # settings
+	# sigmas <- c(1, 3, 5) / 10
+	# xSize <- 0.13 # maximum width of subplot containing bars
+	# ySize <- 0.15 # maximum height of subplot containing bars
+	# width <- 0.2 # width of bars as a proportion of subplot size (real width will be size * width)
+	# tick <- 0.075 # length of subplot tick marks
+	# lwd <- 0.3 # line width of bars
+	# cexAxisLabel <- 0.25
+	# cexPanelLabel <- 0.3
 	
-	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
+	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
-	# # function to plots bars as scaled subplots in a larger plot
-	# basically this just rescales the size and position of values and bars and send the information to rect()
-	subRect0to1 <- function(resp, xOffsetInSubplot, colFill, border, angle=NULL, colAngle=NULL, ...) {
+	# # # function to plots bars as scaled subplots in a larger plot
+	# # basically this just rescales the size and position of values and bars and send the information to rect()
+	# subRect0to1 <- function(resp, xOffsetInSubplot, colFill, border, angle=NULL, colAngle=NULL, ...) {
 	
-		# resp		values of response (not scaled)
-		# xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
-		# colFill	color of fill
-		# border	border  color for border
-		# angle		NULL or angle of fill lines
-		# colAngle 	NULL or color of angle lines (if any)
-		# ...		other
+		# # resp		values of response (not scaled)
+		# # xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
+		# # colFill	color of fill
+		# # border	border  color for border
+		# # angle		NULL or angle of fill lines
+		# # colAngle 	NULL or color of angle lines (if any)
+		# # ...		other
 	
-		respScaled <- resp * ySize + sigma2 - 0.5 * ySize
-		at <- sigma1 - 0.5 * xSize + xOffsetInSubplot * xSize
-		rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colFill, border=border, lwd=lwd)
-		if (!is.null(angle)) rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colAngle, border=border, angle=angle, density=lineDensityScaling * lineDensity, lwd=lwd)
+		# respScaled <- resp * ySize + sigma2 - 0.5 * ySize
+		# at <- sigma1 - 0.5 * xSize + xOffsetInSubplot * xSize
+		# rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colFill, border=border, lwd=lwd)
+		# if (!is.null(angle)) rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colAngle, border=border, angle=angle, density=lineDensityScaling * lineDensity, lwd=lwd)
 		
-	}
+	# }
 	
-	# by ALGORITHM
-	for (algo in sdmAlgos) {
-	# for (algo in 'brt') {
+	# # by ALGORITHM
+	# for (algo in sdmAlgos) {
+	# # for (algo in 'brt') {
 	
-		algoNice <- algosShort(algo)
-		png(paste0(scenarioDir, '/Results - Bar Plot for CBI - ', algoNice, '.png'), width=2 * 650, height=2 * 700, res=600)
+		# algoNice <- algosShort(algo)
+		# png(paste0(scenarioDir, '/Results - Bar Plot for CBI - ', algoNice, '.png'), width=2 * 650, height=2 * 700, res=600)
 	
-		par(mfrow=c(3, 3), oma=c(2, 1, 0, 0.1), mar=c(0, 0.7, 0.3, 0), pty='s', mgp=c(3, 0.1, 0), cex.axis=1.15 * cexAxisLabel)
+		# par(mfrow=c(3, 3), oma=c(2, 1, 0, 0.1), mar=c(0, 0.7, 0.3, 0), pty='s', mgp=c(3, 0.1, 0), cex.axis=1.15 * cexAxisLabel)
 		
-		countPanel <- 1
+		# countPanel <- 1
 		
-		# rows
-		for (countRho in seq_along(rhos)) {
-		# for (countRho in 1) {
+		# # rows
+		# for (countRho in seq_along(rhos)) {
+		# # for (countRho in 1) {
 		
-			rho <- rhos[countRho]
+			# rho <- rhos[countRho]
 		
-			# columns
-			for (countRot in seq_along(rots)) {
-			# for (countRot in 1) {
+			# # columns
+			# for (countRot in seq_along(rots)) {
+			# # for (countRot in 1) {
 	
-				rot <- rots[countRot]
+				# rot <- rots[countRot]
 				
-				omni <- master[master$algo == 'omniscient' & master$rho %==% rho & master$rotT2 %==% rot, ]
-				sdm <- master[master$algo == algo & master$rho %==% rho & master$rotT2 %==% rot, ]
+				# omni <- master[master$algo == 'omniscient' & master$rho %==% rho & master$rotT2 %==% rot, ]
+				# sdm <- master[master$algo == algo & master$rho %==% rho & master$rotT2 %==% rot, ]
 	
-				lims <- c(min(sigmas) - 0.1, max(sigmas) + 0.1)
+				# lims <- c(min(sigmas) - 0.1, max(sigmas) + 0.1)
 	
-				plot(0, type='n', axes=FALSE, ann=FALSE, xlim=lims, ylim=lims, col=NA)
-				axis(1, at=sigmas, labels=rep('', length(sigmas)), tck=-0.03, lwd=0.4, line=-0.1)
-				axis(2, at=sigmas, labels=sigmas, tck=-0.03, lwd=0.4, line=0.1)
-				text(sigmas, rep(min(sigmas) - 0.16, length(sigmas)), labels=sigmas, cex=cexAxisLabel, xpd=NA)
-				if (countRot == 1) mtext(bquote('Niche width in T2 (' * sigma[2] * ')'), side=2, line=0.55, at=mean(sigmas), cex=cexAxisLabel)
-				if (countRho == length(rhos)) mtext(bquote('Niche width in T1 (' * sigma[1] * ')'), side=1, line=0, at=mean(sigmas), cex=cexAxisLabel)
+				# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=lims, ylim=lims, col=NA)
+				# axis(1, at=sigmas, labels=rep('', length(sigmas)), tck=-0.03, lwd=0.4, line=-0.1)
+				# axis(2, at=sigmas, labels=sigmas, tck=-0.03, lwd=0.4, line=0.1)
+				# text(sigmas, rep(min(sigmas) - 0.16, length(sigmas)), labels=sigmas, cex=cexAxisLabel, xpd=NA)
+				# if (countRot == 1) mtext(bquote('Niche width in T2 (' * sigma[2] * ')'), side=2, line=0.55, at=mean(sigmas), cex=cexAxisLabel)
+				# if (countRho == length(rhos)) mtext(bquote('Niche width in T1 (' * sigma[1] * ')'), side=1, line=0, at=mean(sigmas), cex=cexAxisLabel)
 				
-				# plot each multi-annulus
-				for (sigma2 in sigmas) {
+				# # plot each multi-annulus
+				# for (sigma2 in sigmas) {
 				
-					for (sigma1 in sigmas) {
+					# for (sigma1 in sigmas) {
 						
-						# standard (as simulated)
-						if (sigma1 >= sigma2) {
+						# # standard (as simulated)
+						# if (sigma1 >= sigma2) {
 
-							omniControl <- omni$cbiMulti[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
-							omniT1 <- omni$cbiMulti_permT1[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
-							omniT2 <- omni$cbiMulti_permT2[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
+							# omniControl <- omni$cbiMulti[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
+							# omniT1 <- omni$cbiMulti_permT1[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
+							# omniT2 <- omni$cbiMulti_permT2[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2]
 
-							sdmControl <- sdm$cbiMulti[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
-							sdmT1 <- sdm$cbiMulti_permT1[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
-							sdmT2 <- sdm$cbiMulti_permT2[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
+							# sdmControl <- sdm$cbiMulti[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
+							# sdmT1 <- sdm$cbiMulti_permT1[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
+							# sdmT2 <- sdm$cbiMulti_permT2[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2]
 
-						# flipping T1 and T2 since symmetrical
-						} else if (sigma1 < sigma2) {
+						# # flipping T1 and T2 since symmetrical
+						# } else if (sigma1 < sigma2) {
 
-							omniControl <- omni$cbiMulti[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
-							omniT1 <- omni$cbiMulti_permT2[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
-							omniT2 <- omni$cbiMulti_permT1[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
+							# omniControl <- omni$cbiMulti[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
+							# omniT1 <- omni$cbiMulti_permT2[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
+							# omniT2 <- omni$cbiMulti_permT1[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1]
 							
-							sdmControl <- sdm$cbiMulti[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
-							sdmT1 <- sdm$cbiMulti_permT2[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
-							sdmT2 <- sdm$cbiMulti_permT1[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
+							# sdmControl <- sdm$cbiMulti[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
+							# sdmT1 <- sdm$cbiMulti_permT2[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
+							# sdmT2 <- sdm$cbiMulti_permT1[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1]
 							
-						}
+						# }
 
-						# calculate and assign variables for lower/upper limits and median
-						whats <- c('Inner', 'Median', 'Outer')
-						for (modelType in c('sdm', 'omni')) {
-							for (variable in c('Control', 'T1', 'T2')) {
+						# # calculate and assign variables for lower/upper limits and median
+						# whats <- c('Inner', 'Median', 'Outer')
+						# for (modelType in c('sdm', 'omni')) {
+							# for (variable in c('Control', 'T1', 'T2')) {
 								
-								thisVar <- paste0(modelType, variable)
-								x <- get(thisVar)
-								quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
+								# thisVar <- paste0(modelType, variable)
+								# x <- get(thisVar)
+								# quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
 
-								for (countWhat in seq_along(whats)) {
+								# for (countWhat in seq_along(whats)) {
 							
-									what <- whats[countWhat]
-									assign(paste0(thisVar, what), quants[countWhat])
+									# what <- whats[countWhat]
+									# assign(paste0(thisVar, what), quants[countWhat])
 									
-								}
-							}
-						}
+								# }
+							# }
+						# }
 
-						lineDensityScaling <- 1.2
+						# lineDensityScaling <- 1.2
 						
-						# subplot y-axis
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize), c(sigma2 - 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
+						# # subplot y-axis
+						# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize), c(sigma2 - 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
 						
-						# subplot y-axis tick lines and labels
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 + 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2, sigma2), lwd=lwd)
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 - 0.5 * ySize, sigma2 - 0.5 * ySize), lwd=lwd)
+						# # subplot y-axis tick lines and labels
+						# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 + 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
+						# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2, sigma2), lwd=lwd)
+						# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 - 0.5 * ySize, sigma2 - 0.5 * ySize), lwd=lwd)
 						
-						# subplot y-axis labels
-						cex <- 0.2
-						if (sigma1 == 0.1) {
+						# # subplot y-axis labels
+						# cex <- 0.2
+						# if (sigma1 == 0.1) {
 
-							text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
-							text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2, labels=0.5, cex=cex, xpd=NA)
-							text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 - 0.5 * ySize, labels=0, cex=cex, xpd=NA)
+							# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
+							# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2, labels=0.5, cex=cex, xpd=NA)
+							# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 - 0.5 * ySize, labels=0, cex=cex, xpd=NA)
 							
-						}
+						# }
 						
-						# gray background
-						offsetInSubplot <- 0.075
-						rand <- 
-						left <- sigma1 - 0.5 * xSize + offsetInSubplot * xSize
-						right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
-						bottom <- sigma2 - 0.5 * ySize
-						top <- sigma2 + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
-						lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
+						# # gray background
+						# offsetInSubplot <- 0.075
+						# rand <- 
+						# left <- sigma1 - 0.5 * xSize + offsetInSubplot * xSize
+						# right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
+						# bottom <- sigma2 - 0.5 * ySize
+						# top <- sigma2 + 0.5 * ySize
+						# polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						# lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
-						# OMNI control (unpermuted)
-						subRect0to1(
-							resp=omniControl,
-							angle=45,
-							xOffsetInSubplot=0.2,
-							colFill='white',
-							colAngle='black',
-							border='black'
-						)
+						# # OMNI control (unpermuted)
+						# subRect0to1(
+							# resp=omniControl,
+							# angle=45,
+							# xOffsetInSubplot=0.2,
+							# colFill='white',
+							# colAngle='black',
+							# border='black'
+						# )
 						
-						# SDM control (unpermuted)
-						subRect0to1(
-							resp=sdmControl,
-							angle=NULL,
-							xOffsetInSubplot=0.35,
-							colFill=colSdmControl,
-							colAngle=NULL,
-							border=borderSdmControl
-						)
+						# # SDM control (unpermuted)
+						# subRect0to1(
+							# resp=sdmControl,
+							# angle=NULL,
+							# xOffsetInSubplot=0.35,
+							# colFill=colSdmControl,
+							# colAngle=NULL,
+							# border=borderSdmControl
+						# )
 						
-						# OMNI permuted T1
-						subRect0to1(
-							resp=omniT1,
-							angle=45,
-							xOffsetInSubplot=0.55,
-							colFill='white',
-							colAngle=borderOmniT1,
-							border=borderOmniT1
-						)
+						# # OMNI permuted T1
+						# subRect0to1(
+							# resp=omniT1,
+							# angle=45,
+							# xOffsetInSubplot=0.55,
+							# colFill='white',
+							# colAngle=borderOmniT1,
+							# border=borderOmniT1
+						# )
 
-						# SDM permuted T1
-						subRect0to1(
-							resp=sdmT1,
-							angle=NULL,
-							xOffsetInSubplot=0.7,
-							colFill=colSdmT1,
-							colAngle=NULL,
-							border=borderSdmT1
-						)
+						# # SDM permuted T1
+						# subRect0to1(
+							# resp=sdmT1,
+							# angle=NULL,
+							# xOffsetInSubplot=0.7,
+							# colFill=colSdmT1,
+							# colAngle=NULL,
+							# border=borderSdmT1
+						# )
 						
-						# OMNI permuted T2
-						subRect0to1(
-							resp=omniT2,
-							angle=45,
-							xOffsetInSubplot=0.9,
-							colFill='white',
-							colAngle=borderOmniT2,
-							border=borderOmniT2
-						)
+						# # OMNI permuted T2
+						# subRect0to1(
+							# resp=omniT2,
+							# angle=45,
+							# xOffsetInSubplot=0.9,
+							# colFill='white',
+							# colAngle=borderOmniT2,
+							# border=borderOmniT2
+						# )
 						
-						# SDM permuted T2
-						subRect0to1(
-							resp=sdmT2,
-							angle=NULL,
-							xOffsetInSubplot=1.05,
-							colFill=colSdmT2,
-							colAngle=NULL,
-							border=borderSdmT2
-						)
+						# # SDM permuted T2
+						# subRect0to1(
+							# resp=sdmT2,
+							# angle=NULL,
+							# xOffsetInSubplot=1.05,
+							# colFill=colSdmT2,
+							# colAngle=NULL,
+							# border=borderSdmT2
+						# )
 
-						# figure label
-						r <- correlations$cor[correlations$rot == rot]
-						r <- sprintf('%.2f', r)
-						letter <- letters[countPanel]
-						lab <- bquote(.(letter) * ') r = ' * .(r) * ' and ' * rho * ' = ' * .(rho))
-						labelFig(lab, adj=c(-0, 0), cex=cexPanelLabel)
+						# # figure label
+						# r <- correlations$cor[correlations$rot == rot]
+						# r <- sprintf('%.2f', r)
+						# letter <- letters[countPanel]
+						# lab <- bquote(.(letter) * ') r = ' * .(r) * ' and ' * rho * ' = ' * .(rho))
+						# labelFig(lab, adj=c(-0, 0), cex=cexPanelLabel)
 						
-					} # next sigma1
+					# } # next sigma1
 					
-				} # next sigma2
+				# } # next sigma2
 		
-				# legend
-				if (countRho == length(rhos) & countRot == 2) {
+				# # legend
+				# if (countRho == length(rhos) & countRot == 2) {
 				
-					cexLeg <- 0.375
-					inset <- -0.475
-					par(lwd=lwd)
+					# cexLeg <- 0.375
+					# inset <- -0.475
+					# par(lwd=lwd)
 				
-					# background
-					legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
-						legend=c('OMNI control', paste0(algoNice, ' control'),
-						'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
-						'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
-						fill=c('white', colSdmControl, 'white', colSdmT1, 'white', colSdmT2),
-						border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2)
-					)
+					# # background
+					# legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
+						# legend=c('OMNI control', paste0(algoNice, ' control'),
+						# 'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+						# 'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
+						# fill=c('white', colSdmControl, 'white', colSdmT1, 'white', colSdmT2),
+						# border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2)
+					# )
 					
-					# foreground
-					legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
-						legend=c('OMNI control', paste0(algoNice, ' control'),
-						'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
-						'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
-						fill=c(NA, colSdmControl, borderOmniT1, colSdmT1, borderOmniT2, colSdmT2),
-						border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2),
-						angle=c(45, NA, 45, NA, 45, NA),
-						density=lineDensityScaling * lineDensity * c(1, NA, 1, NA, 1, NA)
-					)
+					# # foreground
+					# legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
+						# legend=c('OMNI control', paste0(algoNice, ' control'),
+						# 'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+						# 'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
+						# fill=c(NA, colSdmControl, borderOmniT1, colSdmT1, borderOmniT2, colSdmT2),
+						# border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2),
+						# angle=c(45, NA, 45, NA, 45, NA),
+						# density=lineDensityScaling * lineDensity * c(1, NA, 1, NA, 1, NA)
+					# )
 					
-				}
+				# }
 						
 		
-				countPanel <- countPanel + 1
+				# countPanel <- countPanel + 1
 		
-			} # next rotation
+			# } # next rotation
 			
-		} # next rho
+		# } # next rho
 
-		title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
-		dev.off()
+		# title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
+		# dev.off()
 	
-	} # next algorithm
+	# } # next algorithm
+
+# say('##############################################################################')
+# say('### [bivariate] landscape correlation x niche covariance bar plots for AUC ###')
+# say('##############################################################################')
+
+	# scenarioDir <- './Results/bivariate'
+	# load(paste0(scenarioDir, '/evaluations/!Collated Evaluations.RData'))
+	
+	# # STRATEGY:
+	# # 3x3-panel plot with each panel representing a different combination of landscape correlation (r) and niche covariance (rho)
+	# # landscape correlation changes across rows, niche covariance across columns
+	# # each panel is an xy plot with sigma1 and sigma2 as axes
+	# # each pair of simga1 and sigma2 have a bar plot displaying results for OMNI plus the focal algorithm
+	# # will be making one plot per algorithm
+
+	# # generalization
+	# rhos <- c(-0.5, 0, 0.5)
+	# rots <- c(45, 90, 135)
+	
+	# # settings
+	# sigmas <- c(1, 3, 5) / 10
+	# xSize <- 0.13 # maximum width of subplot containing bars
+	# ySize <- 0.15 # maximum height of subplot containing bars
+	# width <- 0.2 # width of bars as a proportion of subplot size (real width will be size * width)
+	# tick <- 0.075 # length of subplot tick marks
+	# lwd <- 0.3 # line width of bars
+	# cexAxisLabel <- 0.25
+	# cexPanelLabel <- 0.3
+	
+	# correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
+
+	# # # function to plots bars as scaled subplots in a larger plot
+	# # basically this just rescales the size and position of values and bars and send the information to rect()
+	# subRect0to1 <- function(resp, xOffsetInSubplot, colFill, border, angle=NULL, colAngle=NULL, ...) {
+	
+		# # resp		values of response (not scaled)
+		# # xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
+		# # colFill	color of fill
+		# # border	border  color for border
+		# # angle		NULL or angle of fill lines
+		# # colAngle 	NULL or color of angle lines (if any)
+		# # ...		other
+	
+		# respScaled <- resp * ySize + sigma2 - 0.5 * ySize
+		# at <- sigma1 - 0.5 * xSize + xOffsetInSubplot * xSize
+		# rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colFill, border=border, lwd=lwd)
+		# if (!is.null(angle)) rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=colAngle, border=border, angle=angle, density=lineDensityScaling * lineDensity, lwd=lwd)
+		
+	# }
+	
+	# ### by TEST STATISTIC
+	# for (testStat in c('AUCpa', 'AUCbg')) {
+				
+		# if (testStat == 'AUCpa') {
+
+			# respControl <- 'aucPresAbsMulti'
+			# respT1 <- 'aucPresAbsMulti_permT1'
+			# respT2 <- 'aucPresAbsMulti_permT2'
+			
+		# } else if (testStat == 'AUCbg') {
+									
+			# respControl <- 'aucPresBgMulti'
+			# respT1 <- 'aucPresBgMulti_permT1'
+			# respT2 <- 'aucPresBgMulti_permT2'
+			
+		# }
+		# # by ALGORITHM
+		# for (algo in sdmAlgos) {
+		# # for (algo in 'brt') {
+		
+			# algoNice <- algosShort(algo)
+			# png(paste0(scenarioDir, '/Results - Bar Plot for ', testStat, ' - ', algoNice, '.png'), width=2 * 650, height=2 * 700, res=600)
+		
+			# par(mfrow=c(3, 3), oma=c(2, 1, 0, 0.1), mar=c(0, 0.7, 0.3, 0), pty='s', mgp=c(3, 0.1, 0), cex.axis=1.15 * cexAxisLabel)
+			
+			# countPanel <- 1
+			
+			# # rows
+			# for (countRho in seq_along(rhos)) {
+			# # for (countRho in 1) {
+			
+				# rho <- rhos[countRho]
+			
+				# # columns
+				# for (countRot in seq_along(rots)) {
+				# # for (countRot in 1) {
+		
+					# rot <- rots[countRot]
+					
+					# omni <- master[master$algo == 'omniscient' & master$rho %==% rho & master$rotT2 %==% rot, ]
+					# sdm <- master[master$algo == algo & master$rho %==% rho & master$rotT2 %==% rot, ]
+		
+					# lims <- c(min(sigmas) - 0.1, max(sigmas) + 0.1)
+		
+					# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=lims, ylim=lims, col=NA)
+					# axis(1, at=sigmas, labels=rep('', length(sigmas)), tck=-0.03, lwd=0.4, line=-0.1)
+					# axis(2, at=sigmas, labels=sigmas, tck=-0.03, lwd=0.4, line=0.1)
+					# text(sigmas, rep(min(sigmas) - 0.16, length(sigmas)), labels=sigmas, cex=cexAxisLabel, xpd=NA)
+					# if (countRot == 1) mtext(bquote('Niche width in T2 (' * sigma[2] * ')'), side=2, line=0.55, at=mean(sigmas), cex=cexAxisLabel)
+					# if (countRho == length(rhos)) mtext(bquote('Niche width in T1 (' * sigma[1] * ')'), side=1, line=0, at=mean(sigmas), cex=cexAxisLabel)
+					
+					# ### plot each subplot
+					# for (sigma2 in sigmas) {
+					
+						# for (sigma1 in sigmas) {
+							
+							# # standard (as simulated)
+							# if (sigma1 >= sigma2) {
+
+								# omniControl <- omni[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2, respControl]
+								# omniT1 <- omni[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2, respT1]
+								# omniT2 <- omni[omni$sigma1 %==% sigma1 & omni$sigma2 %==% sigma2, respT2]
+
+								# sdmControl <- sdm[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2, respControl]
+								# sdmT1 <- sdm[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2, respT2]
+								# sdmT2 <- sdm[sdm$sigma1 %==% sigma1 & sdm$sigma2 %==% sigma2, respT1]
+
+							# # flipping T1 and T2 since symmetrical
+							# } else if (sigma1 < sigma2) {
+
+								# omniControl <- omni[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1, respControl]
+								# omniT1 <- omni[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1, respT2]
+								# omniT2 <- omni[omni$sigma1 %==% sigma2 & omni$sigma2 %==% sigma1, respT1]
+								
+								# sdmControl <- sdm[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1, respControl]
+								# sdmT1 <- sdm[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1, respT2]
+								# sdmT2 <- sdm[sdm$sigma1 %==% sigma2 & sdm$sigma2 %==% sigma1, respT1]
+								
+							# }
+
+							# # calculate and assign variables for lower/upper limits and median
+							# whats <- c('Inner', 'Median', 'Outer')
+							# for (modelType in c('sdm', 'omni')) {
+								# for (variable in c('Control', 'T1', 'T2')) {
+									
+									# thisVar <- paste0(modelType, variable)
+									# x <- get(thisVar)
+									# quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
+
+									# for (countWhat in seq_along(whats)) {
+								
+										# what <- whats[countWhat]
+										# assign(paste0(thisVar, what), quants[countWhat])
+										
+									# }
+								# }
+							# }
+
+							# lineDensityScaling <- 1.2
+							
+							# # subplot y-axis
+							# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize), c(sigma2 - 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
+							
+							# # subplot y-axis tick lines and labels
+							# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 + 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
+							# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2, sigma2), lwd=lwd)
+							# lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 - 0.5 * ySize, sigma2 - 0.5 * ySize), lwd=lwd)
+							
+							# # subplot y-axis labels
+							# cex <- 0.2
+							# if (sigma1 == 0.1) {
+
+								# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
+								# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2, labels=0.5, cex=cex, xpd=NA)
+								# text(sigma1 - 0.5 * xSize - 3.35 * tick * xSize, sigma2 - 0.5 * ySize, labels=0, cex=cex, xpd=NA)
+								
+							# }
+							
+							# # gray background
+							# offsetInSubplot <- 0.075
+							# rand <- 
+							# left <- sigma1 - 0.5 * xSize + offsetInSubplot * xSize
+							# right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
+							# bottom <- sigma2 - 0.5 * ySize
+							# top <- sigma2 + 0.5 * ySize
+							# polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+							# lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
+
+							# # OMNI control (unpermuted)
+							# subRect0to1(
+								# resp=omniControl,
+								# angle=45,
+								# xOffsetInSubplot=0.2,
+								# colFill='white',
+								# colAngle='black',
+								# border='black'
+							# )
+							
+							# # SDM control (unpermuted)
+							# subRect0to1(
+								# resp=sdmControl,
+								# angle=NULL,
+								# xOffsetInSubplot=0.35,
+								# colFill=colSdmControl,
+								# colAngle=NULL,
+								# border=borderSdmControl
+							# )
+							
+							# # OMNI permuted T1
+							# subRect0to1(
+								# resp=omniT1,
+								# angle=45,
+								# xOffsetInSubplot=0.55,
+								# colFill='white',
+								# colAngle=borderOmniT1,
+								# border=borderOmniT1
+							# )
+
+							# # SDM permuted T1
+							# subRect0to1(
+								# resp=sdmT1,
+								# angle=NULL,
+								# xOffsetInSubplot=0.7,
+								# colFill=colSdmT1,
+								# colAngle=NULL,
+								# border=borderSdmT1
+							# )
+							
+							# # OMNI permuted T2
+							# subRect0to1(
+								# resp=omniT2,
+								# angle=45,
+								# xOffsetInSubplot=0.9,
+								# colFill='white',
+								# colAngle=borderOmniT2,
+								# border=borderOmniT2
+							# )
+							
+							# # SDM permuted T2
+							# subRect0to1(
+								# resp=sdmT2,
+								# angle=NULL,
+								# xOffsetInSubplot=1.05,
+								# colFill=colSdmT2,
+								# colAngle=NULL,
+								# border=borderSdmT2
+							# )
+
+							# # figure label
+							# r <- correlations$cor[correlations$rot == rot]
+							# r <- sprintf('%.2f', r)
+							# letter <- letters[countPanel]
+							# lab <- bquote(.(letter) * ') r = ' * .(r) * ' and ' * rho * ' = ' * .(rho))
+							# labelFig(lab, adj=c(-0, 0), cex=cexPanelLabel)
+							
+						# } # next sigma1
+						
+					# } # next sigma2
+			
+					# # legend
+					# if (countRho == length(rhos) & countRot == 2) {
+					
+						# cexLeg <- 0.375
+						# inset <- -0.475
+						# par(lwd=lwd)
+					
+						# # background
+						# legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
+							# legend=c('OMNI control', paste0(algoNice, ' control'),
+							# 'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+							# 'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
+							# fill=c('white', colSdmControl, 'white', colSdmT1, 'white', colSdmT2),
+							# border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2)
+						# )
+						
+						# # foreground
+						# legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
+							# legend=c('OMNI control', paste0(algoNice, ' control'),
+							# 'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+							# 'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
+							# fill=c(NA, colSdmControl, borderOmniT1, colSdmT1, borderOmniT2, colSdmT2),
+							# border=c(borderOmniControl, borderSdmControl, borderOmniT1, borderSdmT1, borderOmniT2, borderSdmT2),
+							# angle=c(45, NA, 45, NA, 45, NA),
+							# density=lineDensityScaling * lineDensity * c(1, NA, 1, NA, 1, NA)
+						# )
+						
+					# }
+							
+			
+					# countPanel <- countPanel + 1
+			
+				# } # next rotation
+				
+			# } # next rho
+
+			# title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
+			# dev.off()
+		
+		# } # next algorithm
+		
+	# } # next test statistic
 
 # say('##############################################################################')
 # say('### [bivariate] landscape correlation x niche covariance bar plots for COR ###')
