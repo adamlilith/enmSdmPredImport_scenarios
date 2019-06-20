@@ -68,12 +68,16 @@
 	
 	### landscape and species colors
 
-	# species
+	# # species
 	greens <- colorRampPalette(c('white', 'darkgreen'))
 	greens <- greens(101)
 
+	# # landscape
+	# land <- colorRampPalette(c('#543005', '#bf812d', '#f5f5f5', '#35978f', '#003c30'))
+	# land <- land(101)
+	
 	# landscape
-	land <- colorRampPalette(c('#543005', '#bf812d', '#f5f5f5', '#35978f', '#003c30'))
+	land <- colorRampPalette(c('#662506', '#fc8d59', 'white', '#74a9cf', '#023858')) # dark ochre to blue
 	land <- land(101)
 	
 	
@@ -314,94 +318,95 @@
 		
 	# dev.off()
 
-# say('##########################################')
-# say('### [resolution] landscape and species ###')
-# say('##########################################')
+say('##########################################')
+say('### [resolution] landscape and species ###')
+say('##########################################')
 
-	# say('Wanting a simple illustration of the landscape and species in the "resolution" scenario.')
-	# say('Setup: 2 panels, one for TRUE, one for FALSE.')
-	# say('Each panel: 3 columns for grain size, 4 rows for spatial autocorrelation.')
+	say('Wanting a simple illustration of the landscape and species in the "resolution" scenario.')
+	say('Setup: 2 panels, one for TRUE, one for FALSE.')
+	say('Each panel: 3 columns for grain size, 4 rows for spatial autocorrelation.')
 	
-	# thisOutDir <- 'resolution'
-	# scenarioDir <- paste0('./Results/', thisOutDir)
-	# dirCreate(scenarioDir)
+	thisOutDir <- 'resolution'
+	scenarioDir <- paste0('./Results/', thisOutDir)
+	dirCreate(scenarioDir)
 
-	# # define landscape
-	# geography <- list(T1=list(type='linear', min=-1, max=1, noise=0), F1=list(type='random', min=-1, max=1))
+	# define landscape
+	geography <- list(T1=list(type='linear', min=-1, max=1, noise=0), F1=list(type='random', min=-1, max=1))
 	
-	# landscapeNative <- genesis(geography, size=1024, circle=FALSE)
+	landscapeNative <- genesis(geography, size=1024, circle=FALSE)
 	
-	# # extent (for border)
-	# ext <- extent(landscapeNative)
-	# ext <- as(ext, 'SpatialPolygons')
+	# extent (for border)
+	ext <- extent(landscapeNative)
+	ext <- as(ext, 'SpatialPolygons')
 
-	# # plots one layer of landscape
-	# subplotLand <- function(grain, var, noise, main=' ', ylab=' ') {
+	# plots one layer of landscape
+	subplotLand <- function(grain, var, noise, main=' ', ylab=' ') {
 			
-		# # grain		grain size
-		# # var		which variable to plot (T1 or F1)
-		# # noise		noise level
-		# # main		title or ' '
-		# # ylab		ylab or ' '
+		# grain		grain size
+		# var		which variable to plot (T1 or F1)
+		# noise		noise level
+		# main		title or ' '
+		# ylab		ylab or ' '
 			
-		# thisNative <- landscapeNative
-		# thisGeog <- geography
-		# thisGeog[[var]]$noise <- noise
-		# thisNative <- noisy(thisNative, thisGeog)
-		# templateSampled <- raster(nrows=grain, ncols=grain, crs=raster::projection(landscapeNative), ext=extent(landscapeNative))
-		# x <- resample(thisNative[[var]], templateSampled)
+		thisNative <- landscapeNative
+		thisGeog <- geography
+		thisGeog[[var]]$noise <- noise
+		thisNative <- noisy(thisNative, thisGeog)
+		templateSampled <- raster(nrows=grain, ncols=grain, crs=raster::projection(landscapeNative), ext=extent(landscapeNative))
+		x <- resample(thisNative[[var]], templateSampled)
 
-		# plot(ext)
-		# mtext(main, side=3, xpd=NA, col='black', cex=0.65, line=-0.5)
-		# mtext(ylab, side=2, xpd=NA, col='black', cex=0.75)
-		# plot(x, breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, maxpixels=ncell(x), add=TRUE)
-		# plot(ext, border='black', col=NA, xpd=NA, ann=FALSE, add=TRUE)
+		plot(ext)
+		mtext(main, side=3, xpd=NA, col='black', cex=0.65, line=-0.5)
+		mtext(ylab, side=2, xpd=NA, col='black', cex=0.75)
+		plot(x, breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, maxpixels=ncell(x), add=TRUE)
+		plot(ext, border='black', col=NA, xpd=NA, ann=FALSE, add=TRUE)
 		
-	# }
+	}
 
-	# finest <- 2^14
-	# native <- 2^10
-	# coarsest <- 2^6
+	finest <- 2^14
+	native <- 2^10
+	coarsest <- 2^6
 	
-	# png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species NEW.png'), width=4 * 3 * 380, height=8 * 400, res=600)
+	png(paste0(scenarioDir, '/Illustration - RESOLUTION Scenario Landscape and Species NEW.png'), width=4 * 3 * 380, height=8 * 400, res=600)
 	
-		# par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white', cex.main=0.8, lwd=0.6)
+		par(mfrow=c(4, 6), oma=c(1, 4.1, 4.1, 0), mar=c(0, 0, 0, 0), fg='white', col.axis='white', cex.main=0.8, lwd=0.6)
 
-		# noises <- c(0, 1/3, 2/3, 1)
+		noises <- c(0, 1/3, 2/3, 1)
 			
-		# for (countNoise in seq_along(noises)) {
+		for (countNoise in seq_along(noises)) {
 			
-			# noise <- noises[countNoise]
+			noise <- noises[countNoise]
 
-			# if (countNoise == 1) {
-				# main1 <- 'TRUE'
-				# main2 <- 'FALSE'
-			# } else {
-				# main1 <- main2 <- ''
-			# }
+			if (countNoise == 1) {
+				main1 <- 'TRUE'
+				main2 <- 'FALSE'
+			} else {
+				main1 <- main2 <- ''
+			}
 			
-			# par(mar=c(0, 1, 0, 0))
-			# subplotLand(grain=finest, var='T1', noise=noise, main=main1, ylab=round(noise, 2))
-			# par(mar=c(0, 0, 0, 1))
-			# subplotLand(grain=finest, var='F1', noise=noise, main=main2)
+			par(mar=c(0, 1, 0, 0))
+			subplotLand(grain=finest, var='T1', noise=noise, main=main1, ylab=round(noise, 2))
+			par(mar=c(0, 0, 0, 1))
+			subplotLand(grain=finest, var='F1', noise=noise, main=main2)
 			
-			# par(mar=c(0, 1, 0, 0))
-			# subplotLand(grain=native, var='T1', noise=noise, main=main1)
-			# par(mar=c(0, 0, 0, 1))
-			# subplotLand(grain=native, var='F1', noise=noise, main=main2)
+			par(mar=c(0, 1, 0, 0))
+			subplotLand(grain=native, var='T1', noise=noise, main=main1)
+			par(mar=c(0, 0, 0, 1))
+			subplotLand(grain=native, var='F1', noise=noise, main=main2)
 			
-			# par(mar=c(0, 1, 0, 0))
-			# subplotLand(grain=coarsest, var='T1', noise=noise, main=main1)
-			# subplotLand(grain=coarsest, var='F1', noise=noise, main=main2)
+			par(mar=c(0, 1, 0, 0))
+			subplotLand(grain=coarsest, var='T1', noise=noise, main=main1)
+			par(mar=c(0, 0, 0, 1))
+			subplotLand(grain=coarsest, var='F1', noise=noise, main=main2)
 			
-		# }
+		}
 			
-		# repeatSpace <- 41
-		# main <- paste0('Grain: 1/', finest, paste(rep(' ', repeatSpace), collapse=''), 'Grain: 1/', native, paste(rep(' ', repeatSpace), collapse=''),'Grain: 1/', coarsest)
-		# title(main, outer=TRUE, line=1.25, cex.main=1.2, col='black', font=1)
-		# text(-6.55, 2.35, labels='Proportion swapped\n\U2190lower autocorrelation                 higher autocorrelation\U2192', cex=1.3, srt=90, xpd=NA, col='black', font=2)
+		repeatSpace <- 41
+		main <- paste0('Grain: 1/', finest, paste(rep(' ', repeatSpace), collapse=''), 'Grain: 1/', native, paste(rep(' ', repeatSpace), collapse=''),'Grain: 1/', coarsest)
+		title(main, outer=TRUE, line=1.25, cex.main=1.2, col='black', font=1)
+		text(-6.55, 2.35, labels='Proportion swapped\n\U2190lower autocorrelation                 higher autocorrelation\U2192', cex=1.3, srt=90, xpd=NA, col='black', font=2)
 		
-	# dev.off()
+	dev.off()
 	
 # say('############################################################################################')
 # say('### [correlated] calculate correlation between variables as a function of their rotation ###')
@@ -500,6 +505,7 @@
 		# plot(ext)
 		# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
 		# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
+		# correlation <- round(correlation, 2)
 		# lab <- paste0('b) FALSE: Correlation = ', sprintf('%.2f', correlation))
 		# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 		# par(fg='black')
@@ -520,6 +526,7 @@
 			# plot(ext)
 			# plot(landscape[['F1']], breaks=seq(-1, 1, length.out=length(land) - 1), col=land, ann=FALSE, legend=FALSE, add=TRUE)
 			# correlation <- cor(c(as.matrix(landscape[['T1']])), c(as.matrix(landscape[['F1']])), use='pairwise.complete.obs')
+			# correlation <- round(correlation, 2)
 			# lab <- paste0(letters[countRot + 1], ') FALSE: Correlation = ', sprintf('%.2f', correlation))
 			# labelFig(lab, adj=c(0, -0.15), cex=0.8, col='black')
 			# par(fg='black')
@@ -855,7 +862,7 @@
 		
 	# dev.off()
 
-#################################
+################################
 say('DONE!!!', level=1, deco='&')
 say(date()) #####################
 #################################
