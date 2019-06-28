@@ -1,8 +1,8 @@
 ### SDM PREDICTOR INFERENCE - ILLUSTRATIONS
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
-### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results.r')
+### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Full Page Figures.r')
 ###
-### The code in this document is intended to be run after all models have been calibrated and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take many hours.
+### The code in this document is intended to be run after all models have been calibrated and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take several hours, depending on the number of scenarios modeled.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
