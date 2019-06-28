@@ -2,7 +2,7 @@
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Column Figures.r')
 ###
-### The code in this document is intended to be run after all models have been calibratedTrueFalse and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take several hours, depending on the number of scenarios modeled.
+### The code in this document is intended to be run after all models have been calibrated and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take several hours, depending on the number of scenarios modeled. The script contains code to flag cases where tests can discriminate between TRUE and FALSE variables of two TRUE variables, as well as cases where the results are well-calibrated with the omniscient model. However, 
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
@@ -63,15 +63,18 @@
 	setwd('C:/ecology/Drive/Research/ENMs - Predictor Inference')
 
 	# algorithms
-
-	# # set 1
 	algos <- c('omniscient', 'gam', 'maxent', 'brt')
 	sdmAlgos <- c('gam', 'maxent', 'brt')
 
-	allAlgos <- c('omniscient', 'bioclim', 'gam', 'glm', 'maxent', 'brt', 'rf')
-	
-	# responses
+	# responses to plot
 	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	
+	### For a given response range to be considered well-calibrated, it must be within +- 100 * calibTol% of the range of the OMNI model's range (eg if calibTol = 0.1 it must be within +- 10% of the OMNI models' range)
+	### For a given response's median to be considered well-calibrated, it must be within the innermost +-100 * calibTol% quantile (eg, if calibTol = 0.1, it must be within the 40th and 60th quantiles)
+	calibTol <- 0.1
+	calibSymbol <- '\U2020'
+	discrimSymbol <- '\U002A' # symbol to indicate OMNI and SDM can discriminate between variables
+	nullSymbol <- '\U00D7' # symbol to indicate OMNI and SDM can discriminate between variables
 	
 	### colors of bars for scenarios with TRUE and FALSE variables
 	##############################################################
@@ -130,6 +133,7 @@
 		decs,							# number of decimals to show in x-axis variable tick mark labels
 		xlab,							# x-axis label
 		evals,							# data frame with evaluations
+		expectHigher,					# TRUE or FALSE... if test can discriminate, which variable's values should be higher?
 		resps=c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg') # responses to plot
 	) {
 		
@@ -197,7 +201,7 @@
 				
 					lab <- paste0(letters[countAlgo], ') ', algosShort(algo))
 					
-					plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab=ylab, lab=lab, rand=rand, trueField=trueField, falseField=falseField, controlField=controlField)
+					plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab=ylab, lab=lab, rand=rand, trueField=trueField, falseField=falseField, controlField=controlField, expectHigher=expectHigher)
 
 				}
 				
@@ -228,7 +232,8 @@
 		rand,
 		trueField,
 		falseField,
-		controlField
+		controlField,
+		expectHigher
 	) {
 		
 		# general idea:
@@ -252,6 +257,7 @@
 		# trueField		field name of response when TRUE is permuted
 		# falseField		field name of response when FALSE is permuted
 		# controlField	field name of response for control case (or NULL if none)
+		# expectHigher  if test can discriminate, values of which variable should be higher (TRUE or FALSE)
 
 		### settings for plot formatting
 		width <- 0.14 # bar width
@@ -378,14 +384,14 @@
 				acc <- character()
 	
 				# discrimination
-				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse)
-				if (wellCalib) acc <- c(acc, 'C')
+				wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher) & discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+				if (!is.na(wellDiscrim) && wellDiscrim) acc <- c(acc, discrimSymbol)
 				
-				# discrimination
-				wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse) & discriminatedTrueFalse(omniTrue, omniFalse)
-				if (wellDiscrim) acc <- c(acc, 'D')
+				# calibration
+				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
 				
-				text(countX, ylim[2] + 0.1 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=0.8 * labCex, pos=1)
+				text(countX, ylim[2] + 0.1 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
 				
 			}
 			
@@ -425,9 +431,16 @@
 	# This function returns TRUE if the results indicate the SDM can differentiate between TRUE and FALSE
 	# Responses are discriminated successfully if their inner 95% quantile distributions do not overlap
 	discriminatedTrueFalse <- function(
-		sdmTrue,			# results from TRUE
-		sdmFalse			# results from FALSE
-	) (quantile(sdmTrue, 0.975, na.rm=TRUE) < quantile(sdmFalse, 0.025, na.rm=TRUE))			
+		predTrue,			# results from TRUE
+		predFalse,			# results from FALSE
+		expectHigher		# logical, if test can discriminate, which values should be higher (TRUE or FALSE)... expected values are TRUE or FALSE
+	) { 
+		if (expectHigher) {
+			(quantile(predTrue, 0.025, na.rm=TRUE) > quantile(predFalse, 0.975, na.rm=TRUE))
+		} else if (!expectHigher) {
+			(quantile(predTrue, 0.975, na.rm=TRUE) < quantile(predFalse, 0.025, na.rm=TRUE))
+		}
+	}
 	
 	### TEST IF RESULTS DISCRIMINATE BETWEEN TRUE1/TRUE2
 	# This function returns TRUE if the results indicate the SDM can differentiate between TRUE1 and TRUE2
@@ -452,7 +465,7 @@
 		sdmTrue,			# all response values for SDM with TRUE treatment
 		sdmFalse,			# all response values for Sdm with FALSE treatment
 		calibTol = 0.1		# maximum proportional difference between range and median necessary for results
-							# from an SDM to be considered as "well-calibratedTrueFalse"
+							# from an SDM to be considered as "well-calibrated"
 	) {	
 	
 		ok <- TRUE
@@ -508,7 +521,7 @@
 		sdmT1,				# all response values for SDM with TRUE treatment
 		sdmT2,				# all response values for Sdm with FALSE treatment
 		calibTol = 0.1		# maximum proportional difference between range and median necessary for results
-							# from an SDM to be considered as "well-calibratedTrueFalse"
+							# from an SDM to be considered as "well-calibrated"
 	) {	
 	
 		ok <- TRUE
@@ -559,7 +572,7 @@ say('###################################')
 	scenarioDir <- './Results/simple'
 	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# generalization
 	width <- 0.14 # bar width
@@ -573,8 +586,10 @@ say('###################################')
 	sublabY <- -0.07 # position of TRUE/FALSE variable sublabels
 	sublabCex <- 0.38 # size of TRUE/FALSE sublabels
 
+	algoLabY <- -0.34 # position of algorithm labels
+
 	# master plot function
-	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, trueField, controlField, falseField, controlLab) {
+	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, trueField, controlField, falseField, controlLab, omniHasFalse, expectHigher) {
 		
 		# nudge 	amount to move bars in same group (algorithm) left or right
 		# ylim		y-axis limits
@@ -586,6 +601,8 @@ say('###################################')
 		# controlField	field name of response for control case (or NULL if none)
 		# falseField	field name of response for FALSE variable
 		# controlLab character, name of bar representing "control" model/prediction
+		# omniHasFalse   logical, if TRUE then test discrimination and calibration accuracy of OMNI TRUE versus FALSE (TRUE for multivariate tests using performance metrics and FALSE for univariate tests using performance metrics)... FALSE for CORpa and CORbg
+		# expectHigher if test can discriminate, should values of TRUE or FALSE be higher ('true', 'false')
 		
 		# adjust nudging of bars in same groups
 		if (is.null(controlField)) nudge <- nudge / 2
@@ -648,18 +665,29 @@ say('###################################')
 			# accuracy notations
 			acc <- character()
 		
-			# calibration
-			if (algo != 'omniscient') {
-				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse)
-				if (wellCalib) acc <- c(acc, 'C')
+			# discrimination
+			wellDiscrimSdm <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher)
+			if (omniHasFalse) {
+				wellDiscrimOmni <- discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+				if (wellDiscrimSdm & wellDiscrimOmni) acc <- c(acc, discrimSymbol)
+			# } else if (algo == 'omniscient') {
+				# acc <- c(acc, nullSymbol)
+			} else {
+				if (!is.na(wellDiscrimSdm) && wellDiscrimSdm) acc <- c(acc, discrimSymbol)
 			}
 			
-			# discrimination
-			wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse) & discriminatedTrueFalse(omniTrue, omniFalse)
-			if (wellDiscrim) acc <- c(acc, 'D')
+			# calibration
+			if (algo != 'omniscient' & omniHasFalse) {
+				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
+			} else if (algo != 'omniscient' & !omniHasFalse) {
+				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
+			} # else if (algo=='omniscient') {
+				# acc <- c(acc, nullSymbol)
+			# }
 			
-			text(countAlgo , ylim[2] + 0.17 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=0.8 * labCex, pos=1)
-
+			text(countAlgo , ylim[2] + 0.17 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
 			
 		}
 		
@@ -668,13 +696,10 @@ say('###################################')
 	### multivariate: CBI
 	#####################
 	
-	algoLabY <- -0.34 # position of algorithm labels
-
 	png(paste0(scenarioDir, '/Multivariate CBI.png'), width=900, height=900, res=600)
 		
 		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
 		
-		# CBI multivariate
 		lab <- bquote('')
 		ylab <- bquote('CBI')
 		ylim <- c(-1, 1)
@@ -682,8 +707,11 @@ say('###################################')
 		trueField <- 'cbiMulti_permT1'
 		controlField <- 'cbiMulti'
 		falseField <- 'cbiMulti_permF1'
+		rand <- 0
+		omniHasFalse <- TRUE
+		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -692,13 +720,10 @@ say('###################################')
 	### multivariate: AUCpa
 	#######################
 	
-	algoLabY <- -0.34 # position of algorithm labels
-
 	png(paste0(scenarioDir, '/Multivariate AUCpa.png'), width=900, height=900, res=600)
 		
 		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
 		
-		# CBI multivariate
 		lab <- bquote('')
 		ylab <- bquote('AUC'['pa'])
 		ylim <- c(0, 1)
@@ -706,8 +731,11 @@ say('###################################')
 		trueField <- 'aucPresAbsMulti_permT1'
 		controlField <- 'aucPresAbsMulti'
 		falseField <- 'aucPresAbsMulti_permF1'
+		rand <- 0.5
+		omniHasFalse <- TRUE
+		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -716,13 +744,10 @@ say('###################################')
 	### multivariate: AUCbg
 	#######################
 	
-	algoLabY <- -0.34 # position of algorithm labels
-
 	png(paste0(scenarioDir, '/Multivariate AUCbg.png'), width=900, height=900, res=600)
 		
 		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
 		
-		# CBI multivariate
 		lab <- bquote('')
 		ylab <- bquote('AUC'['bg'])
 		ylim <- c(0, 1)
@@ -730,8 +755,11 @@ say('###################################')
 		trueField <- 'aucPresBgMulti_permT1'
 		controlField <- 'aucPresBgMulti'
 		falseField <- 'aucPresBgMulti_permF1'
+		rand <- 0.5
+		omniHasFalse <- TRUE
+		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -740,8 +768,6 @@ say('###################################')
 	### multivariate: CORpa
 	#######################
 	
-	algoLabY <- -0.34 # position of algorithm labels
-
 	png(paste0(scenarioDir, '/Multivariate CORpa.png'), width=900, height=900, res=600)
 		
 		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
@@ -753,8 +779,10 @@ say('###################################')
 		trueField <- 'corPresAbsMulti_permT1'
 		controlField <- NULL
 		falseField <- 'corPresAbsMulti_permF1'
+		rand <- 0
+		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='')
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -763,8 +791,6 @@ say('###################################')
 	### multivariate: CORbg
 	#######################
 	
-	algoLabY <- -0.34 # position of algorithm labels
-
 	png(paste0(scenarioDir, '/Multivariate CORbg.png'), width=900, height=900, res=600)
 		
 		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
@@ -776,8 +802,83 @@ say('###################################')
 		trueField <- 'corPresBgMulti_permT1'
 		controlField <- NULL
 		falseField <- 'corPresBgMulti_permF1'
+		rand <- 0
+		omniHasFalse <- FALSE
+		expectHigher <- FALSE
+		
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		
+		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		
+	dev.off()
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=0, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='')
+	### univariate: CBI
+	###################
+	
+	png(paste0(scenarioDir, '/Univariate CBI.png'), width=900, height=900, res=600)
+		
+		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		
+		lab <- bquote('')
+		ylab <- bquote('CBI')
+		ylim <- c(-1, 1)
+		yTicks <- seq(-1, 1, by=0.5)
+		trueField <- 'cbiUni_onlyT1'
+		controlField <- 'cbiMulti'
+		falseField <- 'cbiUni_onlyF1'
+		rand <- 0
+		omniHasFalse <- FALSE
+		expectHigher <- TRUE
+
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Multivar', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		
+		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		
+	dev.off()
+
+	### univariate: AUCpa
+	#######################
+	
+	png(paste0(scenarioDir, '/Univariate AUCpa.png'), width=900, height=900, res=600)
+		
+		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		
+		lab <- bquote('')
+		ylab <- bquote('AUC'['pa'])
+		ylim <- c(0, 1)
+		yTicks <- seq(0, 1, by=0.25)
+		trueField <- 'aucPresAbsUni_onlyT1'
+		controlField <- 'aucPresAbsMulti'
+		falseField <- 'aucPresAbsUni_onlyF1'
+		rand <- 0.5
+		omniHasFalse <- FALSE
+		expectHigher <- TRUE
+
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		
+		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		
+	dev.off()
+
+	### univariate: AUCbg
+	#######################
+	
+	png(paste0(scenarioDir, '/Univariate AUCbg.png'), width=900, height=900, res=600)
+		
+		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		
+		lab <- bquote('')
+		ylab <- bquote('AUC'['bg'])
+		ylim <- c(0, 1)
+		yTicks <- seq(0, 1, by=0.25)
+		trueField <- 'aucPresBgUni_onlyT1'
+		controlField <- 'aucPresBgMulti'
+		falseField <- 'aucPresBgUni_onlyF1'
+		rand <- 0.5
+		omniHasFalse <- FALSE
+		expectHigher <- TRUE
+
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -790,7 +891,7 @@ say('###########################')
 	scenarioDir <- './Results/simple'
 	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=TRUE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=TRUE)
 	
 	# OMNI AUC
 	x <- evals$aucPresAbsMulti[evals$algo=='omniscient']
@@ -856,13 +957,14 @@ say('########################################')
 	xCol <- 'numTrainPres' # name of x-axis variable column in evaluation data frame
 	decs <- 0 # number of decimals to show in x-axis variable tick mark labels
 	xlab <- 'Number of calibration presences' # x-axis label
-
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
+	
 	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# plot results for each response
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps)
-	
+	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+
 say('###################################')
 say('### [extent] simulation results ###')
 say('###################################')
@@ -873,13 +975,14 @@ say('###################################')
 	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
 	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
 	xlab <- 'Range of TRUE variable' # x-axis label
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
 	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	evals$rangeT1 <- evals$maxT1 - evals$minT1
 
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps)
+	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('#######################################')
 say('### [prevalence] simulation results ###')
@@ -891,12 +994,13 @@ say('#######################################')
 	xCol <- 'prevalence' # name of x-axis variable column in evaluation data frame
 	decs <- 2 # number of decimals to show in x-axis variable tick mark labels
 	xlab <- 'Prevalence' # x-axis label
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
 	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps)
+	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('####################################################')
 say('### [correlated TRUE & FALSE] simulation results ###')
@@ -908,15 +1012,16 @@ say('####################################################')
 	xCol <- 'correlation' # name of x-axis variable column in evaluation data frame
 	decs <- 2 # number of decimals to show in x-axis variable tick mark labels
 	xlab <- 'Correlation between TRUE and FALSE' # x-axis label
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
 	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 	evals$correlation <- correlations$cor[match(evals$rotF1, correlations$rot)]
 	
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps)
+	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('#######################################')
 say('### [resolution] simulation results ###')
@@ -977,6 +1082,7 @@ say('#######################################')
 	respStatistics <- c('CBI', 'AUCpa', 'AUCbg')
 	respControls <- c('cbiMulti', 'aucPresAbsMulti', 'aucPresBgMulti')
 	resps <- c('cbiMulti_perm', 'aucPresAbsMulti_perm', 'aucPresBgMulti_perm')
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 	
 	# y position of guidelines in subplots
 	respRands <- c(0, 0.5, 0.5)
@@ -1148,16 +1254,16 @@ say('#######################################')
 							acc <- character()
 				
 							# discrimination
-							wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse)
-							if (wellCalib) acc <- c(acc, 'C')
-							
-							# discrimination
-							wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse) & discriminatedTrueFalse(omniTrue, omniFalse)
-							if (wellDiscrim) acc <- c(acc, 'D')
+							wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher) & discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+							if (wellDiscrim) acc <- c(acc, discrimSymbol)
 		
+							# calibration
+							wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+							if (wellCalib) acc <- c(acc, calibSymbol)
+							
 							x <- countGrain + 0.85 * xSize
 							y <- bottom + 0.1 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.3 * labCex, pos=2)
 							
 						}
 							
@@ -1184,6 +1290,7 @@ say('#######################################')
 	
 	respRand <- 0.5
 	respMin <- 0
+	expectHigher <- FALSE # expect values from FALSE to be higher
 
 	for (countStat in seq_along(respStatistics)) {
 		
@@ -1325,16 +1432,16 @@ say('#######################################')
 							acc <- character()
 				
 							# discrimination
-							wellCalib <- calibratedTrueFalse(omniControl=NULL, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=NULL, sdmTrue=sdmTrue, sdmFalse=sdmFalse)
-							if (wellCalib) acc <- c(acc, 'C')
-							
-							# discrimination
-							wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse) & discriminatedTrueFalse(omniTrue, omniFalse)
-							if (wellDiscrim) acc <- c(acc, 'D')
+							wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher) & discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+							if (wellDiscrim) acc <- c(acc, discrimSymbol)
 		
+							# calibration
+							wellCalib <- calibratedTrueFalse(omniControl=NULL, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=NULL, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+							if (wellCalib) acc <- c(acc, calibSymbol)
+							
 							x <- countGrain + 0.85 * xSize
 							y <- bottom + 0.1 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.3 * labCex, pos=2)
 							
 						}
 
@@ -1687,16 +1794,16 @@ say('###########################################################################
 							acc <- character()
 				
 							# discrimination
-							wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2)
-							if (wellCalib) acc <- c(acc, 'C')
-							
-							# discrimination
 							wellDiscrim <- discriminatedBivariate(T1=omniT1, T2=omniT2) & discriminatedBivariate(T1=sdmT1, T2=sdmT2)
-							if (wellDiscrim) acc <- c(acc, 'D')
+							if (wellDiscrim) acc <- c(acc, discrimSymbol)
+							
+							# calibration
+							wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
+							if (wellCalib) acc <- c(acc, calibSymbol)
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.4 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
 							
 						}
 
@@ -1995,16 +2102,16 @@ say('###########################################################################
 								acc <- character()
 					
 								# discrimination
-								wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2)
-								if (wellCalib) acc <- c(acc, 'C')
-								
-								# discrimination
 								wellDiscrim <- discriminatedBivariate(T1=omniT1, T2=omniT2) & discriminatedBivariate(T1=sdmT1, T2=sdmT2)
-								if (wellDiscrim) acc <- c(acc, 'D')
+								if (wellDiscrim) acc <- c(acc, discrimSymbol)
+								
+								# calibration
+								wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
+								if (wellCalib) acc <- c(acc, calibSymbol)
 								
 								x <- left + 0.8 * xSize
 								y <- bottom + 0.12 * ySize
-								text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.4 * labCex, pos=2)
+								text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
 								
 							}
 
@@ -2260,16 +2367,16 @@ say('###########################################################################
 							acc <- character()
 				
 							# discrimination
-							wellCalib <- calibratedBivariate(omniControl=NULL, omniT1=omniT1, omniT2=omniT2, sdmControl=NULL, sdmT1=sdmT1, sdmT2=sdmT2)
-							if (wellCalib) acc <- c(acc, 'C')
-							
-							# discrimination
 							wellDiscrim <- discriminatedBivariate(T1=sdmT1, T2=sdmT2)
-							if (wellDiscrim) acc <- c(acc, 'D')
+							if (wellDiscrim) acc <- c(acc, discrimSymbol)
+							
+							# calibration
+							wellCalib <- calibratedBivariate(omniControl=NULL, omniT1=omniT1, omniT2=omniT2, sdmControl=NULL, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
+							if (wellCalib) acc <- c(acc, calibSymbol)
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.4 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
 							
 						}
 
@@ -2344,7 +2451,7 @@ say('###########################################################################
 	ySize <- 0.15 # maximum height of subplot containing bars
 	width <- 0.225 # width of bars as a proportion of subplot size (real width will be size * width)
 	tick <- 0.075 # length of subplot tick marks
-	lwd <- 0.3 # line width of bars
+	lwd <- 0.5 # line width of bars
 	cexAxisLabel <- 0.25
 	cexPanelLabel <- 0.3
 	
@@ -2453,12 +2560,13 @@ say('###########################################################################
 						lineDensityScaling <- 1.2
 						
 						# subplot y-axis
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize), c(sigma2 - 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
+						subaxisLwd <- 0.3
+						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize), c(sigma2 - 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=subaxisLwd)
 						
 						# subplot y-axis tick lines and labels
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 + 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=lwd)
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2, sigma2), lwd=lwd)
-						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 - 0.5 * ySize, sigma2 - 0.5 * ySize), lwd=lwd)
+						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 + 0.5 * ySize, sigma2 + 0.5 * ySize), lwd=subaxisLwd)
+						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2, sigma2), lwd=subaxisLwd)
+						lines(c(sigma1 - 0.5 * xSize, sigma1 - 0.5 * xSize - tick * xSize), c(sigma2 - 0.5 * ySize, sigma2 - 0.5 * ySize), lwd=subaxisLwd)
 						
 						# subplot y-axis labels
 						cex <- 0.2
@@ -2527,16 +2635,16 @@ say('###########################################################################
 							acc <- character()
 				
 							# discrimination
-							wellCalib <- calibratedBivariate(omniControl=NULL, omniT1=omniT1, omniT2=omniT2, sdmControl=NULL, sdmT1=sdmT1, sdmT2=sdmT2)
-							if (wellCalib) acc <- c(acc, 'C')
-							
-							# discrimination
 							wellDiscrim <- discriminatedBivariate(T1=sdmT1, T2=sdmT2)
-							if (wellDiscrim) acc <- c(acc, 'D')
+							if (wellDiscrim) acc <- c(acc, discrimSymbol)
+							
+							# calibration
+							wellCalib <- calibratedBivariate(omniControl=NULL, omniT1=omniT1, omniT2=omniT2, sdmControl=NULL, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
+							if (wellCalib) acc <- c(acc, calibSymbol)
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.4 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
 							
 						}
 
@@ -2599,7 +2707,7 @@ say('###########################################################################
 	# threshold <- 0 # tabulate proportion of test presences less than this value for each simulation
 	
 	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=allAlgos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	# evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
 	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
