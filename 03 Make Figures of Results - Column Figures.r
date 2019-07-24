@@ -25,6 +25,7 @@
 
 ### [bivariate] collate evaluations ###
 ### [bivariate] statistics ###
+### [bivariate] niche covariance ###
 ### [bivariate] landscape correlation x niche covariance bar plots for CBI ###
 ### [bivariate] landscape correlation x niche covariance bar plots for AUC ###
 ### [bivariate] landscape correlation x niche covariance bar plots for CORpa ###
@@ -119,21 +120,24 @@
 		
 	}
 	
-	########################################################################################
-	### make plots of results for a series of response variables for multivariate models ###
-	########################################################################################
+	###############################################################################
+	### plot results for a series of response variables for multivariate models ###
+	###############################################################################
 	
 	### This function makes one figure file for each response (CBI, AUCpa, etc.).
 	### Each figure has three panels (one per algorithm).
-	### It is useful for scenarios where one can plot responses along a continuous x axis
-	multivariatePlots <- function(
+	### Each panel has a user-specified variable along the x-axis (eg prevalence, extent, correlation) and the test statistic on teh y-axis (eg CBI, AUC, COR).
+	### The function is specific to cases comparing a TRUE variable and a FALSE variable.
+	multivariatePlotsTRUEvsFALSE <- function(
 		scenarioDir,					# scenario directory
 		evalDir,						# evaluation directory
 		xCol,							# name of field in "evals" with x-axis values
 		decs,							# number of decimals to show in x-axis variable tick mark labels
 		xlab,							# x-axis label
 		evals,							# data frame with evaluations
-		expectHigher,					# TRUE or FALSE... if test can discriminate, which variable's values should be higher?
+		expectHigher,					# TRUE or FALSE or NULL... which variable should have a higher value of
+										# the test statistic if the variables can be discriminated accurately?
+										# (TRUE or FALSE or NULL for neither)
 		resps=c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg') # responses to plot
 	) {
 		
@@ -201,7 +205,95 @@
 				
 					lab <- paste0(letters[countAlgo], ') ', algosShort(algo))
 					
-					plotScalarResp(xCol=xCol, decs=decs, xlab=xlab, algo=algo, nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab=ylab, lab=lab, rand=rand, trueField=trueField, falseField=falseField, controlField=controlField, expectHigher=expectHigher)
+					plotScalarRespTRUEvsFALSE(xCol=xCol, decs=decs, xlab=xlab, algo=algo, nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab=ylab, lab=lab, rand=rand, trueField=trueField, falseField=falseField, controlField=controlField, expectHigher=expectHigher)
+
+				}
+				
+			dev.off()
+			
+		} # next response
+		
+	}
+			
+	### This function makes one figure file for each response (CBI, AUCpa, etc.).
+	### Each figure has three panels (one per algorithm).
+	### Each panel has a user-specified variable along the x-axis (eg prevalence, extent, correlation) and the test statistic on teh y-axis (eg CBI, AUC, COR).
+	### The function is specific to cases comparing a TRUE variable and another TRUE variable.
+	multivariatePlotsTRUEvsTRUE <- function(
+		scenarioDir,					# scenario directory
+		evalDir,						# evaluation directory
+		xCol,							# name of field in "evals" with x-axis values
+		decs,							# number of decimals to show in x-axis variable tick mark labels
+		xlab,							# x-axis label
+		evals,							# data frame with evaluations
+		resps=c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg') # responses to plot
+	) {
+		
+		for (resp in resps) {
+			
+			if (resp == 'Multivariate CBI') {
+				
+				ylim <- c(-1, 1)
+				yTicks <- seq(-1, 1, by=0.25)
+				ylab <- 'CBI'
+				rand <- 0
+				true1Field <- 'cbiMulti_permT1'
+				true2Field <- 'cbiMulti_permT2'
+				controlField <- 'cbiMulti'
+				
+			} else if (resp == 'Multivariate AUCpa') {
+
+				ylim <- c(0, 1)
+				yTicks <- seq(0, 1, by=0.25)
+				ylab <- bquote('AUC'['pa'])
+				rand <- 0.5
+				true1Field <- 'aucPresAbsMulti_permT1'
+				true2Field <- 'aucPresAbsMulti_permT2'
+				controlField <- 'aucPresAbsMulti'
+				
+			} else if (resp == 'Multivariate AUCbg') {
+
+				ylim <- c(0, 1)
+				yTicks <- seq(0, 1, by=0.25)
+				ylab <- bquote('AUC'['bg'])
+				rand <- 0.5
+				true1Field <- 'aucPresBgMulti_permT1'
+				true2Field <- 'aucPresBgMulti_permT2'
+				controlField <- 'aucPresBgMulti'
+				
+			} else if (resp == 'Multivariate CORpa') {
+
+				ylim <- c(-0.25, 1)
+				yTicks <- seq(-0.25, 1, by=0.25)
+				ylab <- bquote('COR'['pa'])
+				rand <- 0
+				true1Field <- 'corPresAbsMulti_permT1'
+				true2Field <- 'corPresAbsMulti_permT2'
+				controlField <- NULL
+				
+			} else if (resp == 'Multivariate CORbg') {
+
+				ylim <- c(-0.25, 1)
+				yTicks <- seq(-0.25, 1, by=0.25)
+				ylab <- bquote('COR'['bg'])
+				rand <- 0
+				true1Field <- 'corPresBgMulti_permT1'
+				true2Field <- 'corPresBgMulti_permT2'
+				controlField <- NULL
+				
+			}
+			
+			png(paste0(scenarioDir, '/', resp, ' - ', paste(toupper(sdmAlgos), collapse=' '), '.png'), width=4 * 250, height=4 * 720, res=600)
+				
+				par(mfrow=c(3, 1), oma=c(0, 0, 0, 0), mar=c(1.6, 2, 1, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.425, tcl=-0.25)
+				
+				for (countAlgo in seq_along(sdmAlgos)) {
+
+					algo <- sdmAlgos[countAlgo]
+				
+					lab <- paste0(letters[countAlgo], ') ', algosShort(algo))
+					
+					plotScalarRespTRUEvsTRUE(xCol=xCol, decs=decs, xlab=xlab, algo=algo, nudge=nudge, subnudge=subnudge, ylim=ylim, yTicks=yTicks, ylab=ylab, lab=lab, rand=rand, true1Field=true1Field, true2Field=true2Field, controlField=controlField)
 
 				}
 				
@@ -218,7 +310,8 @@
 	### generic plot function for plots with a scalar along the x-axis and variable importance along the y
 	### The x-axis can represent: prevalence, landscape extent, correlation between landscape variables, correlation between variables in shaping the niche, and so on. This function is intended to supply a thematic unity to plots of these types.
 	### This function is best for plots with 1 column and 3 rows, one row per algorithm
-	plotScalarResp <- function(
+	### The function assumes the variables of interest are TRUE and FALSE (ie not TRUE vs another TRUE)
+	plotScalarRespTRUEvsFALSE <- function(
 		xCol,
 		decs,
 		xlab,
@@ -257,7 +350,7 @@
 		# trueField		field name of response when TRUE is permuted
 		# falseField		field name of response when FALSE is permuted
 		# controlField	field name of response for control case (or NULL if none)
-		# expectHigher  if test can discriminate, values of which variable should be higher (TRUE or FALSE)
+		# expectHigher  if test can discriminate, values of which variable should be higher (TRUE or FALSE or NULL for neither)
 
 		### settings for plot formatting
 		width <- 0.14 # bar width
@@ -379,22 +472,192 @@
 			rect(sdmFalse, at=countX - adjust + nudge + subnudge, width=width, col=colFalse, border=borderFalse, xpd=NA, lwd=lwd)
 
 			### accuracy indicators
-			if (!all(is.na(sdmTrue)) & !all(is.na(sdmFalse))) {
-	
-				acc <- character()
-	
-				# discrimination
-				wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher) & discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
-				if (!is.na(wellDiscrim) && wellDiscrim) acc <- c(acc, discrimSymbol)
-				
-				# calibration
-				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
-				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
-				
-				text(countX, ylim[2] + 0.1 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
+			if (!is.na(expectHigher)) {
+			
+				if (!all(is.na(sdmTrue)) & !all(is.na(sdmFalse))) {
+		
+					acc <- character()
+		
+					# discrimination
+					wellDiscrim <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher) & discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+					if (!is.na(wellDiscrim) && wellDiscrim) acc <- c(acc, discrimSymbol)
+					
+					# calibration
+					wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+					if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
+					
+					text(countX, ylim[2] + 0.1 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
+					
+				}
 				
 			}
+				
+		} # next value along x axis
+		
+	}
+	
+	### generic plot function for plots with a scalar along the x-axis and variable importance along the y
+	### The x-axis can represent: prevalence, landscape extent, correlation between landscape variables, correlation between variables in shaping the niche, and so on. This function is intended to supply a thematic unity to plots of these types.
+	### This function is best for plots with 1 column and 3 rows, one row per algorithm
+	### The function assumes the variables of interest are TRUE and another TRUE (ie not TRUE vs FALSE)
+	plotScalarRespTRUEvsTRUE <- function(
+		xCol,
+		decs,
+		xlab,
+		algo,
+		nudge,
+		subnudge,
+		ylim,
+		yTicks,
+		ylab,
+		lab,
+		rand,
+		true1Field,
+		true2Field,
+		controlField
+	) {
+		
+		# general idea:
+		# graph shows results for one algorithm plus OMNI
+		# x-axis: independent variable (prevalence, extent, etc)
+		# y-axis: variable importance
+		# each level of x-variable range: three sets of bars per algorithm, one is control, one is TRUE, one for FALSE, sets of bars are staggered
+		
+		# xCol			name of column in evaluation data frame that has values for x axis
+		# decs			NULL (use values of xCol as-is for x-axis tick labels) or an integer indicating number
+						# of digits to display for x tick labels
+		# xlab			x-axis label
+		# algo			algorithm (not OMNI)
+		# nudge 		amount to move sets of bars belonging to control/treatment model predictions relative to x-axis tick
+		# subnudge		amount to move bars belonging to same control/treatment model predictions relative to x-axis tick
+		# ylim			y-axis limits
+		# ylab			y-axis label
+		# yTicks		position of tick marks on y-axis
+		# lab			figure label
+		# rand			value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
+		# trueField		field name of response when TRUE1 is permuted
+		# falseField	field name of response when TRUE2 is permuted
+		# controlField	field name of response for control case (or NULL if none)
+
+		### settings for plot formatting
+		width <- 0.14 # bar width
+		nudge <- 0.26 # nudge pair of bars for same algorithm left/right
+		subnudge <- nudge / 4 # nudge bars within same class
+		lwd <- 0.8 # line width of box borders
+		figLabPos <- c(-0.2250, 0.03) # position of figure label
+		
+		legCex <- 0.6 # legend
+		
+		ylabX1 <- -0.105 # position of inner y-axis label
+		ylabX2 <- -0.165 # position of outer y-axis label
+		labCex <- 0.65 # size of algorithm, y-axis, and figure labels
+		
+		xlabY1 <- -0 # position of inner x-axis sublabels (range of TRUE)
+		xlabY2 <- -0.14 # position of outer x-axis label
+		
+		lineDensity <- 110 # density of lines per inch for perturbed OMNI
+	
+		### plot
+	
+		# x-axis values
+		x <- sort(unique(evals[ , xCol]))
+		
+		# base plot
+		plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(x)), ylim=ylim, tcl=-0.25)
+		labelFig(lab, adj=figLabPos, cex=labCex)
+		usr <- par('usr')
+		
+		# gray background
+		left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
+		right <- length(x) + (2 + ifelse(is.null(controlField), 0.25, 0)) * nudge
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.8 * lwd, xpd=NA)
+		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
+		for (i in 1:(length(x) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
+
+		# x: axis labels
+		axis(1, at=seq_along(x), labels=rep('', length(x)), tck=-0.03, lwd=0.8)
+		xLabs <- if (!is.null(decs)) { sprintf(paste0('%.', decs, 'f'), x) } else { x }
+		text(seq_along(x), y=rep(usr[3] + xlabY1 * (usr[4] - usr[3]), length(x)), labels=xLabs, cex=0.8 * labCex, xpd=NA, srt=0, pos=1, col='black')
+		text(mean(seq_along(x)), y=usr[3] + xlabY2 * (usr[4] - usr[3]), labels=xlab, cex=labCex, xpd=NA, srt=0, col='black')
+	
+		# y: y-axis labels
+		axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
+		text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
+		text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
+
+		thisNudge <- length(algos) / 2
+		
+		# for each value of x
+		for (countX in seq_along(x)) {
+		
+			thisX <- x[countX]
+
+			# get data
+			omniTrue1 <- evals[evals$algo == 'omniscient' & evals[ , xCol] == thisX, true1Field]
+			omniTrue2 <- evals[evals$algo == 'omniscient' & evals[ , xCol] == thisX, true2Field]
+			sdmTrue1 <- evals[evals$algo == algo & evals[ , xCol] == thisX, true1Field]
+			sdmTrue2 <- evals[evals$algo == algo & evals[ , xCol] == thisX, true2Field]
+		
+			# if there is a distinct response for control/unperturbed models
+			# used when using CBI or AUC
+			if (!is.null(controlField)) {
+		
+				omniControl <- evals[evals$algo == 'omniscient' & evals[ , xCol] == thisX, controlField]
+				sdmControl <- evals[evals$algo == algo & evals[ , xCol] == thisX, controlField]
 			
+				# unperturbed OMNI
+				rect(omniControl, at=countX - nudge - subnudge, width=width, col=colOmniControl, border=NA, xpd=NA, lwd=lwd)
+				rect(omniControl, at=countX - nudge - subnudge, width=width, density=lineDensity, col=colOmniControl, fill=colOmniControl, border=borderOmniControl, xpd=NA, lwd=lwd)
+			
+				# unperturbed SDM
+				rect(sdmControl, at=countX - nudge + subnudge, width=width, col=colSdmControl, border=borderSdmControl, xpd=NA, lwd=0.8)
+
+				leg <- c(
+					'OMNI control',
+					paste0('OMNI TRUE1'),
+					paste0('OMNI TRUE2'),
+					paste0(algosShort(algo), ' control'),
+					paste0(algosShort(algo), ' TRUE1'),
+					paste0(algosShort(algo), ' TRUE2')
+				)
+			
+				par(lwd=0.5)
+			
+				legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', 'white', colSdmControl, colSdmT1, colSdmT2), border=c(borderOmniControl, borderSdmT1, borderSdmT2, borderSdmControl, borderSdmT1, borderSdmT2))
+				
+				adjust <- 0
+				
+			# if there is no distinct response for control/unperturbed
+			# for when plotting correlation metric
+			} else {
+
+				omniControl <- sdmControl <- NULL
+			
+				# legend
+				leg <- c(
+					paste0('OMNI TRUE1'),
+					paste0('OMNI TRUE2'),
+					paste0(algosShort(algo), ' TRUE1'),
+					paste0(algosShort(algo), ' TRUE2')
+				)
+			
+				par(lwd=0.5)
+
+				legend('bottomright', inset=c(0, 0.025), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', colTrue, colFalse), border=c(borderTrue, borderFalse, borderTrue, borderFalse))
+				
+				adjust <- 1/2 * nudge
+				
+			}
+				
+			### TRUE1 response
+			rect(omniTrue1, at=countX - adjust - subnudge, width=width, col='white', border=borderSdmT1, xpd=NA, lwd=lwd)
+			rect(sdmTrue1, at=countX - adjust + subnudge, width=width, col=colSdmT1, border=borderSdmT1, xpd=NA, lwd=lwd)
+
+			### TRUE2 response
+			rect(omniTrue2, at=countX - adjust + nudge - subnudge, width=width, col='white', border=borderSdmT2, xpd=NA, lwd=lwd)
+			rect(sdmTrue2, at=countX - adjust + nudge + subnudge, width=width, col=colSdmT2, border=borderSdmT2, xpd=NA, lwd=lwd)
+
 		} # next value along x axis
 		
 	}
@@ -963,7 +1226,7 @@ say('########################################')
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# plot results for each response
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('###################################')
 say('### [extent] simulation results ###')
@@ -974,7 +1237,7 @@ say('###################################')
 	evalDir <- paste0(scenarioDir, '/evaluations')
 	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
 	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
-	xlab <- 'Range of TRUE variable' # x-axis label
+	xlab <- 'Study region extent (range of TRUE)' # x-axis label
 	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
 	# load evaluations and calculate x-axis variable
@@ -982,7 +1245,7 @@ say('###################################')
 	evals$rangeT1 <- evals$maxT1 - evals$minT1
 
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('#######################################')
 say('### [prevalence] simulation results ###')
@@ -1000,7 +1263,7 @@ say('#######################################')
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('####################################################')
 say('### [correlated TRUE & FALSE] simulation results ###')
@@ -1021,7 +1284,7 @@ say('####################################################')
 	evals$correlation <- correlations$cor[match(evals$rotF1, correlations$rot)]
 	
 	# plot multivariate model results
-	multivariatePlots(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('#######################################')
 say('### [resolution] simulation results ###')
@@ -1057,6 +1320,7 @@ say('#######################################')
 	lwd <- 0.4 # line width of bars
 	cexAxisLabel <- 0.5
 	cexPanelLabel <- 0.7
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels	
 
 	lineDensity <- NULL
 	
@@ -1114,7 +1378,7 @@ say('#######################################')
 				xlim <- range(xs) + c(-0.5, 0.5)
 				ylim <- range(ys) + c(-0.5, 0.5)
 				
-				ylab <- 'Proportion swapped\n\U2190lower autocorrelation     higher autocorrelation\U2192'
+				ylab <- 'Spatial autocorrelation\n(proportion of cells swapped)\n\U2190lower autocorrelation     higher autocorrelation\U2192'
 				
 				plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
 				axis(1, at=xs, labels=paste0('1/', grains), tck=-0.01, lwd=0.6, line=-0.25)
@@ -1263,7 +1527,7 @@ say('#######################################')
 							
 							x <- countGrain + 0.85 * xSize
 							y <- bottom + 0.1 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.3 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.5 * labCex, pos=2)
 							
 						}
 							
@@ -1313,7 +1577,7 @@ say('#######################################')
 				xlim <- range(xs) + c(-0.5, 0.5)
 				ylim <- range(ys) + c(-0.5, 0.5)
 				
-				ylab <- 'Proportion swapped\n\U2190lower autocorrelation     higher autocorrelation\U2192'
+				ylab <- 'Spatial autocorrelation\n(proportion of cells swapped)\n\U2190lower autocorrelation     higher autocorrelation\U2192'
 				
 				plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
 				axis(1, at=xs, labels=paste0('1/', grains), tck=-0.01, lwd=0.6, line=-0.25)
@@ -1441,7 +1705,7 @@ say('#######################################')
 							
 							x <- countGrain + 0.85 * xSize
 							y <- bottom + 0.1 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.3 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.5 * labCex, pos=2)
 							
 						}
 
@@ -1557,7 +1821,25 @@ say('##############################')
 			say('Median CBI for ', toupper(algo), ', permuted T2, for sigma1 = 0.5, sigma2 = 0.1, rho = 0: ', sprintf('%.2f', x3med), ' (inner 95% CI: ', sprintf('%.2f', x3low), '-', sprintf('%.2f', x3high), ')', post=2)
 			
 		}
-			
+
+say('####################################')
+say('### [bivariate] niche covariance ###')
+say('####################################')
+
+	# generalization
+	scenarioDir <- './Results/bivariate' # scenario directory
+	evalDir <- paste0(scenarioDir, '/evaluations')
+	xCol <- 'rho' # name of x-axis variable column in evaluation data frame
+	decs <- 2 # number of decimals to show in x-axis variable tick mark labels
+	xlab <- bquote('Niche covariance (' * rho * ')') # x-axis label
+
+	# load evaluations and calculate x-axis variable
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	evals <- evals[evals$rotT2 %==% 90 & evals$sigma1 %==% 0.3 & evals$sigma2 %==% 0.3, ]
+
+	# plot multivariate model results
+	multivariatePlotsTRUEvsTRUE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps)
+		
 say('##############################################################################')
 say('### [bivariate] landscape correlation x niche covariance bar plots for CBI ###')
 say('##############################################################################')
@@ -1588,6 +1870,7 @@ say('###########################################################################
 	lwd <- 0.5 # line width of bars
 	cexAxisLabel <- 0.25
 	cexPanelLabel <- 0.3
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels
 	
 	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
@@ -1803,7 +2086,7 @@ say('###########################################################################
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1 * labCex, pos=2)
 							
 						}
 
@@ -1877,6 +2160,7 @@ say('###########################################################################
 	lwd <- 0.5 # line width of bars
 	cexAxisLabel <- 0.25
 	cexPanelLabel <- 0.3
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels
 	
 	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
@@ -2111,7 +2395,7 @@ say('###########################################################################
 								
 								x <- left + 0.8 * xSize
 								y <- bottom + 0.12 * ySize
-								text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+								text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1 * labCex, pos=2)
 								
 							}
 
@@ -2186,6 +2470,7 @@ say('###########################################################################
 	lwd <- 0.5 # line width of bars
 	cexAxisLabel <- 0.25
 	cexPanelLabel <- 0.3
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels
 	
 	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
@@ -2376,7 +2661,7 @@ say('###########################################################################
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1 * labCex, pos=2)
 							
 						}
 
@@ -2454,6 +2739,7 @@ say('###########################################################################
 	lwd <- 0.5 # line width of bars
 	cexAxisLabel <- 0.25
 	cexPanelLabel <- 0.3
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels
 	
 	correlations <- read.csv('./Results/Correlations between Variables as a Function of Rotation between Them.csv')
 
@@ -2644,7 +2930,7 @@ say('###########################################################################
 							
 							x <- left + 0.8 * xSize
 							y <- bottom + 0.12 * ySize
-							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=0.8 * labCex, pos=2)
+							text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1 * labCex, pos=2)
 							
 						}
 
@@ -2692,126 +2978,126 @@ say('###########################################################################
 	
 	} # next algorithm
 
-# say('#####################################################################################')
-# say('### [extra] investigating decline in performance of OMNI control at large extents ###')
-# say('#####################################################################################')
+say('#####################################################################################')
+say('### [extra] investigating decline in performance of OMNI control at large extents ###')
+say('#####################################################################################')
 
-	# say('I want to investigate the why OMNI control seems to decline in performance as extent goes above 2048 cells on a side. I am guessing this is due to location of some test presences in highly unlikely locations (ie at very low values of TRUE).', breaks=100)
+	say('I want to investigate the why OMNI control seems to decline in performance as extent goes above 2048 cells on a side. I am guessing this is due to location of some test presences in highly unlikely locations (ie at very low values of TRUE).', breaks=100)
 	
-	# # generalization
-	# scenarioDir <- 'H:/Global Change Program/Research/ENMs - Predictor Inference/Results/extent'
-	# simDir <- paste0(scenarioDir, '/!scenario data')
-	# evalDir <- paste0(scenarioDir, '/evaluations')
+	# generalization
+	scenarioDir <- 'H:/Global Change Program/Research/ENMs - Predictor Inference/Results/extent'
+	simDir <- paste0(scenarioDir, '/!scenario data')
+	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	# # threshold
-	# threshold <- 0 # tabulate proportion of test presences less than this value for each simulation
+	# threshold
+	threshold <- 0 # tabulate proportion of test presences less than this value for each simulation
 	
-	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
-	# evals$rangeT1 <- evals$maxT1 - evals$minT1
+	# load evaluations and calculate x-axis variable
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	evals$rangeT1 <- evals$maxT1 - evals$minT1
 	
-	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
-	# xlab <- 'Range of TRUE variable' # x-axis label
+	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
+	xlab <- 'Range of TRUE variable' # x-axis label
 
-	# # landscape sizes
-	# landscapeSizes <- sort(unique(evals$sizeNative))
+	# landscape sizes
+	landscapeSizes <- sort(unique(evals$sizeNative))
 	
-	# # will store proportion of test presences less than the threshold for each simulation
-	# test <- data.frame()
+	# will store proportion of test presences less than the threshold for each simulation
+	test <- data.frame()
 	
-	# for (landscapeSize in landscapeSizes) {
+	for (landscapeSize in landscapeSizes) {
 	
-		# for (iter in 1:100) {
+		for (iter in 1:100) {
 	
-			# load(paste0(simDir, '/landscape size = ', prefix(landscapeSize, 4), ' cells sim ', prefix(iter, 4), '.RData'))
-			# proportLtThold <- sum(sim$testData$testPres$T1 < threshold) / length(sim$testData$testPres$T1)
+			load(paste0(simDir, '/landscape size = ', prefix(landscapeSize, 4), ' cells sim ', prefix(iter, 4), '.RData'))
+			proportLtThold <- sum(sim$testData$testPres$T1 < threshold) / length(sim$testData$testPres$T1)
 			
-			# cbiMulti <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sizeNative == landscapeSize & evals$iter == iter]
+			cbiMulti <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sizeNative == landscapeSize & evals$iter == iter]
 			
-			# test <- rbind(
-				# test,
-				# data.frame(
-					# threshold = threshold,
-					# landscapeSize = landscapeSize,
-					# iter = iter,
-					# proportLtThold = proportLtThold,
-					# cbiMulti = cbiMulti
-				# )
-			# )
+			test <- rbind(
+				test,
+				data.frame(
+					threshold = threshold,
+					landscapeSize = landscapeSize,
+					iter = iter,
+					proportLtThold = proportLtThold,
+					cbiMulti = cbiMulti
+				)
+			)
 			
-		# }
+		}
 		
-	# }
+	}
 	
-	# plot(0, 0, xlim=c(0, 1), ylim=c(-1, 1), xlab='Proportion of test presences\nwith TRUE < 0', ylab='CBI', col='white')
+	plot(0, 0, xlim=c(0, 1), ylim=c(-1, 1), xlab='Proportion of test presences\nwith TRUE < 0', ylab='CBI', col='white')
 	
-	# cols <- paste0('gray', round(100 / (1 + seq_along(landscapeSizes))))
+	cols <- paste0('gray', round(100 / (1 + seq_along(landscapeSizes))))
 	
-	# for (count in seq_along(landscapeSizes)) {
+	for (count in seq_along(landscapeSizes)) {
 
-		# landscapeSize <- landscapeSizes[count]
-		# col <- cols[count]
+		landscapeSize <- landscapeSizes[count]
+		col <- cols[count]
 		
-		# x <- test$proportLtThold[test$landscapeSize == landscapeSize]
-		# y <- test$cbiMulti[test$landscapeSize == landscapeSize]
+		x <- test$proportLtThold[test$landscapeSize == landscapeSize]
+		y <- test$cbiMulti[test$landscapeSize == landscapeSize]
 		
-		# xOrder <- order(x)
-		# x <- x[xOrder]
-		# y <- y[xOrder]
+		xOrder <- order(x)
+		x <- x[xOrder]
+		y <- y[xOrder]
 		
-		# yTrans <- logitAdj(0.5 * (y + 1), epsilon=0.001)
+		yTrans <- logitAdj(0.5 * (y + 1), epsilon=0.001)
 		
-		# lm <- lm(yTrans ~ x)
-		# lmPred <- predict(lm)
-		# lmPred <- (2 * probitAdj(lmPred, epsilon=0.001)) - 1
+		lm <- lm(yTrans ~ x)
+		lmPred <- predict(lm)
+		lmPred <- (2 * probitAdj(lmPred, epsilon=0.001)) - 1
 		
-		# points(x, y, col=col, pch=count)
-		# lines(x, lmPred, col=col, lwd=5)
+		points(x, y, col=col, pch=count)
+		lines(x, lmPred, col=col, lwd=5)
 		
-	# }
+	}
 	
-	# legend('topright', legend=landscapeSizes, col=cols, lwd=3)
+	legend('topright', legend=landscapeSizes, col=cols, lwd=3)
 
-# say('##############################################')
-# say('### [extra] sensitivity of CBI to outliers ###')
-# say('##############################################')
+say('##############################################')
+say('### [extra] sensitivity of CBI to outliers ###')
+say('##############################################')
 
-	# say('The analysis "### [extra] investigating decline in performance of OMNI control at large extents ###" was based on a hypothesis that is correct, but not well-indicated by the analysis in that section. I discovered through trial-and-error that CBI is very sensitivity to improbable test presences (test presences in areas with very low probability of presence. This analysis will demonstrate this.', breaks=100)
+	say('The analysis "### [extra] investigating decline in performance of OMNI control at large extents ###" was based on a hypothesis that is correct, but not well-indicated by the analysis in that section. I discovered through trial-and-error that CBI is very sensitivity to improbable test presences (test presences in areas with very low probability of presence. This analysis will demonstrate this.', breaks=100)
 
-	# scenarioDir <- './Results/extent' # scenario directory
+	scenarioDir <- './Results/extent' # scenario directory
 
-	# # probability of presence of a single improbable presence
-	# improbPres <- c(10^(-1:-4))
+	# probability of presence of a single improbable presence
+	improbPres <- c(10^(-1:-4))
 	
-	# # background probability of presence
-	# bg <- seq(0, 1, length.out=10000)
+	# background probability of presence
+	bg <- seq(0, 1, length.out=10000)
 
-	# from <- 0.5
-	# to <- 1
+	from <- 0.5
+	to <- 1
 	
-	# png(paste0(scenarioDir, '/Sensitivity of CBI to Improbable Test Presences.png'), width=1200, height=1200, res=600)
+	png(paste0(scenarioDir, '/Sensitivity of CBI to Improbable Test Presences.png'), width=1200, height=1200, res=600)
 		
-		# par(oma=rep(0, 4), mar=c(4, 4, 1, 1), cex=0.5)
+		par(oma=rep(0, 4), mar=c(4, 4, 1, 1), cex=0.5)
 		
-		# plot(1, 1, col='white', xlab=bquote('Probability of improbable presence (log'['10']*')'), ylab='CBI', xlim=range(log10(improbPres)), ylim=c(0, 1))
+		plot(1, 1, col='white', xlab=bquote('Probability of improbable presence (log'['10']*')'), ylab='CBI', xlim=range(log10(improbPres)), ylim=c(0, 1))
 		
-		# for (i in seq_along(improbPres)) {
+		for (i in seq_along(improbPres)) {
 		
-			# improb <- improbPres[i]
-			# say(improb)
-			# probPres <- seq(from, to, length.out=199)
-			# cbi <- contBoyce(c(improb, probPres), bg, numBins=1001)
-			# points(log10(improb), cbi, pch=16, col='red')
+			improb <- improbPres[i]
+			say(improb)
+			probPres <- seq(from, to, length.out=199)
+			cbi <- contBoyce(c(improb, probPres), bg, numBins=1001)
+			points(log10(improb), cbi, pch=16, col='red')
 			
-			# probPres <- seq(from, to, length.out=200)
-			# cbi <- contBoyce(probPres, bg, numBins=1001)
-			# points(log10(improb), cbi)
+			probPres <- seq(from, to, length.out=200)
+			cbi <- contBoyce(probPres, bg, numBins=1001)
+			points(log10(improb), cbi)
 			
-		# }
+		}
 		
-		# legend('bottomright', legend=c('with improbable presence', 'without improbable presence'), pch=c(16, 1), col=c('red', 'black'), bty='n')
+		legend('bottomright', legend=c('with improbable presence', 'without improbable presence'), pch=c(16, 1), col=c('red', 'black'), bty='n')
 		
-	# dev.off()
+	dev.off()
 		
 #################################
 say('DONE!!!', level=1, deco='&')
