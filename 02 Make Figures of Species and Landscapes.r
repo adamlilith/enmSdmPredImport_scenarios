@@ -641,7 +641,7 @@ say('###########################################################################
 			labelFig(lab, adj=c(-0.03, -0.1), cex=1.8, col='black')
 			
 			# sigma1 axis label
-			text(0.5, -0.4, labels='Niche width in T1', xpd=NA, col='black', cex=2)
+			text(0.5, -0.4, labels='Niche breadth in T1', xpd=NA, col='black', cex=2)
 			
 			# TRUE2
 			par(mar=c(4, 1, 0, 0), fg=NA)
@@ -697,7 +697,7 @@ say('###########################################################################
 					
 					# sigma2 axis label
 					if (countSigma1 == 1 & countSigma2 == 2) {
-						text(-0.34, 0.5, labels='Niche width in T2', xpd=NA, col='black', srt=90, cex=2)
+						text(-0.34, 0.5, labels='Niche breadth in T2', xpd=NA, col='black', srt=90, cex=2)
 					}
 					
 				} # next sigma1
@@ -845,12 +845,12 @@ say('###########################################################################
 					# sigma1 axis label
 					if (countSigma1 == 2 & countSigma2 == 3) {
 					
-						text(0.5, 1.35, labels='Niche width in T1', xpd=NA, col='black', srt=0, cex=2)
+						text(0.5, 1.35, labels='Niche breadth in T1', xpd=NA, col='black', srt=0, cex=2)
 					}
 					
 					# sigma2 axis label
 					if (countSigma1 == 1 & countSigma2 == 2) {
-						text(-0.34, 0.5, labels='Niche width in T2', xpd=NA, col='black', srt=90, cex=2)
+						text(-0.34, 0.5, labels='Niche breadth in T2', xpd=NA, col='black', srt=90, cex=2)
 					}
 					
 				} # next sigma1
