@@ -39,18 +39,15 @@
 ### libraries ###
 #################
 
-	library(compiler)
+	# CRAN
 	library(sp)
-	library(rgdal)
 	library(raster)
 	library(RColorBrewer)
-	library(rgeos)
-	library(rJava)
-	options(java.parameters='-Xmx1g' )
-	library(dismo)
 	library(plotrix)
 	library(fpCompare)
 	library(scales)
+
+	# custom libraries (on GitHub, user account adamlilith)
 	library(omnibus)
 	library(enmSdm)
 	library(statisfactory)
@@ -68,9 +65,6 @@
 	algos <- c('omniscient', 'gam', 'maxent', 'brt')
 	sdmAlgos <- c('gam', 'maxent', 'brt')
 
-	# responses to plot
-	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
-	
 	### For a given response range to be considered well-calibrated, it must be within +- 100 * calibTol% of the range of the OMNI model's range (eg if calibTol = 0.1 it must be within +- 10% of the OMNI models' range)
 	### For a given response's median to be considered well-calibrated, it must be within the innermost +-100 * calibTol% quantile (eg, if calibTol = 0.1, it must be within the 40th and 60th quantiles)
 	calibTol <- 0.1
@@ -360,7 +354,7 @@
 		lwd <- 0.8 # line width of box borders
 		figLabPos <- c(-0.2250, 0.03) # position of figure label
 		
-		legCex <- 0.6 # legend
+		legCex <- 0.55 # legend
 		
 		ylabX1 <- -0.105 # position of inner y-axis label
 		ylabX2 <- -0.165 # position of outer y-axis label
@@ -428,17 +422,17 @@
 				rect(sdmControl, at=countX - nudge + subnudge, width=width, col=colSdmControl, border=borderSdmControl, xpd=NA, lwd=0.8)
 
 				leg <- c(
-					'OMNI control',
-					paste0('OMNI TRUE'),
-					paste0('OMNI FALSE'),
-					paste0(algosShort(algo), ' control'),
-					paste0(algosShort(algo), ' TRUE'),
-					paste0(algosShort(algo), ' FALSE')
+					'OMNI unpermuted',
+					paste0('OMNI TRUE perm.'),
+					paste0('OMNI FALSE perm.'),
+					paste0(algosShort(algo), ' unpermuted'),
+					paste0(algosShort(algo), ' TRUE perm.'),
+					paste0(algosShort(algo), ' FALSE perm.')
 				)
 			
 				par(lwd=0.5)
 			
-				legend('bottomright', inset=c(0, 0.05), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', 'white', colSdmControl, colTrue, colFalse), border=c(borderOmniControl, borderTrue, borderFalse, borderSdmControl, borderTrue, borderFalse))
+				legend('bottomleft', inset=c(0.02, 0.02), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', 'white', colSdmControl, colTrue, colFalse), border=c(borderOmniControl, borderTrue, borderFalse, borderSdmControl, borderTrue, borderFalse))
 				
 				adjust <- 0
 				
@@ -450,10 +444,10 @@
 			
 				# legend
 				leg <- c(
-					paste0('OMNI TRUE'),
-					paste0('OMNI FALSE'),
-					paste0(algosShort(algo), ' TRUE'),
-					paste0(algosShort(algo), ' FALSE')
+					paste0('OMNI TRUE perm.'),
+					paste0('OMNI FALSE perm.'),
+					paste0(algosShort(algo), ' TRUE perm.'),
+					paste0(algosShort(algo), ' FALSE perm.')
 				)
 			
 				par(lwd=0.5)
@@ -615,12 +609,12 @@
 				rect(sdmControl, at=countX - nudge + subnudge, width=width, col=colSdmControl, border=borderSdmControl, xpd=NA, lwd=0.8)
 
 				leg <- c(
-					'OMNI control',
-					paste0('OMNI TRUE1'),
-					paste0('OMNI TRUE2'),
-					paste0(algosShort(algo), ' control'),
-					paste0(algosShort(algo), ' TRUE1'),
-					paste0(algosShort(algo), ' TRUE2')
+					'OMNI unpermuted',
+					paste0('OMNI T1 perm.'),
+					paste0('OMNI T2 perm.'),
+					paste0(algosShort(algo), ' unpermuted'),
+					paste0(algosShort(algo), ' T1 perm.'),
+					paste0(algosShort(algo), ' T2 perm.')
 				)
 			
 				par(lwd=0.5)
@@ -637,10 +631,10 @@
 			
 				# legend
 				leg <- c(
-					paste0('OMNI TRUE1'),
-					paste0('OMNI TRUE2'),
-					paste0(algosShort(algo), ' TRUE1'),
-					paste0(algosShort(algo), ' TRUE2')
+					paste0('OMNI T1 perm.'),
+					paste0('OMNI T2 perm.'),
+					paste0(algosShort(algo), ' TRUE1 perm.'),
+					paste0(algosShort(algo), ' TRUE2 perm.')
 				)
 			
 				par(lwd=0.5)
@@ -850,8 +844,19 @@ say('###################################')
 	sublabY <- -0.07 # position of TRUE/FALSE variable sublabels
 	sublabCex <- 0.38 # size of TRUE/FALSE sublabels
 
-	algoLabY <- -0.34 # position of algorithm labels
+	algoLabY <- -0.62 # position of algorithm labels
 
+	# par settings
+	oma <- rep(0, 4)
+	mar <- c(3.7, 1.6, 0.5, 0.5)
+	mgp <- c(2, 0.2, 0)
+	cex.axis <- 0.35
+	lwd <- 0.6
+	
+	# image size
+	figWidth <- 900
+	figHeight <- 1100
+	
 	# master plot function
 	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, trueField, controlField, falseField, controlLab, omniHasFalse, expectHigher) {
 		
@@ -886,9 +891,9 @@ say('###################################')
 		
 		# x: variable labels
 		axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
-		text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
+		text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
 		if (!is.null(controlField)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep(controlLab, length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col='black')
-		text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
+		text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
 		
 		# x: algorithm labels
 		text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
@@ -974,14 +979,14 @@ say('###################################')
 	### multivariate: CBI
 	#####################
 	
-	png(paste0(scenarioDir, '/Multivariate CBI.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Multivariate CBI.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('CBI')
-		ylim <- c(-1, 1)
-		yTicks <- seq(-1, 1, by=0.5)
+		ylim <- c(-0.5, 1)
+		yTicks <- seq(-0.5, 1, by=0.5)
 		trueField <- 'cbiMulti_permT1'
 		controlField <- 'cbiMulti'
 		falseField <- 'cbiMulti_permF1'
@@ -989,7 +994,7 @@ say('###################################')
 		omniHasFalse <- TRUE
 		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -998,9 +1003,9 @@ say('###################################')
 	### multivariate: AUCpa
 	#######################
 	
-	png(paste0(scenarioDir, '/Multivariate AUCpa.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Multivariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('AUC'['pa'])
@@ -1013,7 +1018,7 @@ say('###################################')
 		omniHasFalse <- TRUE
 		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -1022,9 +1027,9 @@ say('###################################')
 	### multivariate: AUCbg
 	#######################
 	
-	png(paste0(scenarioDir, '/Multivariate AUCbg.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Multivariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('AUC'['bg'])
@@ -1037,7 +1042,7 @@ say('###################################')
 		omniHasFalse <- TRUE
 		expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -1046,9 +1051,9 @@ say('###################################')
 	### multivariate: CORpa
 	#######################
 	
-	png(paste0(scenarioDir, '/Multivariate CORpa.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Multivariate CORpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('COR'['pa'])
@@ -1069,9 +1074,9 @@ say('###################################')
 	### multivariate: CORbg
 	#######################
 	
-	png(paste0(scenarioDir, '/Multivariate CORbg.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Multivariate CORbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('COR'['bg'])
@@ -1093,9 +1098,9 @@ say('###################################')
 	### univariate: CBI
 	###################
 	
-	png(paste0(scenarioDir, '/Univariate CBI.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Univariate CBI.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('CBI')
@@ -1117,9 +1122,9 @@ say('###################################')
 	### univariate: AUCpa
 	#######################
 	
-	png(paste0(scenarioDir, '/Univariate AUCpa.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Univariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('AUC'['pa'])
@@ -1132,7 +1137,7 @@ say('###################################')
 		omniHasFalse <- FALSE
 		expectHigher <- TRUE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
@@ -1141,9 +1146,9 @@ say('###################################')
 	### univariate: AUCbg
 	#######################
 	
-	png(paste0(scenarioDir, '/Univariate AUCbg.png'), width=900, height=900, res=600)
+	png(paste0(scenarioDir, '/Univariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=rep(0, 4), mar=c(2.2, 2, 0.5, 0.5), mgp=c(2, 0.2, 0), cex.axis=0.35, lwd=0.6)
+		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
 		lab <- bquote('')
 		ylab <- bquote('AUC'['bg'])
@@ -1156,12 +1161,12 @@ say('###################################')
 		omniHasFalse <- FALSE
 		expectHigher <- TRUE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Control', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
 	dev.off()
-
+ 
 say('###########################')
 say('### [simple] statistics ###')
 say('###########################')
@@ -1236,30 +1241,14 @@ say('########################################')
 	decs <- 0 # number of decimals to show in x-axis variable tick mark labels
 	xlab <- 'Number of calibration presences' # x-axis label
 	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
+
+	# responses to plot
+	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
 	
 	# load evaluations and calculate x-axis variable
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
 	# plot results for each response
-	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
-
-say('###################################')
-say('### [extent] simulation results ###')
-say('###################################')
-
-	# generalization
-	scenarioDir <- './Results/extent' # scenario directory
-	evalDir <- paste0(scenarioDir, '/evaluations')
-	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
-	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
-	xlab <- 'Study region extent (range of TRUE)' # x-axis label
-	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
-
-	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
-	evals$rangeT1 <- evals$maxT1 - evals$minT1
-
-	# plot multivariate model results
 	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
 say('#######################################')
@@ -1274,9 +1263,34 @@ say('#######################################')
 	xlab <- 'Prevalence' # x-axis label
 	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
+	# responses to plot
+	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	
 	# load evaluations and calculate x-axis variable
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
+	# plot multivariate model results
+	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
+
+say('###################################')
+say('### [extent] simulation results ###')
+say('###################################')
+
+	# generalization
+	scenarioDir <- './Results/extent' # scenario directory
+	evalDir <- paste0(scenarioDir, '/evaluations')
+	xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
+	decs <- NULL # number of decimals to show in x-axis variable tick mark labels
+	xlab <- 'Study region extent (range of TRUE)' # x-axis label
+	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
+
+	# responses to plot
+	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	
+	# load evaluations and calculate x-axis variable
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	evals$rangeT1 <- evals$maxT1 - evals$minT1
+
 	# plot multivariate model results
 	multivariatePlotsTRUEvsFALSE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, xlab=xlab, evals=evals, resps=resps, expectHigher=expectHigher)
 
@@ -1292,6 +1306,9 @@ say('####################################################')
 	xlab <- 'Correlation between TRUE and FALSE' # x-axis label
 	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 
+	# responses to plot
+	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	
 	# load evaluations and calculate x-axis variable
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
@@ -1739,12 +1756,12 @@ say('#######################################')
 		
 	} # next test statistic
 	
-say('#######################################')
-say('### [bivariate] collate evaluations ###')
-say('#######################################')
+# # say('#######################################')
+# # say('### [bivariate] collate evaluations ###')
+# # say('#######################################')
 
-	evalDir <- './Results/bivariate/evaluations'
-	evals <- loadEvals(evalDir, algos=c('omniscient', 'brt', 'gam', 'maxent'), save=TRUE, redo=FALSE)
+	# # evalDir <- './Results/bivariate/evaluations'
+	# # evals <- loadEvals(evalDir, algos=c('omniscient', 'brt', 'gam', 'maxent'), save=TRUE, redo=FALSE)
 
 say('##############################')
 say('### [bivariate] statistics ###')
@@ -1848,6 +1865,9 @@ say('####################################')
 	decs <- 2 # number of decimals to show in x-axis variable tick mark labels
 	xlab <- bquote('Niche covariance (' * rho * ')') # x-axis label
 
+	# responses to plot
+	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	
 	# load evaluations and calculate x-axis variable
 	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	evals <- evals[evals$rotT2 %==% 90 & evals$sigma1 %==% 0.3 & evals$sigma2 %==% 0.3, ]
@@ -2124,9 +2144,9 @@ say('###########################################################################
 					par(lwd=lwd)
 				
 					legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
-						legend=c('OMNI control', paste0(algoNice, ' control'),
-						'OMNI T1', paste0(algoNice, ' T1'),
-						'OMNI T2', paste0(algoNice, ' T2')),
+						legend=c('OMNI unpermuted', paste0(algoNice, ' unpermuted'),
+						'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+						'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
 						fill=c('white', colSdmControl, 'white', colSdmT1, 'white', colSdmT2),
 						border=c(borderOmniControl, borderSdmControl, borderSdmT1, borderSdmT1, borderSdmT2, borderSdmT2)
 					)
@@ -2433,9 +2453,9 @@ say('###########################################################################
 						par(lwd=lwd)
 					
 						legend('bottom', inset=inset, xpd=NA, ncol=3, cex=cexLeg, bty='n',
-							legend=c('OMNI control', paste0(algoNice, ' control'),
-							'OMNI T1', paste0(algoNice, ' T1'),
-							'OMNI T2', paste0(algoNice, ' T2')),
+							legend=c('OMNI unpermuted', paste0(algoNice, ' unpermuted'),
+							'OMNI T1 permuted', paste0(algoNice, ' T1 permuted'),
+							'OMNI T2 permuted', paste0(algoNice, ' T2 permuted')),
 							fill=c('white', colSdmControl, 'white', colSdmT1, 'white', colSdmT2),
 							border=c(borderOmniControl, borderSdmControl, borderSdmT1, borderSdmT1, borderSdmT2, borderSdmT2)
 						)
@@ -2701,10 +2721,10 @@ say('###########################################################################
 					# foreground
 					legend('bottom', inset=inset, xpd=NA, ncol=2, cex=cexLeg, bty='n',
 						legend=c(
-							'OMNI T1',
-							paste0(algoNice, ' T1'),
-							'OMNI T2',
-							paste0(algoNice, ' T2')
+							'OMNI T1 permuted',
+							paste0(algoNice, ' T1 permuted'),
+							'OMNI T2 permuted',
+							paste0(algoNice, ' T2 permuted')
 						),
 						fill=c('white', colSdmT1, 'white', colSdmT2),
 						border=c(borderSdmT1, borderSdmT1, borderSdmT2, borderSdmT2)
@@ -2970,10 +2990,10 @@ say('###########################################################################
 					# foreground
 					legend('bottom', inset=inset, xpd=NA, ncol=2, cex=cexLeg, bty='n',
 						legend=c(
-							'OMNI T1',
-							paste0(algoNice, ' T1'),
-							'OMNI T2',
-							paste0(algoNice, ' T2')
+							'OMNI T1 permuted',
+							paste0(algoNice, ' T1 permuted'),
+							'OMNI T2 permuted',
+							paste0(algoNice, ' T2 permuted')
 						),
 						fill=c('white', colSdmT1, 'white', colSdmT2),
 						border=c(borderSdmT1, borderSdmT1, borderSdmT2, borderSdmT2)

@@ -29,18 +29,17 @@
 ### libraries ###
 #################
 
-	library(compiler)
+	# CRAN
 	library(sp)
 	library(rgdal)
 	library(raster)
 	library(RColorBrewer)
 	library(rgeos)
-	library(rJava)
-	options(java.parameters='-Xmx1g' )
-	library(dismo)
 	library(plotrix)
 	library(fpCompare)
 	library(scales)
+
+	# custom libraries (on GitHub, user account adamlilith)
 	library(omnibus)
 	library(enmSdm)
 	library(enmSdmPredImport)
