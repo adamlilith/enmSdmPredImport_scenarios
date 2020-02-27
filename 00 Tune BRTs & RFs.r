@@ -90,14 +90,17 @@
 ### functions ###
 #################
 
+	# CRAN
 	library(sp)
 	library(rgdal)
 	library(raster)
 	library(rJava)
 	options(java.parameters='-Xmx1g' )
 	library(gbm)
-	# library(party)
 	library(dismo)
+	# library(party)
+	
+	# custom libraries (on GitHub, user account adamlilith)
 	library(omnibus)
 	library(enmSdm)
 	library(enmSdmPredImport)

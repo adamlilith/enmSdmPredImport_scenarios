@@ -80,6 +80,7 @@
 ### functions ###
 #################
 
+	# CRAN
 	library(sp)
 	library(rgdal)
 	library(raster)
@@ -87,6 +88,8 @@
 	options(java.parameters='-Xmx1g' )
 	library(gbm)
 	library(dismo)
+
+	# custom libraries (on GitHub, user account adamlilith)
 	library(omnibus)
 	library(enmSdm)
 	library(enmSdmPredImport)

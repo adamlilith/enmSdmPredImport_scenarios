@@ -36,18 +36,13 @@
 ### libraries ###
 #################
 
-	library(compiler)
-	library(sp)
-	library(rgdal)
-	library(raster)
+	# CRAN
 	library(RColorBrewer)
-	library(rgeos)
-	library(rJava)
-	options(java.parameters='-Xmx1g' )
-	library(dismo)
 	library(plotrix)
 	library(fpCompare)
 	library(scales)
+
+	# custom libraries (on GitHub, user account adamlilith)
 	library(omnibus)
 	library(enmSdm)
 	library(statisfactory)
