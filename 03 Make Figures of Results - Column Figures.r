@@ -1166,7 +1166,7 @@ say('###################################')
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
 	dev.off()
-print(NON) 
+
 say('###########################')
 say('### [simple] statistics ###')
 say('###########################')
@@ -1174,7 +1174,7 @@ say('###########################')
 	scenarioDir <- './Results/simple'
 	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=TRUE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 	# OMNI AUC
 	x <- evals$aucPresAbsMulti[evals$algo=='omniscient']
