@@ -2,7 +2,7 @@
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Column Figures.r')
 ###
-### The code in this document is intended to be run after all models have been calibrated and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take several hours, depending on the number of scenarios modeled. The script contains code to flag cases where tests can discriminate between TRUE and FALSE variables of two TRUE variables, as well as cases where the results are well-calibrated with the omniscient model.
+### The code in this document is intended to be run after all models have been calibrated and evaluated. It creates figures, one per test statistic (AUCpa, AUCbg, CBI, CORpa, and CORbg) mostly in "column" form, with three subpanels, one per SDM algorithm.  Results for the bivariate modeling appear as one figure per algorithm per test statistic. The code relies on a set of plotting functions which appear in the beginning of the document.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
@@ -1166,7 +1166,7 @@ say('###################################')
 		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
 	dev.off()
-print(NON) 
+
 say('###########################')
 say('### [simple] statistics ###')
 say('###########################')
@@ -1174,7 +1174,7 @@ say('###########################')
 	scenarioDir <- './Results/simple'
 	evalDir <- paste0(scenarioDir, '/evaluations')
 
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=TRUE)
+	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 	
 	# OMNI AUC
 	x <- evals$aucPresAbsMulti[evals$algo=='omniscient']
