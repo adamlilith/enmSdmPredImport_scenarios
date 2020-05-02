@@ -2,7 +2,7 @@
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Simplified Figures for a Single Algorithm.r')
 ###
-### The code in this document is intended to be run after all models have been calibrated and evaluated. Most of the sections run extremely quickly except for the section that collates evaluation results for the [bivariate] experiment ("### [bivariate] collate evaluations ###") which can take several hours, depending on the number of scenarios modeled. The script contains code to flag cases where tests can discriminate between TRUE and FALSE variables of two TRUE variables, as well as cases where the results are well-calibrated with the omniscient model.
+### The code in this document is intended to be run after all models have been calibrated and evaluated. It creates one figure per test statistic (AUCpa, AUCbg, CBI, CORpa, or CORbg) per SDM algorithm. Most of the sections run extremely quickly. The code relies on a set of plotting functions which appear at the beginning of the document.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
@@ -31,9 +31,6 @@
 ### [bivariate] landscape correlation x niche covariance bar plots for AUC ###
 ### [bivariate] landscape correlation x niche covariance bar plots for CORpa ###
 ### [bivariate] landscape correlation x niche covariance bar plots for CORbg ###
-
-### [extra] investigating decline in performance of OMNI control at large extents ###
-### [extra] sensitivity of CBI to outliers ###
 
 #################
 ### libraries ###
@@ -2666,127 +2663,6 @@ say('###########################################################################
 	
 	} # next algorithm
 
-# say('#####################################################################################')
-# say('### [extra] investigating decline in performance of OMNI control at large extents ###')
-# say('#####################################################################################')
-
-	# say('I want to investigate the why OMNI control seems to decline in performance as extent goes above 2048 cells on a side. I am guessing this is due to location of some test presences in highly unlikely locations (ie at very low values of TRUE).', breaks=100)
-	
-	# # generalization
-	# scenarioDir <- 'H:/Global Change Program/Research/ENMs - Predictor Inference/Results/extent'
-	# simDir <- paste0(scenarioDir, '/!scenario data')
-	# evalDir <- paste0(scenarioDir, '/evaluations')
-
-	# # threshold
-	# threshold <- 0 # tabulate proportion of test presences less than this value for each simulation
-	
-	# # load evaluations and calculate x-axis variable
-	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
-	# evals$rangeT1 <- evals$maxT1 - evals$minT1
-	
-	# xCol <- 'rangeT1' # name of x-axis variable column in evaluation data frame
-	# xlab <- 'Range of TRUE variable' # x-axis label
-
-	# # landscape sizes
-	# landscapeSizes <- sort(unique(evals$sizeNative))
-	
-	# # will store proportion of test presences less than the threshold for each simulation
-	# test <- data.frame()
-	
-	# for (landscapeSize in landscapeSizes) {
-	
-		# for (iter in 1:100) {
-	
-			# load(paste0(simDir, '/landscape size = ', prefix(landscapeSize, 4), ' cells sim ', prefix(iter, 4), '.RData'))
-			# proportLtThold <- sum(sim$testData$testPres$T1 < threshold) / length(sim$testData$testPres$T1)
-			
-			# cbiMulti <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sizeNative == landscapeSize & evals$iter == iter]
-			
-			# test <- rbind(
-				# test,
-				# data.frame(
-					# threshold = threshold,
-					# landscapeSize = landscapeSize,
-					# iter = iter,
-					# proportLtThold = proportLtThold,
-					# cbiMulti = cbiMulti
-				# )
-			# )
-			
-		# }
-		
-	# }
-	
-	# plot(0, 0, xlim=c(0, 1), ylim=c(-1, 1), xlab='Proportion of test presences\nwith TRUE < 0', ylab='CBI', col='white')
-	
-	# cols <- paste0('gray', round(100 / (1 + seq_along(landscapeSizes))))
-	
-	# for (count in seq_along(landscapeSizes)) {
-
-		# landscapeSize <- landscapeSizes[count]
-		# col <- cols[count]
-		
-		# x <- test$proportLtThold[test$landscapeSize == landscapeSize]
-		# y <- test$cbiMulti[test$landscapeSize == landscapeSize]
-		
-		# xOrder <- order(x)
-		# x <- x[xOrder]
-		# y <- y[xOrder]
-		
-		# yTrans <- logitAdj(0.5 * (y + 1), epsilon=0.001)
-		
-		# lm <- lm(yTrans ~ x)
-		# lmPred <- predict(lm)
-		# lmPred <- (2 * probitAdj(lmPred, epsilon=0.001)) - 1
-		
-		# points(x, y, col=col, pch=count)
-		# lines(x, lmPred, col=col, lwd=5)
-		
-	# }
-	
-	# legend('topright', legend=landscapeSizes, col=cols, lwd=3)
-
-# say('##############################################')
-# say('### [extra] sensitivity of CBI to outliers ###')
-# say('##############################################')
-
-	# say('The analysis "### [extra] investigating decline in performance of OMNI control at large extents ###" was based on a hypothesis that is correct, but not well-indicated by the analysis in that section. I discovered through trial-and-error that CBI is very sensitivity to improbable test presences (test presences in areas with very low probability of presence. This analysis will demonstrate this.', breaks=100)
-
-	# scenarioDir <- './Results/extent' # scenario directory
-
-	# # probability of presence of a single improbable presence
-	# improbPres <- c(10^(-1:-4))
-	
-	# # background probability of presence
-	# bg <- seq(0, 1, length.out=10000)
-
-	# from <- 0.5
-	# to <- 1
-	
-	# png(paste0(scenarioDir, '/Sensitivity of CBI to Improbable Test Presences.png'), width=1200, height=1200, res=600)
-		
-		# par(oma=rep(0, 4), mar=c(4, 4, 1, 1), cex=0.5)
-		
-		# plot(1, 1, col='white', xlab=bquote('Probability of improbable presence (log'['10']*')'), ylab='CBI', xlim=range(log10(improbPres)), ylim=c(0, 1))
-		
-		# for (i in seq_along(improbPres)) {
-		
-			# improb <- improbPres[i]
-			# say(improb)
-			# probPres <- seq(from, to, length.out=199)
-			# cbi <- contBoyce(c(improb, probPres), bg, numBins=1001)
-			# points(log10(improb), cbi, pch=16, col='red')
-			
-			# probPres <- seq(from, to, length.out=200)
-			# cbi <- contBoyce(probPres, bg, numBins=1001)
-			# points(log10(improb), cbi)
-			
-		# }
-		
-		# legend('bottomright', legend=c('with improbable presence', 'without improbable presence'), pch=c(16, 1), col=c('red', 'black'), bty='n')
-		
-	# dev.off()
-		
 #################################
 say('DONE!!!', level=1, deco='&')
 say(date()) #####################
