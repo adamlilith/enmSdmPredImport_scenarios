@@ -95,6 +95,9 @@
 	colSdmT2 <- colOmniT2 <- '#c2a5cf' # light purple (CB safe)
 	borderSdmT2 <- borderOmniT2 <- '#7b3294' # dark purple (CB safe)
 
+	### gray background
+	panelBgCol <- 'gray87'
+	
 ###############################
 ### case-specific functions ###
 ###############################
@@ -378,7 +381,7 @@
 		# gray background
 		left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
 		right <- length(x) + (2 + ifelse(is.null(controlField), 0.25, 0)) * nudge
-		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col=panelBgCol, border=NA, xpd=NA)
 		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.8 * lwd, xpd=NA)
 		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
 		for (i in 1:(length(x) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
@@ -565,7 +568,7 @@
 		# gray background
 		left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
 		right <- length(x) + (2 + ifelse(is.null(controlField), 0.25, 0)) * nudge
-		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col=panelBgCol, border=NA, xpd=NA)
 		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.8 * lwd, xpd=NA)
 		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
 		for (i in 1:(length(x) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
@@ -633,13 +636,13 @@
 				leg <- c(
 					paste0('OMNI T1 perm.'),
 					paste0('OMNI T2 perm.'),
-					paste0(algosShort(algo), ' TRUE1 perm.'),
-					paste0(algosShort(algo), ' TRUE2 perm.')
+					paste0(algosShort(algo), ' T1 perm.'),
+					paste0(algosShort(algo), ' T2 perm.')
 				)
 			
 				par(lwd=0.5)
 
-				legend('bottomright', inset=c(0, 0.025), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', colTrue, colFalse), border=c(borderTrue, borderFalse, borderTrue, borderFalse))
+				legend('bottomright', inset=c(0, 0.025), ncol=2, bty='n', legend=leg, cex=legCex, fill=c('white', 'white', colSdmT1, colSdmT2), border=c(borderSdmT1, borderSdmT2, borderSdmT1, borderSdmT2))
 				
 				adjust <- 1/2 * nudge
 				
@@ -884,7 +887,7 @@ say('###################################')
 		# gray background
 		left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
 		right <- length(algos) + (2.5 + ifelse(is.null(controlField), 0.25, -0.3)) * nudge
-		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col='gray85', border=NA, xpd=NA)
+		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col=panelBgCol, border=NA, xpd=NA)
 		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
 		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
 		for (i in 1:(length(algos) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
@@ -1352,7 +1355,7 @@ say('#######################################')
 	lwd <- 0.4 # line width of bars
 	cexAxisLabel <- 0.5
 	cexPanelLabel <- 0.7
-	labCex <- 0.65 # size of algorithm, y-axis, and figure labels	
+	labCex <- 0.65 # size of algorithm, y-axis, and figure labels
 
 	lineDensity <- NULL
 	
@@ -1485,7 +1488,7 @@ say('#######################################')
 						right <- countGrain + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
 						bottom <- subplotPosY - 0.5 * ySize
 						top <- subplotPosY + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 						lines(c(left, right), c(subplotPosY, subplotPosY), lwd=1.5 * lwd, col='white')
 
 						# OMNI control (unpermuted)
@@ -1681,7 +1684,7 @@ say('#######################################')
 						right <- countGrain + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
 						bottom <- subplotPosY - 0.5 * ySize
 						top <- subplotPosY + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 						lines(c(left, right), c(subplotPosY, subplotPosY), lwd=1.5 * lwd, col='white')
 
 						# OMNI permuted T1
@@ -2041,7 +2044,7 @@ say('###########################################################################
 						right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
 						bottom <- sigma2 - 0.5 * ySize
 						top <- sigma2 + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 						lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
 						# OMNI control (unpermuted)
@@ -2350,7 +2353,7 @@ say('###########################################################################
 							right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
 							bottom <- sigma2 - 0.5 * ySize
 							top <- sigma2 + 0.5 * ySize
-							polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+							polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 							lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
 							# OMNI control (unpermuted)
@@ -2636,7 +2639,7 @@ say('###########################################################################
 						right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
 						bottom <- sigma2 - 0.5 * ySize
 						top <- sigma2 + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 						lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
 						# OMNI permuted T1
@@ -2905,7 +2908,7 @@ say('###########################################################################
 						right <- sigma1 + 0.5 * xSize + 3 * offsetInSubplot * xSize
 						bottom <- sigma2 - 0.5 * ySize
 						top <- sigma2 + 0.5 * ySize
-						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col='gray90', border=NA, xpd=NA)
+						polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
 						lines(c(left, right), c(sigma2, sigma2), lwd=1.5 * lwd, col='white')
 
 						# OMNI permuted T1
