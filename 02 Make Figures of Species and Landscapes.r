@@ -1,6 +1,8 @@
 ### SDM PREDICTOR INFERENCE - ILLUSTRATIONS
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/02 Make Figures of Species and Landscapes.r')
+###
+### The code in this script generates the figures in Appendix 2 of Smith & Santos. Figures represent maps of the environmental variables and the species' true probability of occurrence.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())

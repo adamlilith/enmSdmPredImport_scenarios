@@ -2,7 +2,7 @@
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Column Figures.r')
 ###
-### The code in this document is intended to be run after all models have been calibrated and evaluated. It creates figures, one per test statistic (AUCpa, AUCbg, CBI, CORpa, and CORbg) mostly in "column" form, with three subpanels, one per SDM algorithm.  Results for the bivariate modeling appear as one figure per algorithm per test statistic. The code relies on a set of plotting functions which appear in the beginning of the document.
+### The code in this document is intended to be run after all models have been calibrated and evaluated and creates figures used in Appendices 4-8 of Smith & Santos. For Experiments 1 through 6 it creates figures, one per test statistic (AUCpa, AUCbg, CBI, CORpa, and CORbg) mostly in "column" form, with three subpanels, one per SDM algorithm. Figures for the bivariate modeling in Experiments 7 through 9 each represent one per algorithm per test statistic. The code relies on a set of plotting functions which appear in the beginning of the document.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
@@ -826,349 +826,349 @@
 		
 	}
 
-say('###################################')
-say('### [simple] simulation results ###')
-say('###################################')
+# say('###################################')
+# say('### [simple] simulation results ###')
+# say('###################################')
 
-	scenarioDir <- './Results/simple'
-	evalDir <- paste0(scenarioDir, '/evaluations')
+	# scenarioDir <- './Results/simple'
+	# evalDir <- paste0(scenarioDir, '/evaluations')
 
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
 
-	# generalization
-	width <- 0.14 # bar width
-	nudge <- 0.22 # nudge left/right
-	figLabPos <- c(-0.15, 0.05) # position of figure label
+	# # generalization
+	# width <- 0.14 # bar width
+	# nudge <- 0.22 # nudge left/right
+	# figLabPos <- c(-0.15, 0.05) # position of figure label
 	
-	ylabX1 <- -0.18 # position of inner y-axis label
-	ylabX2 <- -0.26 # position of outer y-axis label
-	labCex <- 0.45 # size of algorithm, y-axis, and figure labels
+	# ylabX1 <- -0.18 # position of inner y-axis label
+	# ylabX2 <- -0.26 # position of outer y-axis label
+	# labCex <- 0.45 # size of algorithm, y-axis, and figure labels
 	
-	sublabY <- -0.07 # position of TRUE/FALSE variable sublabels
-	sublabCex <- 0.38 # size of TRUE/FALSE sublabels
+	# sublabY <- -0.07 # position of TRUE/FALSE variable sublabels
+	# sublabCex <- 0.38 # size of TRUE/FALSE sublabels
 
-	algoLabY <- -0.62 # position of algorithm labels
+	# algoLabY <- -0.62 # position of algorithm labels
 
-	# par settings
-	oma <- rep(0, 4)
-	mar <- c(3.7, 1.6, 0.5, 0.5)
-	mgp <- c(2, 0.2, 0)
-	cex.axis <- 0.35
-	lwd <- 0.6
+	# # par settings
+	# oma <- rep(0, 4)
+	# mar <- c(3.7, 1.6, 0.5, 0.5)
+	# mgp <- c(2, 0.2, 0)
+	# cex.axis <- 0.35
+	# lwd <- 0.6
 	
-	# image size
-	figWidth <- 900
-	figHeight <- 1100
+	# # image size
+	# figWidth <- 900
+	# figHeight <- 1100
 	
-	# master plot function
-	plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, trueField, controlField, falseField, controlLab, omniHasFalse, expectHigher) {
+	# # master plot function
+	# plotSimpleResp <- function(nudge, ylim, yTicks, ylab, lab, rand, trueField, controlField, falseField, controlLab, omniHasFalse, expectHigher) {
 		
-		# nudge 	amount to move bars in same group (algorithm) left or right
-		# ylim		y-axis limits
-		# ylab		y-axis label
-		# yTicks	position of tick marks on y-axis
-		# lab		figure label
-		# rand		value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
-		# trueField	field name of response for TRUE variable
-		# controlField	field name of response for control case (or NULL if none)
-		# falseField	field name of response for FALSE variable
-		# controlLab character, name of bar representing "control" model/prediction
-		# omniHasFalse   logical, if TRUE then test discrimination and calibration accuracy of OMNI TRUE versus FALSE (TRUE for multivariate tests using performance metrics and FALSE for univariate tests using performance metrics)... FALSE for CORpa and CORbg
-		# expectHigher if test can discriminate, should values of TRUE or FALSE be higher ('true', 'false')
+		# # nudge 	amount to move bars in same group (algorithm) left or right
+		# # ylim		y-axis limits
+		# # ylab		y-axis label
+		# # yTicks	position of tick marks on y-axis
+		# # lab		figure label
+		# # rand		value of response equal to "random prediction" (eg 0.5 for AUC or 0 for CBI)
+		# # trueField	field name of response for TRUE variable
+		# # controlField	field name of response for control case (or NULL if none)
+		# # falseField	field name of response for FALSE variable
+		# # controlLab character, name of bar representing "control" model/prediction
+		# # omniHasFalse   logical, if TRUE then test discrimination and calibration accuracy of OMNI TRUE versus FALSE (TRUE for multivariate tests using performance metrics and FALSE for univariate tests using performance metrics)... FALSE for CORpa and CORbg
+		# # expectHigher if test can discriminate, should values of TRUE or FALSE be higher ('true', 'false')
 		
-		# adjust nudging of bars in same groups
-		if (is.null(controlField)) nudge <- nudge / 2
+		# # adjust nudging of bars in same groups
+		# if (is.null(controlField)) nudge <- nudge / 2
 		
-		# base plot
-		plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(algos)), ylim=ylim)
-		labelFig(lab, adj=figLabPos, cex=labCex)
-		usr <- par('usr')
+		# # base plot
+		# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=c(0.5, length(algos)), ylim=ylim)
+		# labelFig(lab, adj=figLabPos, cex=labCex)
+		# usr <- par('usr')
 
-		# gray background
-		left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
-		right <- length(algos) + (2.5 + ifelse(is.null(controlField), 0.25, -0.3)) * nudge
-		polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col=panelBgCol, border=NA, xpd=NA)
-		lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
-		for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
-		for (i in 1:(length(algos) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
+		# # gray background
+		# left <- 1 - (2 + ifelse(is.null(controlField), 0.75, 0)) * nudge
+		# right <- length(algos) + (2.5 + ifelse(is.null(controlField), 0.25, -0.3)) * nudge
+		# polygon(x=c(left, right, right, left), y=c(min(yTicks), min(yTicks), max(yTicks), max(yTicks)), col=panelBgCol, border=NA, xpd=NA)
+		# lines(x=c(left, right), y=c(rand, rand), col='white', lwd=1.4, xpd=NA)
+		# for (ats in yTicks) lines(x=c(left, right), y=c(ats, ats), col='white', lwd=0.5, xpd=NA)
+		# for (i in 1:(length(algos) - 1)) lines(x=c(i + 0.5, i + 0.5), y=c(-1, 1), col='white', lwd=0.5, xpd=NA)
 		
-		# x: variable labels
-		axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
-		text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
-		if (!is.null(controlField)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep(controlLab, length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col='black')
-		text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
+		# # x: variable labels
+		# axis(1, at=seq_along(algos), labels=rep('', length(algos)), tck=-0.03, lwd=0.8)
+		# text(seq_along(algos) - nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('TRUE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderTrue)
+		# if (!is.null(controlField)) text(seq_along(algos), y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep(controlLab, length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col='black')
+		# text(seq_along(algos) + nudge, y=rep(usr[3] + sublabY * (usr[4] - usr[3]), length(algos)), labels=rep('FALSE permuted', length(algos)), cex=sublabCex, xpd=NA, srt=90, adj=c(1, 0.3), col=borderFalse)
 		
-		# x: algorithm labels
-		text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
+		# # x: algorithm labels
+		# text(seq_along(algos), y=rep(usr[3] + algoLabY * (usr[4] - usr[3]), length(algos)), labels=algosShort(algos), xpd=NA, cex=labCex)
 		
-		# y: y-axis labels
-		axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
-		text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
-		text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
+		# # y: y-axis labels
+		# axis(2, at=yTicks, labels=yTicks, tck=-0.03, lwd=0.8)
+		# text(usr[1] + ylabX1 * (usr[2] - usr[1]), y=mean(yTicks), label='\U2190important       unimportant\U2192', srt=90, cex=0.9 * labCex, xpd=NA)
+		# text(usr[1] + ylabX2 * (usr[2] - usr[1]), y=mean(yTicks), label=ylab, srt=90, cex=labCex, xpd=NA)
 
-		# get this for evaluating calibration/discrimination accuracy
-		omniControl <- if (!is.null(controlField)) {
-			evals[evals$algo=='omniscient', controlField]
-		} else {
-			NULL
-		}
+		# # get this for evaluating calibration/discrimination accuracy
+		# omniControl <- if (!is.null(controlField)) {
+			# evals[evals$algo=='omniscient', controlField]
+		# } else {
+			# NULL
+		# }
 		
-		omniTrue <- evals[evals$algo=='omniscient', trueField]
-		omniFalse <- evals[evals$algo=='omniscient', falseField]
+		# omniTrue <- evals[evals$algo=='omniscient', trueField]
+		# omniFalse <- evals[evals$algo=='omniscient', falseField]
 
-		# responses
-		for (countAlgo in seq_along(algos)) {
+		# # responses
+		# for (countAlgo in seq_along(algos)) {
 		
-			algo <- algos[countAlgo]
+			# algo <- algos[countAlgo]
 		
-			# responses
-			sdmControl <- if (!is.null(controlField)) {
-				evals[evals$algo==algo, controlField]
-			} else {
-				NULL
-			}
+			# # responses
+			# sdmControl <- if (!is.null(controlField)) {
+				# evals[evals$algo==algo, controlField]
+			# } else {
+				# NULL
+			# }
 
-			sdmTrue <- evals[evals$algo==algo, trueField]
-			sdmFalse <- evals[evals$algo==algo, falseField]
+			# sdmTrue <- evals[evals$algo==algo, trueField]
+			# sdmFalse <- evals[evals$algo==algo, falseField]
 
-			# colors
-			if (algo == 'omniscient') {
-				thisColControl <- 'white'
-				thisBorderControl <- borderOmniControl
-				thisColTrue <- 'white'
-				thisBorderTrue <- borderTrue
-				thisColFalse <- 'white'
-				thisBorderFalse <- borderFalse
-			} else {
-				thisColControl <- colSdmControl
-				thisBorderControl <- borderSdmControl
-				thisColTrue <- colTrue
-				thisBorderTrue <- borderTrue
-				thisColFalse <- colFalse
-				thisBorderFalse <- borderFalse
-			}
-			if (!is.null(controlField)) rect(sdmControl, at=countAlgo, width=width, col=thisColControl, border=thisBorderControl, lwd=0.8)
+			# # colors
+			# if (algo == 'omniscient') {
+				# thisColControl <- 'white'
+				# thisBorderControl <- borderOmniControl
+				# thisColTrue <- 'white'
+				# thisBorderTrue <- borderTrue
+				# thisColFalse <- 'white'
+				# thisBorderFalse <- borderFalse
+			# } else {
+				# thisColControl <- colSdmControl
+				# thisBorderControl <- borderSdmControl
+				# thisColTrue <- colTrue
+				# thisBorderTrue <- borderTrue
+				# thisColFalse <- colFalse
+				# thisBorderFalse <- borderFalse
+			# }
+			# if (!is.null(controlField)) rect(sdmControl, at=countAlgo, width=width, col=thisColControl, border=thisBorderControl, lwd=0.8)
 			
-			rect(sdmTrue, at=countAlgo - nudge, width=width, col=thisColTrue, border=thisBorderTrue, xpd=NA, lwd=0.8)
-			rect(sdmFalse, at=countAlgo + nudge, width=width, col=thisColFalse, border=thisBorderFalse, xpd=NA, lwd=0.8)
+			# rect(sdmTrue, at=countAlgo - nudge, width=width, col=thisColTrue, border=thisBorderTrue, xpd=NA, lwd=0.8)
+			# rect(sdmFalse, at=countAlgo + nudge, width=width, col=thisColFalse, border=thisBorderFalse, xpd=NA, lwd=0.8)
 			
-			# accuracy notations
-			acc <- character()
+			# # accuracy notations
+			# acc <- character()
 		
-			# discrimination
-			wellDiscrimSdm <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher)
-			if (omniHasFalse) {
-				wellDiscrimOmni <- discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
-				if (wellDiscrimSdm & wellDiscrimOmni) acc <- c(acc, discrimSymbol)
-			} else {
-				if (!is.na(wellDiscrimSdm) && wellDiscrimSdm) acc <- c(acc, discrimSymbol)
-			}
+			# # discrimination
+			# wellDiscrimSdm <- discriminatedTrueFalse(sdmTrue, sdmFalse, expectHigher=expectHigher)
+			# if (omniHasFalse) {
+				# wellDiscrimOmni <- discriminatedTrueFalse(omniTrue, omniFalse, expectHigher=expectHigher)
+				# if (wellDiscrimSdm & wellDiscrimOmni) acc <- c(acc, discrimSymbol)
+			# } else {
+				# if (!is.na(wellDiscrimSdm) && wellDiscrimSdm) acc <- c(acc, discrimSymbol)
+			# }
 			
-			# calibration
-			if (algo != 'omniscient' & omniHasFalse) {
-				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
-				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
-			} else if (algo != 'omniscient' & !omniHasFalse) {
-				wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
-				if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
-			}
+			# # calibration
+			# if (algo != 'omniscient' & omniHasFalse) {
+				# wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+				# if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
+			# } else if (algo != 'omniscient' & !omniHasFalse) {
+				# wellCalib <- calibratedTrueFalse(omniControl=omniControl, omniTrue=omniTrue, omniFalse=omniFalse, sdmControl=sdmControl, sdmTrue=sdmTrue, sdmFalse=sdmFalse, calibTol=calibTol)
+				# if (!is.na(wellCalib) && wellCalib) acc <- c(acc, calibSymbol)
+			# }
 			
-			text(countAlgo , ylim[2] + 0.17 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
+			# text(countAlgo , ylim[2] + 0.17 * diff(ylim), labels=paste(acc, collapse=' '), xpd=NA, cex=1.3 * labCex, pos=1)
 			
-		}
+		# }
 		
-	}
+	# }
 
-	### multivariate: CBI
-	#####################
+	# ### multivariate: CBI
+	# #####################
 	
-	png(paste0(scenarioDir, '/Multivariate CBI.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Multivariate CBI.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('CBI')
-		ylim <- c(-0.5, 1)
-		yTicks <- seq(-0.5, 1, by=0.5)
-		trueField <- 'cbiMulti_permT1'
-		controlField <- 'cbiMulti'
-		falseField <- 'cbiMulti_permF1'
-		rand <- 0
-		omniHasFalse <- TRUE
-		expectHigher <- FALSE
+		# lab <- bquote('')
+		# ylab <- bquote('CBI')
+		# ylim <- c(-0.5, 1)
+		# yTicks <- seq(-0.5, 1, by=0.5)
+		# trueField <- 'cbiMulti_permT1'
+		# controlField <- 'cbiMulti'
+		# falseField <- 'cbiMulti_permF1'
+		# rand <- 0
+		# omniHasFalse <- TRUE
+		# expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### multivariate: AUCpa
-	#######################
+	# ### multivariate: AUCpa
+	# #######################
 	
-	png(paste0(scenarioDir, '/Multivariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Multivariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('AUC'['pa'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'aucPresAbsMulti_permT1'
-		controlField <- 'aucPresAbsMulti'
-		falseField <- 'aucPresAbsMulti_permF1'
-		rand <- 0.5
-		omniHasFalse <- TRUE
-		expectHigher <- FALSE
+		# lab <- bquote('')
+		# ylab <- bquote('AUC'['pa'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'aucPresAbsMulti_permT1'
+		# controlField <- 'aucPresAbsMulti'
+		# falseField <- 'aucPresAbsMulti_permF1'
+		# rand <- 0.5
+		# omniHasFalse <- TRUE
+		# expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### multivariate: AUCbg
-	#######################
+	# ### multivariate: AUCbg
+	# #######################
 	
-	png(paste0(scenarioDir, '/Multivariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Multivariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('AUC'['bg'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'aucPresBgMulti_permT1'
-		controlField <- 'aucPresBgMulti'
-		falseField <- 'aucPresBgMulti_permF1'
-		rand <- 0.5
-		omniHasFalse <- TRUE
-		expectHigher <- FALSE
+		# lab <- bquote('')
+		# ylab <- bquote('AUC'['bg'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'aucPresBgMulti_permT1'
+		# controlField <- 'aucPresBgMulti'
+		# falseField <- 'aucPresBgMulti_permF1'
+		# rand <- 0.5
+		# omniHasFalse <- TRUE
+		# expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### multivariate: CORpa
-	#######################
+	# ### multivariate: CORpa
+	# #######################
 	
-	png(paste0(scenarioDir, '/Multivariate CORpa.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Multivariate CORpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('COR'['pa'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'corPresAbsMulti_permT1'
-		controlField <- NULL
-		falseField <- 'corPresAbsMulti_permF1'
-		rand <- 0
-		expectHigher <- FALSE
+		# lab <- bquote('')
+		# ylab <- bquote('COR'['pa'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'corPresAbsMulti_permT1'
+		# controlField <- NULL
+		# falseField <- 'corPresAbsMulti_permF1'
+		# rand <- 0
+		# expectHigher <- FALSE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### multivariate: CORbg
-	#######################
+	# ### multivariate: CORbg
+	# #######################
 	
-	png(paste0(scenarioDir, '/Multivariate CORbg.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Multivariate CORbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('COR'['bg'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'corPresBgMulti_permT1'
-		controlField <- NULL
-		falseField <- 'corPresBgMulti_permF1'
-		rand <- 0
-		omniHasFalse <- FALSE
-		expectHigher <- FALSE
+		# lab <- bquote('')
+		# ylab <- bquote('COR'['bg'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'corPresBgMulti_permT1'
+		# controlField <- NULL
+		# falseField <- 'corPresBgMulti_permF1'
+		# rand <- 0
+		# omniHasFalse <- FALSE
+		# expectHigher <- FALSE
 		
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### univariate: CBI
-	###################
+	# ### univariate: CBI
+	# ###################
 	
-	png(paste0(scenarioDir, '/Univariate CBI.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Univariate CBI.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('CBI')
-		ylim <- c(-1, 1)
-		yTicks <- seq(-1, 1, by=0.5)
-		trueField <- 'cbiUni_onlyT1'
-		controlField <- 'cbiMulti'
-		falseField <- 'cbiUni_onlyF1'
-		rand <- 0
-		omniHasFalse <- FALSE
-		expectHigher <- TRUE
+		# lab <- bquote('')
+		# ylab <- bquote('CBI')
+		# ylim <- c(-1, 1)
+		# yTicks <- seq(-1, 1, by=0.5)
+		# trueField <- 'cbiUni_onlyT1'
+		# controlField <- 'cbiMulti'
+		# falseField <- 'cbiUni_onlyF1'
+		# rand <- 0
+		# omniHasFalse <- FALSE
+		# expectHigher <- TRUE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Multivar', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Multivar', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### univariate: AUCpa
-	#######################
+	# ### univariate: AUCpa
+	# #######################
 	
-	png(paste0(scenarioDir, '/Univariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Univariate AUCpa.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('AUC'['pa'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'aucPresAbsUni_onlyT1'
-		controlField <- 'aucPresAbsMulti'
-		falseField <- 'aucPresAbsUni_onlyF1'
-		rand <- 0.5
-		omniHasFalse <- FALSE
-		expectHigher <- TRUE
+		# lab <- bquote('')
+		# ylab <- bquote('AUC'['pa'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'aucPresAbsUni_onlyT1'
+		# controlField <- 'aucPresAbsMulti'
+		# falseField <- 'aucPresAbsUni_onlyF1'
+		# rand <- 0.5
+		# omniHasFalse <- FALSE
+		# expectHigher <- TRUE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
-	### univariate: AUCbg
-	#######################
+	# ### univariate: AUCbg
+	# #######################
 	
-	png(paste0(scenarioDir, '/Univariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
+	# png(paste0(scenarioDir, '/Univariate AUCbg.png'), width=figWidth, height=figHeight, res=600)
 		
-		par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
+		# par(oma=oma, mar=mar, mgp=mgp, cex.axis=cex.axis, lwd=lwd)
 		
-		lab <- bquote('')
-		ylab <- bquote('AUC'['bg'])
-		ylim <- c(0, 1)
-		yTicks <- seq(0, 1, by=0.25)
-		trueField <- 'aucPresBgUni_onlyT1'
-		controlField <- 'aucPresBgMulti'
-		falseField <- 'aucPresBgUni_onlyF1'
-		rand <- 0.5
-		omniHasFalse <- FALSE
-		expectHigher <- TRUE
+		# lab <- bquote('')
+		# ylab <- bquote('AUC'['bg'])
+		# ylim <- c(0, 1)
+		# yTicks <- seq(0, 1, by=0.25)
+		# trueField <- 'aucPresBgUni_onlyT1'
+		# controlField <- 'aucPresBgMulti'
+		# falseField <- 'aucPresBgUni_onlyF1'
+		# rand <- 0.5
+		# omniHasFalse <- FALSE
+		# expectHigher <- TRUE
 
-		plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
+		# plotSimpleResp(nudge=nudge, ylim=ylim, ylab=ylab, lab=lab, yTicks=yTicks, rand=rand, trueField=trueField, controlField=controlField, falseField=falseField, controlLab='Unpermuted', omniHasFalse=omniHasFalse, expectHigher=expectHigher)
 		
-		title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
+		# title(sub=date(), outer=TRUE, cex.sub=0.2, line=-0.82)
 		
-	dev.off()
+	# dev.off()
 
 say('###########################')
 say('### [simple] statistics ###')
@@ -1232,7 +1232,7 @@ say('###########################')
 	x <- evals$cbiUni_onlyF1[evals$algo=='brt']
 	say('Number of times univariate BRT converged using just FALSE variable (out of 100): ', successes)
 	successes <- sum(!is.na(x))
-	
+	print(NO)
 say('########################################')
 say('### [sample size] simulation results ###')
 say('########################################')

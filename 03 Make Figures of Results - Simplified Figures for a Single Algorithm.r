@@ -2,7 +2,7 @@
 ### Adam B. Smith | Missouri Botanical Garden | adam.smith@mobot.org
 ### source('C:/Ecology/Drive/Research/ENMs - Predictor Inference/Scripts/03 Make Figures of Results - Simplified Figures for a Single Algorithm.r')
 ###
-### The code in this document is intended to be run after all models have been calibrated and evaluated. It creates one figure per test statistic (AUCpa, AUCbg, CBI, CORpa, or CORbg) per SDM algorithm. Most of the sections run extremely quickly. The code relies on a set of plotting functions which appear at the beginning of the document.
+### The code in this document is intended to be run after all models have been calibrated and evaluated and recreates the figures used in the main body of the manuscript by Smith & Santos. For most experiments, it creates one figure per test statistic (AUCpa, AUCbg, CBI, CORpa, or CORbg) per SDM algorithm (sometimes just one per algorithm or test statistic is generated). Much of the code relies on a set of plotting functions which appear at the beginning of the document.
 
 	memory.limit(memory.limit() * 2^30)
 	rm(list=ls())
@@ -1173,7 +1173,7 @@
 	
 	# # SAC
 	# noises <- c(0, 1/3, 2/3, 1)
-	# noisesRounded <- round(noises, 2)
+	# noisesNeat <- c('0', '1/3', '2/3', '1')
 	
 	# # grain size
 	# grains <- c(2^14, 2^10, 2^6)
@@ -1248,7 +1248,7 @@
 			# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
 			# axis(1, at=xs, labels=NA, tck=-0.01, lwd=lwd, line=-0.45)
 			# text(xs, y=rep(0.4, length(grains)), labels=paste0('1/', grains), xpd=NA, cex=axisCex)
-			# axis(2, at=ys, labels=rev(noisesRounded), tck=-0.015, lwd=lwd, line=-0.03)
+			# axis(2, at=ys, labels=rev(noisesNeat), tck=-0.015, lwd=lwd, line=-0.03)
 			# mtext('Grain size', side=1, cex=0.9 * labCex, line=-0.41)
 			# labelFig('c) Spatial resolution and autocorrelation', adj=c(-0.2, -0.02), cex=0.9 * labCex, xpd=NA)
 			
@@ -1508,305 +1508,305 @@
 			
 		# }
 
-say('####################################')
-say('### [bivariate] niche covariance ###')
-say('####################################')
+# say('####################################')
+# say('### [bivariate] niche covariance ###')
+# say('####################################')
 
-	# generalization
-	scenarioDir <- './Results/bivariate' # scenario directory
-	evalDir <- paste0(scenarioDir, '/evaluations')
-	xCol <- 'rho' # name of x-axis variable column in evaluation data frame
-	decs <- 2 # number of decimals to show in x-axis variable tick mark labels
-	filePrepend <- 'Niche Covariance' # prepended to file name
-	xlab <- bquote('Niche covariance (' * rho * ')') # x-axis label
-	lab <- 'b) Niche covariance'
+	# # generalization
+	# scenarioDir <- './Results/bivariate' # scenario directory
+	# evalDir <- paste0(scenarioDir, '/evaluations')
+	# xCol <- 'rho' # name of x-axis variable column in evaluation data frame
+	# decs <- 2 # number of decimals to show in x-axis variable tick mark labels
+	# filePrepend <- 'Niche Covariance' # prepended to file name
+	# xlab <- bquote('Niche covariance (' * rho * ')') # x-axis label
+	# lab <- 'b) Niche covariance'
 
-	# responses to plot
-	resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
+	# # responses to plot
+	# resps <- c('Multivariate CBI', 'Multivariate AUCpa', 'Multivariate AUCbg', 'Multivariate CORpa', 'Multivariate CORbg')
 	
-	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
-	evals <- evals[evals$rotT2 %==% 90 & evals$sigma1 %==% 0.3 & evals$sigma2 %==% 0.3, ]
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(evalDir, algos=algos, save=TRUE, redo=FALSE)
+	# evals <- evals[evals$rotT2 %==% 90 & evals$sigma1 %==% 0.3 & evals$sigma2 %==% 0.3, ]
 
-	# plot multivariate model results
-	multivariatePlotsTRUEvsTRUE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, filePrepend=filePrepend, lab=lab, xlab=xlab, evals=evals, resps=resps)
+	# # plot multivariate model results
+	# multivariatePlotsTRUEvsTRUE(scenarioDir=scenarioDir, evalDir=evalDir, xCol=xCol, decs=decs, filePrepend=filePrepend, lab=lab, xlab=xlab, evals=evals, resps=resps)
 	
-say('##########################################')
-say('### [niche breadth] simulation results ###')
-say('##########################################')
+# say('##########################################')
+# say('### [niche breadth] simulation results ###')
+# say('##########################################')
 
-	say('Layout:')
-	say('3 columns (niche width in T1) and 3 rows (niche width in T2).')
-	say('Each subpanel is a barplot showing response of OMNI and the SDM.')
+	# say('Layout:')
+	# say('3 columns (niche width in T1) and 3 rows (niche width in T2).')
+	# say('Each subpanel is a barplot showing response of OMNI and the SDM.')
 
-	# generalization
-	scenarioDir <- './Results/bivariate' # scenario directory
+	# # generalization
+	# scenarioDir <- './Results/bivariate' # scenario directory
 
-	# load evaluations and calculate x-axis variable
-	evals <- loadEvals(
-		evalDir=paste0(scenarioDir, '/evaluations'),
-		algos=algos,
-		save=TRUE,
-		redo=FALSE
-	)
+	# # load evaluations and calculate x-axis variable
+	# evals <- loadEvals(
+		# evalDir=paste0(scenarioDir, '/evaluations'),
+		# algos=algos,
+		# save=TRUE,
+		# redo=FALSE
+	# )
 	
-	# niche widths
-	sigmas <- c(1, 3, 5) / 10
+	# # niche widths
+	# sigmas <- c(1, 3, 5) / 10
 	
-	# specify which treatment
-	rho <- 0
-	rotT2 <- 90
+	# # specify which treatment
+	# rho <- 0
+	# rotT2 <- 90
 	
-	# plot settings
-	xSize <- 0.775 # maximum width of subplot containing bars
-	ySize <- 0.875 # maximum height of subplot containing bars
-	width <- 0.17 # width of bars as a proportion of subplot size (real width will be size * width)
-	tick <- 0.05 # length of subplot tick marks
-	lwd <- 0.6 # line width of bars
-	cexAxisLabel <- 0.5
-	cexPanelLabel <- 0.7
-	labCex <- 0.51 # size of algorithm, y-axis, and figure labels	
-	axisCex <- 0.42
+	# # plot settings
+	# xSize <- 0.775 # maximum width of subplot containing bars
+	# ySize <- 0.875 # maximum height of subplot containing bars
+	# width <- 0.17 # width of bars as a proportion of subplot size (real width will be size * width)
+	# tick <- 0.05 # length of subplot tick marks
+	# lwd <- 0.6 # line width of bars
+	# cexAxisLabel <- 0.5
+	# cexPanelLabel <- 0.7
+	# labCex <- 0.51 # size of algorithm, y-axis, and figure labels	
+	# axisCex <- 0.42
 	
-	lineDensity <- NULL
+	# lineDensity <- NULL
 	
-	# function to plots bars as scaled subplots in a larger plot
-	# basically this just rescales the size and position of values and bars and send the information to rect()
-	scaleRespToSubplot <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
+	# # function to plots bars as scaled subplots in a larger plot
+	# # basically this just rescales the size and position of values and bars and send the information to rect()
+	# scaleRespToSubplot <- function(resp, angle, xOffsetInSubplot, col, border, ...) {
 	
-		# resp		values of response (not scaled)
-		# angle		NULL or angle of fill lines
-		# xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
-		# col, border  color for fill and border
-		# ...		other
+		# # resp		values of response (not scaled)
+		# # angle		NULL or angle of fill lines
+		# # xOffsetInSubplot placement along x-axis of subplot, specified as proportion of x-axis length
+		# # col, border  color for fill and border
+		# # ...		other
 	
-		respScaled <- resp * 0.5 * ySize + subplotPosY - 0 * 0.5 * ySize
-		at <- countSigma1 - 0.5 * xSize + xOffsetInSubplot * xSize
-		rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=col, border=border, angle=angle, density=NA, lwd=rectLwd)
+		# # respScaled <- resp * 0.5 * ySize + subplotPosY - 0 * 0.5 * ySize
+		# respScaled <- resp * 1 * ySize + subplotPosY - 1 * 0.5 * ySize
+		# at <- countSigma1 - 0.5 * xSize + xOffsetInSubplot * xSize
+		# rect(x=respScaled, at=at, width=xSize * width, scale=TRUE, col=col, border=border, angle=angle, density=NA, lwd=rectLwd)
 		
-	}
+	# }
 	
-	### plot CBI, AUCpa, AUCbg
-	##########################
+	# ### plot CBI, AUCpa, AUCbg
+	# ##########################
 	
-	respStatistics <- c('CBI', 'AUCpa', 'AUCbg')
-	respControls <- c('cbiMulti', 'aucPresAbsMulti', 'aucPresBgMulti')
-	resps <- c('cbiMulti_perm', 'aucPresAbsMulti_perm', 'aucPresBgMulti_perm')
-	expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
+	# respStatistics <- c('CBI', 'AUCpa', 'AUCbg')
+	# respControls <- c('cbiMulti', 'aucPresAbsMulti', 'aucPresBgMulti')
+	# resps <- c('cbiMulti_perm', 'aucPresAbsMulti_perm', 'aucPresBgMulti_perm')
+	# expectHigher <- FALSE # expect values for FALSE to be higher than TRUE for successful discrimination
 	
-	# y position of guidelines in subplots
-	respRands <- c(0, 0.5, 0.5)
-	respMins <- c(-1, 0, 0)
+	# # y position of guidelines in subplots
+	# respRands <- c(0, 0.5, 0.5)
+	# respMins <- c(-1, 0, 0)
 
-	# by TEST STATISTIC
-	# for (countStat in seq_along(respStatistics)) {
-	for (countStat in 1) {
+	# # by TEST STATISTIC
+	# # for (countStat in seq_along(respStatistics)) {
+	# for (countStat in 1) {
 	
-		respStatistic <- respStatistics[countStat]
-		controlField <- respControls[countStat]
-		resp <- resps[countStat]
+		# respStatistic <- respStatistics[countStat]
+		# controlField <- respControls[countStat]
+		# resp <- resps[countStat]
 	
-		respRand <- respRands[countStat]
-		respMin <- respMins[countStat]
+		# respRand <- respRands[countStat]
+		# respMin <- respMins[countStat]
 		
-		png(paste0(scenarioDir, '/Niche Breadth ', toupper(sdmAlgo), ' ', respStatistic, ' for rho = ', rho, ' and rotT2 = ', rotT2, '.png'), width=1050, height=1000, res=600)
+		# png(paste0(scenarioDir, '/Niche Breadth ', toupper(sdmAlgo), ' ', respStatistic, ' for rho = ', rho, ' and rotT2 = ', rotT2, '.png'), width=1050, height=1000, res=600)
 		
-			par(oma=c(0, 0, 0, 0), mar=c(1, 1.1, 0.4, 0), mgp=c(1, 0, 0), cex.axis=axisCex, tcl=-0.2)
+			# par(oma=c(0, 0, 0, 0), mar=c(1, 1.1, 0.4, 0), mgp=c(1, 0, 0), cex.axis=axisCex, tcl=-0.2)
 
-			algo <- algos[2]
-			algoNice <- algosShort(algo)
+			# algo <- algos[2]
+			# algoNice <- algosShort(algo)
 	
-			ats <- seq_along(sigmas)
-			xlim <- range(ats) + c(-0.5, 0.5)
-			ylim <- range(ats) + c(-0.5, 0.5)
+			# ats <- seq_along(sigmas)
+			# xlim <- range(ats) + c(-0.5, 0.5)
+			# ylim <- range(ats) + c(-0.5, 0.5)
 			
-			xlab <- bquote('Niche breadth in T1 (' * sigma[1] * ')')
-			ylab <- bquote('Niche breadth in T2 (' * sigma[2] * ')')
+			# xlab <- bquote('Niche breadth in T1 (' * sigma[1] * ')')
+			# ylab <- bquote('Niche breadth in T2 (' * sigma[2] * ')')
 			
-			plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
-			axis(1, at=ats, labels=NA, tck=-0.015, lwd=lwd, line=-0.18)
-			text(ats, y=rep(0.3, length(sigmas)), labels=sigmas, xpd=NA, cex=axisCex)
-			axis(2, at=ats, labels=sigmas, tck=-0.015, lwd=lwd, line=-0.03)
-			mtext(xlab, side=1, cex=labCex, line=0.18)
-			mtext(ylab, side=2, cex=labCex, line=0.4)
-			labelFig('a) Niche breadth', adj=c(-0.2, 0.02), cex=labCex, xpd=NA)
+			# plot(0, type='n', axes=FALSE, ann=FALSE, xlim=xlim, ylim=ylim, col=NA)
+			# axis(1, at=ats, labels=NA, tck=-0.015, lwd=lwd, line=-0.18)
+			# text(ats, y=rep(0.3, length(sigmas)), labels=sigmas, xpd=NA, cex=axisCex)
+			# axis(2, at=ats, labels=sigmas, tck=-0.015, lwd=lwd, line=-0.03)
+			# mtext(xlab, side=1, cex=labCex, line=0.18)
+			# mtext(ylab, side=2, cex=labCex, line=0.4)
+			# labelFig('a) Niche breadth', adj=c(-0.2, 0.02), cex=labCex, xpd=NA)
 			
-			# by sigma2 (rows)
-			for (countSigma2 in seq_along(sigmas)) {
+			# # by sigma2 (rows)
+			# for (countSigma2 in seq_along(sigmas)) {
 		
-				sigma2 <- sigmas[countSigma2]
-				subplotPosY <- countSigma2 # y-axis position of subplot
+				# sigma2 <- sigmas[countSigma2]
+				# subplotPosY <- countSigma2 # y-axis position of subplot
 		
-				# by sigma1 (columns)
-				for (countSigma1 in seq_along(sigmas)) {
+				# # by sigma1 (columns)
+				# for (countSigma1 in seq_along(sigmas)) {
 				
-					sigma1 <- sigmas[countSigma1]
+					# sigma1 <- sigmas[countSigma1]
 
-					# get response data: standard (as simulated)
-					if (sigma1 >= sigma2) {
+					# # get response data: standard (as simulated)
+					# if (sigma1 >= sigma2) {
 
-						omniControl <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						omniT1 <- evals$cbiMulti_permT1[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						omniT2 <- evals$cbiMulti_permT2[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniControl <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniT1 <- evals$cbiMulti_permT1[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniT2 <- evals$cbiMulti_permT2[evals$algo == 'omniscient' & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
 
-						sdmControl <- evals$cbiMulti[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						sdmT1 <- evals$cbiMulti_permT1[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						sdmT2 <- evals$cbiMulti_permT2[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmControl <- evals$cbiMulti[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmT1 <- evals$cbiMulti_permT1[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmT2 <- evals$cbiMulti_permT2[evals$algo == algo & evals$sigma1 %==% sigma1 & evals$sigma2 %==% sigma2 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
 
-					# get response data: flipping T1 and T2 since symmetrical
-					} else if (sigma1 < sigma2) {
+					# # get response data: flipping T1 and T2 since symmetrical
+					# } else if (sigma1 < sigma2) {
 
-						omniControl <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						omniT1 <- evals$cbiMulti_permT2[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						omniT2 <- evals$cbiMulti_permT1[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniControl <- evals$cbiMulti[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniT1 <- evals$cbiMulti_permT2[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# omniT2 <- evals$cbiMulti_permT1[evals$algo == 'omniscient' & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
 						
-						sdmControl <- evals$cbiMulti[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						sdmT1 <- evals$cbiMulti_permT2[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
-						sdmT2 <- evals$cbiMulti_permT1[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmControl <- evals$cbiMulti[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmT1 <- evals$cbiMulti_permT2[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
+						# sdmT2 <- evals$cbiMulti_permT1[evals$algo == algo & evals$sigma1 %==% sigma2 & evals$sigma2 %==% sigma1 & evals$rho  %==% rho & evals$rotT2 %==% rotT2]
 
-					}
+					# }
 
-					# calculate and assign variables for lower/upper limits and median
-					whats <- c('Inner', 'Median', 'Outer')
-					for (modelType in c('sdm', 'omni')) {
-						for (variable in c('Control', 'T1', 'T2')) {
+					# # calculate and assign variables for lower/upper limits and median
+					# whats <- c('Inner', 'Median', 'Outer')
+					# for (modelType in c('sdm', 'omni')) {
+						# for (variable in c('Control', 'T1', 'T2')) {
 							
-							thisVar <- paste0(modelType, variable)
-							x <- get(thisVar)
-							quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
+							# thisVar <- paste0(modelType, variable)
+							# x <- get(thisVar)
+							# quants <- quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)
 
-							for (countWhat in seq_along(whats)) {
+							# for (countWhat in seq_along(whats)) {
 						
-								what <- whats[countWhat]
-								assign(paste0(thisVar, what), quants[countWhat])
+								# what <- whats[countWhat]
+								# assign(paste0(thisVar, what), quants[countWhat])
 								
-							}
-						}
-					}
+							# }
+						# }
+					# }
 
-					# s <- 0.8 # line density scalar for angled fills
+					# # s <- 0.8 # line density scalar for angled fills
 					
-					# subplot y-axis
-					lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize), c(subplotPosY - 0.5 * ySize, subplotPosY + 0.5 * ySize), lwd=lwd)
+					# # subplot y-axis
+					# lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize), c(subplotPosY - 0.5 * ySize, subplotPosY + 0.5 * ySize), lwd=lwd)
 					
-					# subplot y-axis tick lines and labels
-					lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY + 0.5 * ySize, subplotPosY + 0.5 * ySize), lwd=lwd)
-					lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY, subplotPosY), lwd=lwd)
-					lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY - 0.5 * ySize, subplotPosY - 0.5 * ySize), lwd=lwd)
+					# # subplot y-axis tick lines and labels
+					# lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY + 0.5 * ySize, subplotPosY + 0.5 * ySize), lwd=lwd)
+					# lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY, subplotPosY), lwd=lwd)
+					# lines(c(countSigma1 - 0.5 * xSize, countSigma1 - 0.5 * xSize - tick * xSize), c(subplotPosY - 0.5 * ySize, subplotPosY - 0.5 * ySize), lwd=lwd)
 					
-					# subplot y-axis labels
-					cex <- 0.3
-					offset <- 2.5
-					if (countSigma1 == 1) {
+					# # subplot y-axis labels
+					# cex <- 0.3
+					# offset <- 2.5
+					# if (countSigma1 == 1) {
 
-						text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
-						text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY, labels=respRand, cex=cex, xpd=NA)
-						text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY - 0.5 * ySize, labels=respMin, cex=cex, xpd=NA)
+						# text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY + 0.5 * ySize, labels=1, cex=cex, xpd=NA)
+						# text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY, labels=respRand, cex=cex, xpd=NA)
+						# text(countSigma1 - 0.5 * xSize - offset * tick * xSize, subplotPosY - 0.5 * ySize, labels=respMin, cex=cex, xpd=NA)
 						
-					}
+					# }
 					
-					# gray background
-					offsetInSubplot <- 0.1
-					rand <- 0
-					left <- countSigma1 - 0.54 * xSize + offsetInSubplot * xSize
-					right <- countSigma1 + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
-					bottom <- subplotPosY - 0.5 * ySize
-					top <- subplotPosY + 0.5 * ySize
-					polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
-					lines(c(left, right), c(subplotPosY, subplotPosY), lwd=1.5 * lwd, col='white')
+					# # gray background
+					# offsetInSubplot <- 0.1
+					# rand <- 0
+					# left <- countSigma1 - 0.54 * xSize + offsetInSubplot * xSize
+					# right <- countSigma1 + 0.5 * xSize + 1.75 * offsetInSubplot * xSize
+					# bottom <- subplotPosY - 0.5 * ySize
+					# top <- subplotPosY + 0.5 * ySize
+					# polygon(x=c(left, right, right, left), y=c(bottom, bottom, top, top), col=panelBgCol, border=NA, xpd=NA)
+					# lines(c(left, right), c(subplotPosY, subplotPosY), lwd=1.5 * lwd, col='white')
 
-					# y <- subplotPosY + 0.25 * ySize
-					# lines(c(left, right), c(y, y), lwd=1 * lwd, col='white')
+					# # y <- subplotPosY + 0.25 * ySize
+					# # lines(c(left, right), c(y, y), lwd=1 * lwd, col='white')
 
-					# y <- subplotPosY - 0.25 * ySize
-					# lines(c(left, right), c(y, y), lwd=1 * lwd, col='white')
+					# # y <- subplotPosY - 0.25 * ySize
+					# # lines(c(left, right), c(y, y), lwd=1 * lwd, col='white')
 
-					# OMNI control (unpermuted)
-					scaleRespToSubplot(
-						resp=omniControl,
-						angle=NULL,
-						xOffsetInSubplot=0.2,
-						col=colOmniControl,
-						border=borderOmniControl
-					)
+					# # OMNI control (unpermuted)
+					# scaleRespToSubplot(
+						# resp=omniControl,
+						# angle=NULL,
+						# xOffsetInSubplot=0.2,
+						# col=colOmniControl,
+						# border=borderOmniControl
+					# )
 					
-					# SDM control (unpermuted)
-					scaleRespToSubplot(
-						resp=sdmControl,
-						angle=NULL,
-						xOffsetInSubplot=0.35,
-						col=colSdmControl,
-						border=borderSdmControl
-					)
+					# # SDM control (unpermuted)
+					# scaleRespToSubplot(
+						# resp=sdmControl,
+						# angle=NULL,
+						# xOffsetInSubplot=0.35,
+						# col=colSdmControl,
+						# border=borderSdmControl
+					# )
 					
-					# OMNI permuted T1
-					scaleRespToSubplot(
-						resp=omniT1,
-						angle=NULL,
-						xOffsetInSubplot=0.55,
-						col='white',
-						border=borderOmniT1
-					)
+					# # OMNI permuted T1
+					# scaleRespToSubplot(
+						# resp=omniT1,
+						# angle=NULL,
+						# xOffsetInSubplot=0.55,
+						# col='white',
+						# border=borderOmniT1
+					# )
 
-					# SDM permuted T1
-					scaleRespToSubplot(
-						resp=sdmT1,
-						angle=NULL,
-						xOffsetInSubplot=0.7,
-						col=colSdmT1,
-						border=borderSdmT1
-					)
+					# # SDM permuted T1
+					# scaleRespToSubplot(
+						# resp=sdmT1,
+						# angle=NULL,
+						# xOffsetInSubplot=0.7,
+						# col=colSdmT1,
+						# border=borderSdmT1
+					# )
 					
-					# OMNI permuted T2
-					scaleRespToSubplot(
-						resp=omniT2,
-						angle=NULL,
-						xOffsetInSubplot=0.9,
-						col='white',
-						border=borderOmniT2
-					)
+					# # OMNI permuted T2
+					# scaleRespToSubplot(
+						# resp=omniT2,
+						# angle=NULL,
+						# xOffsetInSubplot=0.9,
+						# col='white',
+						# border=borderOmniT2
+					# )
 
-					# SDM permuted T2
-					scaleRespToSubplot(
-						resp=sdmT2,
-						angle=NULL,
-						xOffsetInSubplot=1.05,
-						col=colSdmT2,
-						border=borderSdmT2
-					)
+					# # SDM permuted T2
+					# scaleRespToSubplot(
+						# resp=sdmT2,
+						# angle=NULL,
+						# xOffsetInSubplot=1.05,
+						# col=colSdmT2,
+						# border=borderSdmT2
+					# )
 					
 
-					## accuracy indicators
-					sdmT1Nas <- sum(!is.na(sdmT1))
-					sdmT2Nas <- sum(!is.na(sdmT2))
-					if (sdmT1Nas > 1 & sdmT2Nas > 1) {
+					# ## accuracy indicators
+					# sdmT1Nas <- sum(!is.na(sdmT1))
+					# sdmT2Nas <- sum(!is.na(sdmT2))
+					# if (sdmT1Nas > 1 & sdmT2Nas > 1) {
 			
-						acc <- character()
+						# acc <- character()
 			
-						# discrimination
-						wellDiscrim <- discriminatedBivariate(omniT1, omniT2) & discriminatedBivariate(sdmT1, sdmT2)
-						if (wellDiscrim) acc <- c(acc, discrimSymbol)
+						# # discrimination
+						# wellDiscrim <- discriminatedBivariate(omniT1, omniT2) & discriminatedBivariate(sdmT1, sdmT2)
+						# if (wellDiscrim) acc <- c(acc, discrimSymbol)
 	
-						# calibration
-						wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
-						if (wellCalib) acc <- c(acc, calibSymbol)
+						# # calibration
+						# wellCalib <- calibratedBivariate(omniControl=omniControl, omniT1=omniT1, omniT2=omniT2, sdmControl=sdmControl, sdmT1=sdmT1, sdmT2=sdmT2, calibTol=calibTol)
+						# if (wellCalib) acc <- c(acc, calibSymbol)
 						
-						x <- countSigma1 + 0.85 * xSize
-						y <- bottom + 0.1 * ySize
-						text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.5 * labCex, pos=2)
+						# x <- countSigma1 + 0.14 * xSize
+						# y <- bottom + 0.1 * ySize
+						# text(x, y, labels=paste(acc, collapse=''), xpd=NA, cex=1.5 * labCex, pos=2)
 						
-					}
+					# }
 						
-				} # next sigma1
+				# } # next sigma1
 
-			} # next sigma2
+			# } # next sigma2
 
-			title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
+			# title(sub=date(), cex.sub=0.4, outer=TRUE, line=3)
 		
-		dev.off()
+		# dev.off()
 
-	} # next test statistic
-		
+	# } # next test statistic
 		
 #################################
 say('DONE!!!', level=1, deco='&')
