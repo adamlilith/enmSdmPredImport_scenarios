@@ -6,7 +6,7 @@ To run these scripts, you will need to have installed the following packages:
 
 Creating scenarios and running models: `sp`, `raster`, `gbm`, `dismo`, and `rJava`.
 
-To install from GitHub:
+To install from GitHub:  
 `remotes::install_github('adamlilith/omnibus')`  
 `remotes::install_github('adamlilith/statisfactory')`  
 `remotes::install_github('adamlilith/legendary')`  
