@@ -13,7 +13,9 @@ To install from GitHub:
 `remotes::install_github('adamlilith/enmSdm')`  
 `remotes::install_github('adamlilith/enmSdmPredImport')` 
 
-The analysis in the publication used Maxent version 3.3.3k. To recreate the output with fidelity (except for random seeds), you will need to copy a java file into the "java" directory of the library of your `dismo` installation.  Version 3.3.3k seems not to be available, but can be obtained by contacting Adam Smith (adam DOT smith AT mobot DOT org). You can also use the newer version available from download https://biodiversityinformatics.amnh.org/open_source/maxent/.
+Note that if you have issues installing any of the latter packages (e.g., because of using an earlier/later version of R), you can download the ZIP file of the package from the `zipTarFiles` directory in each of these packages. You can then install manually in R from this file.
+
+The analysis in the publication used Maxent version 3.3.3k. To recreate the output with fidelity (except for random seeds), you will need to copy a Java file into the "java" directory of the library of your `dismo` installation.  Version 3.3.3k seems not to be available, but can be obtained by contacting Adam Smith (adam DOT smith AT mobot DOT org). You can also use the newer version available from download https://biodiversityinformatics.amnh.org/open_source/maxent/.
 
 Additional packages needed for creating figures: `RColorBrewer`,  `plotrix`, `fpCompare`, and `scales`.
 
