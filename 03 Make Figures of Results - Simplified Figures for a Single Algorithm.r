@@ -602,11 +602,11 @@
 
 				leg <- c(
 					'OMNI unpermuted',
-					paste0('OMNI TRUE permuted'),
-					paste0('OMNI FALSE permuted'),
+					paste0('OMNI T1 permuted'),
+					paste0('OMNI T2 permuted'),
 					paste0(algosShort(algo), ' unpermuted'),
-					paste0(algosShort(algo), ' TRUE permuted'),
-					paste0(algosShort(algo), ' FALSE permuted')
+					paste0(algosShort(algo), ' T1 permuted'),
+					paste0(algosShort(algo), ' T2 permuted')
 				)
 			
 				par(lwd=0.5)
@@ -623,10 +623,10 @@
 			
 				# legend
 				leg <- c(
-					paste0('OMNI TRUE permuted'),
-					paste0('OMNI FALSE permuted'),
-					paste0(algosShort(algo), ' TRUE permuted'),
-					paste0(algosShort(algo), ' FALSE permuted')
+					paste0('OMNI T1 permuted'),
+					paste0('OMNI T2 permuted'),
+					paste0(algosShort(algo), ' T1 permuted'),
+					paste0(algosShort(algo), ' T2 permuted')
 				)
 			
 				par(lwd=0.5)

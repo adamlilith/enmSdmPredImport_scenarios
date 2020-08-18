@@ -718,6 +718,9 @@
 	### This function takes as arguments a set of results from treatment models (ie, model predictions with predictors permuted) and possibly control models (predictions with data as-observed). It tests if the SDM's range and median values are different from the OMNI models' range and median by a given tolerance. Output is logical (TRUE if well-calibrated, FALSE if not).
 	### For a given response range to be considered well-calibrated, it must be within +- 100 * calibTol% of the range of the OMNI model's range (eg if calibTol = 0.1 it must be within +- 10% of the OMNI models' range)
 	### For a given response's median to be considered well-calibrated, it must be within the innermost +-100 * calibTol% quantile (eg, if calibTol = 0.1, it must be within the 40th and 60th quantiles)
+	
+	### Post publication note (Smith & Santos Ecography): A better test would also look at the min/max values. This test only examines the range and median.
+	
 	calibratedTrueFalse <- function(
 		omniControl,		# all response values for OMNI control model (NULL if none)
 		omniTrue,			# all response values for OMNI with TRUE treatment
