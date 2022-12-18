@@ -1,5 +1,9 @@
 # enmSdmPredImport_scenarios
 
+<!-- badges: start -->
+[![DOI](https://img.shields.io/badge/Ecography_Open_Access-10.1111%ecog.05317-green)](https://doi.org/10.1111/ecog.05317)
+<!-- badges: end -->
+
 The scripts in this repository recreate all of the analyses of Smith, A.B. and Santos, M.J. 2020. Testing the ability of species distribution models to infer variable importance. *Ecography* 43:1801-1813.
 
 To run these scripts, you will need to have installed the following packages to create scenarios, and run and evaluate models: `sp`, `raster`, `gbm`, `dismo`, and `rJava`.
